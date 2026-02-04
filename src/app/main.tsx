@@ -4,7 +4,7 @@ import '@react-sigma/core/lib/style.css';
 import '@/styles/tailwind.css';
 import App from '@/app/App';
 
-const resolveMode = () => process.env.NODE_ENV ?? 'production';
+const resolveMode = () => import.meta.env.MODE ?? 'production';
 
 export async function enableMocking(isDev: boolean) {
   if (isDev) {
