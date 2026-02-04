@@ -49,4 +49,10 @@ export default [
       'prettier/prettier': 'error',
     },
   },
+  {
+    files: ['**/*.d.ts'],
+    rules: {
+      'no-unused-vars': 'off',
+    },
+  },
 ];
