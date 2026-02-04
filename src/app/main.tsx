@@ -4,7 +4,16 @@ import '@react-sigma/core/lib/style.css';
 import '@/styles/tailwind.css';
 import App from '@/app/App';
 
-const resolveMode = () => import.meta.env.MODE ?? 'production';
+const resolveMode = () => {
+  const metaEnv = typeof import.meta !== 'undefined' ? import.meta.env?.MODE : undefined;
+  if (metaEnv) {
+    return metaEnv;
+  }
+
+  const nodeEnv = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env
+    ?.NODE_ENV;
+  return nodeEnv ?? 'production';
+};
 
 export async function enableMocking(isDev: boolean) {
   if (isDev) {
