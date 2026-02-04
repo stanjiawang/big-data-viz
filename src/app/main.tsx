@@ -5,9 +5,8 @@ import '@/styles/tailwind.css';
 import App from '@/app/App';
 
 const resolveMode = () => {
-  const metaEnv = typeof import.meta !== 'undefined' ? import.meta.env?.MODE : undefined;
-  if (metaEnv) {
-    return metaEnv;
+  if (typeof __APP_MODE__ !== 'undefined') {
+    return __APP_MODE__;
   }
 
   const nodeEnv = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env

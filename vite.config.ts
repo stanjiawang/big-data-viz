@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
-export default defineConfig(() => ({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     checker({
@@ -17,5 +17,8 @@ export default defineConfig(() => ({
     alias: {
       '@': path.resolve(rootDir, './src'),
     },
+  },
+  define: {
+    __APP_MODE__: JSON.stringify(mode),
   },
 }));
