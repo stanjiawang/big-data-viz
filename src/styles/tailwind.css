@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+
+@reference "tailwindcss/utilities";
+
+:root {
+  color-scheme: light;
+}
+
+@layer base {
+  :focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2 ring-offset-white;
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    @apply cursor-not-allowed opacity-70;
+  }
+}
+
+body {
+  @apply bg-slate-50 text-slate-900;
+}
