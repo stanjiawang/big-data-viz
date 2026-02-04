@@ -4,14 +4,14 @@ import type { GraphResponse } from '@/lib/types';
 import { RelationshipGraph } from '@/features/graph/RelationshipGraph';
 
 const gotoNodeMock = jest.fn();
-let registeredEvents: Record<string, (event: any) => void> | null = null;
+let registeredEvents: Record<string, (_event: any) => void> | null = null;
 
 jest.mock('@react-sigma/core', () => {
   return {
     SigmaContainer: ({ children }: { children?: React.ReactNode }) => (
       <div data-testid="sigma-container">{children}</div>
     ),
-    useRegisterEvents: () => (events: Record<string, (event: any) => void>) => {
+    useRegisterEvents: () => (events: Record<string, (_event: any) => void>) => {
       registeredEvents = events;
     },
     useSetSettings: () => () => {},
