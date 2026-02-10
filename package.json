@@ -17,7 +17,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check:env": "node scripts/check-env.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

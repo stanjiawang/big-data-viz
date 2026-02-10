@@ -21,6 +21,10 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Validate environment
+        env:
+          VITE_ENABLE_MSW: true
+        run: pnpm run check:env
       - name: Lint
         run: pnpm run lint
       - name: Typecheck

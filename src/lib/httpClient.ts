@@ -5,6 +5,7 @@ type HttpRequestOptions = {
   timeoutMs?: number;
   retryCount?: number;
   signal?: AbortSignal;
+  requestId?: string;
 };
 
 type RequestRetryState = {
@@ -63,11 +64,20 @@ function createTimeoutSignal(timeoutMs: number, externalSignal?: AbortSignal) {
   };
 }
 
+function generateRequestId() {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `req-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 export async function fetchJson<T>(path: string, options: HttpRequestOptions = {}): Promise<T> {
   const config = getRuntimeConfig();
   const timeoutMs = options.timeoutMs ?? config.apiTimeoutMs;
   const retryCount = options.retryCount ?? config.apiRetryCount;
   const url = buildUrl(path, config.apiBaseUrl);
+  const requestId = options.requestId ?? generateRequestId();
   const retryState: RequestRetryState = { attempts: 0 };
 
   while (retryState.attempts <= retryCount) {
@@ -81,6 +91,7 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
         signal,
         headers: {
           Accept: 'application/json',
+          'X-Request-Id': requestId,
         },
       });
 
