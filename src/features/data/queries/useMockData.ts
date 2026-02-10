@@ -23,6 +23,7 @@ export function useMockData(params: UseMockDataParams): UseQueryResult<DataChunk
       offset: params.offset,
       limit: params.limit,
       total: params.total,
+      vectorSize: params.vectorSize,
       filters: params.filters,
     }),
     queryFn: () =>
@@ -45,6 +46,7 @@ export function useMockDataSuspense(
       offset: params.offset,
       limit: params.limit,
       total: params.total,
+      vectorSize: params.vectorSize,
       filters: params.filters,
     }),
     queryFn: () =>

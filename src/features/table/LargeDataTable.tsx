@@ -8,6 +8,7 @@ import { queryKeys } from '@/features/data/queries/queryKeys';
 import { useMockData } from '@/features/data/queries/useMockData';
 
 const PAGE_SIZE = 200;
+const VECTOR_SIZE = 128;
 const DEFAULT_ROW_HEIGHT = 44;
 const COMPACT_ROW_HEIGHT = 34;
 const DEFAULT_COL_WIDTHS = [160, 200, 140, 140];
@@ -72,7 +73,7 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
     total,
     offset: 0,
     limit: PAGE_SIZE,
-    vectorSize: 128,
+    vectorSize: VECTOR_SIZE,
     filters,
   });
 
@@ -94,6 +95,7 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
           offset,
           limit: PAGE_SIZE,
           total,
+          vectorSize: VECTOR_SIZE,
           filters,
         }),
       );
@@ -116,6 +118,7 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
         offset,
         limit: PAGE_SIZE,
         total,
+        vectorSize: VECTOR_SIZE,
         filters,
       });
       if (!queryClient.getQueryData(key)) {
@@ -126,7 +129,7 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
               total,
               offset,
               limit: PAGE_SIZE,
-              vectorSize: 128,
+              vectorSize: VECTOR_SIZE,
               filters,
             }),
         });

@@ -60,14 +60,14 @@ MSW can be enabled in development via `VITE_ENABLE_MSW=true`.
 
 Query params:
 
-- `size`: `100k | 1m | 10m`
+- `size`: `100000 | 1000000 | 10000000 | 50000000`
 - `label`: `all | class-A | class-B | ...`
 - `source`: `all | user | sensor | system | synthetic`
 
 Example:
 
 ```
-http://localhost:5173/?size=1m&label=all&source=all
+http://localhost:5173/?size=1000000&label=all&source=all
 ```
 
 ## Project Structure

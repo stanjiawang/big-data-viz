@@ -66,7 +66,7 @@ describe('LargeDataTable', () => {
     });
 
     queryClient.setQueryData(
-      queryKeys.mockData({ offset: 0, limit: 200, total: 2, filters }),
+      queryKeys.mockData({ offset: 0, limit: 200, total: 2, vectorSize: 128, filters }),
       chunk,
     );
 

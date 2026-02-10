@@ -10,7 +10,7 @@
 - Visualization: ECharts, deck.gl
 - Perf: TanStack React Virtual for large lists/tables
 - Quality: ESLint (flat config), Prettier, Stylelint, Husky + lint-staged
-- Test: Vitest + Testing Library
+- Test: Jest + Testing Library
 - E2E: Playwright
 
 ## General Principles
@@ -72,7 +72,7 @@
 
 ## Testing Standards
 
-- Unit/integration: Vitest + Testing Library
+- Unit/integration: Jest + Testing Library
   - Test behavior, not implementation.
   - Prefer `screen.*` queries, role-based queries, and user flows (`userEvent`).
   - Use MSW for API-dependent components.

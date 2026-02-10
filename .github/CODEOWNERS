@@ -1,0 +1,15 @@
+# Global owners
+* @your-org/frontend-platform
+
+# Core app
+/src/app/ @your-org/frontend-platform
+/src/lib/ @your-org/frontend-platform
+/src/config/ @your-org/frontend-platform
+
+# Data/visualization features
+/src/features/ @your-org/data-viz
+
+# Tooling and CI
+/.github/ @your-org/devex
+/package.json @your-org/devex
+/pnpm-lock.yaml @your-org/devex
