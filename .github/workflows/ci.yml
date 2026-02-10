@@ -7,6 +7,14 @@ on:
     branches: [main]
 
 jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependency review
+        uses: actions/dependency-review-action@v4
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -32,7 +40,7 @@ jobs:
       - name: Stylelint
         run: pnpm run stylelint
       - name: Unit tests
-        run: pnpm test
+        run: pnpm run test:coverage
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
       - name: E2E tests
