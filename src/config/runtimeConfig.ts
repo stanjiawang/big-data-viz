@@ -20,8 +20,17 @@ function resolveMode() {
   return nodeEnv ?? 'production';
 }
 
-function parseNumber(value: string | number | undefined, fallback: number) {
-  if (value === undefined) {
+function parseTimeoutMs(value: string | number | undefined, fallback: number) {
+  if (value === undefined || value === '') {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parseRetryCount(value: string | number | undefined, fallback: number) {
+  if (value === undefined || value === '') {
     return fallback;
   }
 
@@ -30,7 +39,7 @@ function parseNumber(value: string | number | undefined, fallback: number) {
 }
 
 function parseBoolean(value: string | boolean | undefined, fallback: boolean) {
-  if (value === undefined) {
+  if (value === undefined || value === '') {
     return fallback;
   }
 
@@ -64,12 +73,12 @@ export function getRuntimeConfig(): RuntimeConfig {
     typeof __APP_API_BASE_URL__ !== 'undefined' ? __APP_API_BASE_URL__ : undefined,
   );
 
-  const apiTimeoutMs = parseNumber(
+  const apiTimeoutMs = parseTimeoutMs(
     typeof __APP_API_TIMEOUT_MS__ !== 'undefined' ? __APP_API_TIMEOUT_MS__ : undefined,
     DEFAULT_TIMEOUT_MS,
   );
 
-  const apiRetryCount = parseNumber(
+  const apiRetryCount = parseRetryCount(
     typeof __APP_API_RETRY_COUNT__ !== 'undefined' ? __APP_API_RETRY_COUNT__ : undefined,
     DEFAULT_RETRY_COUNT,
   );

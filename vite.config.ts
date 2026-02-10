@@ -6,6 +6,10 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
+function defineLiteral(value: string | undefined) {
+  return value === undefined ? 'undefined' : JSON.stringify(value);
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
 
@@ -23,10 +27,10 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       __APP_MODE__: JSON.stringify(mode),
-      __APP_API_BASE_URL__: JSON.stringify(env.VITE_API_BASE_URL ?? ''),
-      __APP_API_TIMEOUT_MS__: JSON.stringify(env.VITE_API_TIMEOUT_MS ?? ''),
-      __APP_API_RETRY_COUNT__: JSON.stringify(env.VITE_API_RETRY_COUNT ?? ''),
-      __APP_ENABLE_MSW__: JSON.stringify(env.VITE_ENABLE_MSW ?? ''),
+      __APP_API_BASE_URL__: defineLiteral(env.VITE_API_BASE_URL),
+      __APP_API_TIMEOUT_MS__: defineLiteral(env.VITE_API_TIMEOUT_MS),
+      __APP_API_RETRY_COUNT__: defineLiteral(env.VITE_API_RETRY_COUNT),
+      __APP_ENABLE_MSW__: defineLiteral(env.VITE_ENABLE_MSW),
     },
   };
 });
