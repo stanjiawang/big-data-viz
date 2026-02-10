@@ -1,18 +1,26 @@
 import { getGraph, getMockData, getTimeSeries } from '@/lib/apiClient';
+import { ApiError } from '@/lib/errors';
 
 describe('apiClient', () => {
   const fetchMock = jest.fn();
 
   beforeEach(() => {
     fetchMock.mockReset();
-    // @ts-expect-error - mock fetch in test env
-    global.fetch = fetchMock;
+    Object.defineProperty(globalThis, 'fetch', {
+      value: fetchMock,
+      writable: true,
+    });
   });
 
   it('builds mock data query params', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
-      json: async () => ({ total: 0, offset: 0, limit: 0, records: [] }),
+      json: async () => ({
+        total: 0,
+        offset: 0,
+        limit: 0,
+        records: [],
+      }),
     });
 
     await getMockData({
@@ -53,5 +61,20 @@ describe('apiClient', () => {
 
     await getGraph();
     expect(fetchMock.mock.calls[0][0]).toBe('/api/graph');
+  });
+
+  it('throws parse error when response schema is invalid', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ total: 'wrong-type', records: [] }),
+    });
+
+    try {
+      await getMockData();
+      throw new Error('Expected getMockData to fail for invalid schema');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).code).toBe('PARSE_ERROR');
+    }
   });
 });

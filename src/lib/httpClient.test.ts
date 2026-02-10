@@ -1,0 +1,60 @@
+import { fetchJson } from '@/lib/httpClient';
+import { ApiError } from '@/lib/errors';
+
+describe('httpClient', () => {
+  const fetchMock = jest.fn();
+
+  beforeEach(() => {
+    fetchMock.mockReset();
+    Object.defineProperty(globalThis, 'fetch', {
+      value: fetchMock,
+      writable: true,
+    });
+  });
+
+  it('returns parsed JSON on success', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true }),
+    });
+
+    await expect(fetchJson<{ ok: boolean }>('/api/test')).resolves.toEqual({ ok: true });
+  });
+
+  it('throws ApiError for non-2xx responses', async () => {
+    fetchMock.mockResolvedValue({
+      ok: false,
+      status: 503,
+      json: async () => ({}),
+    });
+
+    await expect(fetchJson('/api/test', { retryCount: 0 })).rejects.toMatchObject({
+      name: 'ApiError',
+      code: 'HTTP_ERROR',
+      status: 503,
+    });
+  });
+
+  it('retries once for server errors when retryCount is set', async () => {
+    fetchMock
+      .mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({}) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true }) });
+
+    const result = await fetchJson<{ ok: boolean }>('/api/test', { retryCount: 1 });
+
+    expect(result.ok).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('wraps network failures as ApiError', async () => {
+    fetchMock.mockRejectedValue(new Error('socket closed'));
+
+    try {
+      await fetchJson('/api/test', { retryCount: 0 });
+      throw new Error('Expected fetchJson to fail');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).code).toBe('NETWORK_ERROR');
+    }
+  });
+});

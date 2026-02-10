@@ -1,3 +1,7 @@
+import type { ZodType } from 'zod';
+import { ApiError } from '@/lib/errors';
+import { fetchJson } from '@/lib/httpClient';
+import { dataChunkSchema, graphResponseSchema, timeSeriesResponseSchema } from '@/lib/schemas';
 import type { DataChunk, GraphResponse, MockFilters, TimeSeriesResponse } from '@/lib/types';
 
 type ChunkParams = {
@@ -12,15 +16,22 @@ type TimeSeriesParams = {
   metric?: string;
 };
 
-async function fetchJson<T>(input: RequestInfo, init?: RequestInit) {
-  const response = await fetch(input, init);
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
+function validateResponse<T>(payload: unknown, schema: ZodType<T>, url: string): T {
+  const result = schema.safeParse(payload);
+
+  if (!result.success) {
+    throw new ApiError({
+      message: 'API response does not match expected schema',
+      code: 'PARSE_ERROR',
+      url,
+      cause: result.error,
+    });
   }
-  return (await response.json()) as T;
+
+  return result.data;
 }
 
-export function getMockData(params: ChunkParams = {}) {
+export async function getMockData(params: ChunkParams = {}): Promise<DataChunk> {
   const search = new URLSearchParams({
     total: String(params.total ?? 1_000_000),
     offset: String(params.offset ?? 0),
@@ -52,16 +63,23 @@ export function getMockData(params: ChunkParams = {}) {
     search.set('weightMax', String(params.filters.weightMax));
   }
 
-  return fetchJson<DataChunk>(`/api/mock-data?${search.toString()}`);
+  const url = `/api/mock-data?${search.toString()}`;
+  const payload = await fetchJson<unknown>(url);
+  return validateResponse(payload, dataChunkSchema, url);
 }
 
-export function getTimeSeries(params: TimeSeriesParams = {}) {
+export async function getTimeSeries(params: TimeSeriesParams = {}): Promise<TimeSeriesResponse> {
   const search = new URLSearchParams({
     metric: params.metric ?? 'ingestion',
   });
-  return fetchJson<TimeSeriesResponse>(`/api/timeseries?${search.toString()}`);
+
+  const url = `/api/timeseries?${search.toString()}`;
+  const payload = await fetchJson<unknown>(url);
+  return validateResponse(payload, timeSeriesResponseSchema, url);
 }
 
-export function getGraph() {
-  return fetchJson<GraphResponse>('/api/graph');
+export async function getGraph(): Promise<GraphResponse> {
+  const url = '/api/graph';
+  const payload = await fetchJson<unknown>(url);
+  return validateResponse(payload, graphResponseSchema, url);
 }

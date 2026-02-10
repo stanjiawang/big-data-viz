@@ -17,7 +17,7 @@ Enterprise-ready workspace for large-scale AI training data analytics, built wit
 - Tailwind CSS
 - React Query
 - MSW (Mock Service Worker)
-- Recharts + Visx + Deck.gl + Sigma.js
+- Deck.gl + Sigma.js
 - Jest + React Testing Library
 - Playwright
 
@@ -25,10 +25,20 @@ Enterprise-ready workspace for large-scale AI training data analytics, built wit
 
 ```bash
 pnpm install
+cp .env.example .env
 pnpm run dev
 ```
 
 Open: http://localhost:5173
+
+## Runtime Configuration
+
+The app uses environment-driven runtime config and a resilient API client (timeout + retry + typed errors).
+
+- `VITE_API_BASE_URL`: API origin, for example `https://api.company.com`
+- `VITE_API_TIMEOUT_MS`: request timeout in milliseconds
+- `VITE_API_RETRY_COUNT`: retry count for retriable failures
+- `VITE_ENABLE_MSW`: `true` or `false`, enables mock API worker in development
 
 ## Scripts
 
@@ -46,7 +56,9 @@ pnpm test:e2e
 
 ## Mock Data
 
-MSW is enabled by default in development. You can control dataset size and filters via query params:
+MSW can be enabled in development via `VITE_ENABLE_MSW=true`.
+
+Query params:
 
 - `size`: `100k | 1m | 10m`
 - `label`: `all | class-A | class-B | ...`
@@ -64,8 +76,9 @@ http://localhost:5173/?size=1m&label=all&source=all
 src/
   app/            App entry, bootstrap, query client
   components/     Reusable UI and layout components
+  config/         Runtime config resolution
   features/       Domain features (charts, graph, embeddings, table)
-  lib/            Core utilities and data generators
+  lib/            Core utilities, API transport, data generators
   mocks/          MSW handlers
   styles/         Tailwind entry
 ```

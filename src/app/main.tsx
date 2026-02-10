@@ -3,19 +3,10 @@ import { createRoot } from 'react-dom/client';
 import '@react-sigma/core/lib/style.css';
 import '@/styles/tailwind.css';
 import App from '@/app/App';
+import { getRuntimeConfig } from '@/config/runtimeConfig';
 
-const resolveMode = () => {
-  if (typeof __APP_MODE__ !== 'undefined') {
-    return __APP_MODE__;
-  }
-
-  const nodeEnv = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env
-    ?.NODE_ENV;
-  return nodeEnv ?? 'production';
-};
-
-export async function enableMocking(isDev: boolean) {
-  if (isDev) {
+export async function enableMocking(enabled: boolean) {
+  if (enabled) {
     const { worker } = await import('@/mocks/browser');
     return worker.start({
       onUnhandledRequest: 'bypass',
@@ -27,7 +18,7 @@ export async function enableMocking(isDev: boolean) {
 
 export async function bootstrap({
   rootId = 'root',
-  isDev = resolveMode() === 'development',
+  isDev = getRuntimeConfig().mode === 'development',
 }: {
   rootId?: string;
   isDev?: boolean;
@@ -38,7 +29,8 @@ export async function bootstrap({
     throw new Error('Root container is missing in index.html');
   }
 
-  await enableMocking(isDev);
+  const config = getRuntimeConfig();
+  await enableMocking(isDev && config.enableMocking);
 
   createRoot(container).render(
     <StrictMode>
@@ -47,6 +39,6 @@ export async function bootstrap({
   );
 }
 
-if (resolveMode() !== 'test') {
+if (getRuntimeConfig().mode !== 'test') {
   void bootstrap();
 }
