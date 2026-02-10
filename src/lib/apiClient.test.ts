@@ -10,6 +10,7 @@ describe('apiClient', () => {
       value: fetchMock,
       writable: true,
     });
+    window.history.replaceState({}, '', '/');
   });
 
   it('builds mock data query params', async () => {
@@ -76,5 +77,31 @@ describe('apiClient', () => {
       expect(error).toBeInstanceOf(ApiError);
       expect((error as ApiError).code).toBe('PARSE_ERROR');
     }
+  });
+
+  it('forwards mock control params from location search', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        total: 0,
+        offset: 0,
+        limit: 0,
+        records: [],
+      }),
+    });
+
+    window.history.replaceState({}, '', '/?mockFailure=server-error&mockDelayMs=100');
+
+    await getMockData({
+      total: 10,
+      offset: 0,
+      limit: 1,
+      vectorSize: 8,
+      filters: { source: 'all' },
+    });
+
+    const url = fetchMock.mock.calls[0][0] as string;
+    expect(url).toContain('mockFailure=server-error');
+    expect(url).toContain('mockDelayMs=100');
   });
 });

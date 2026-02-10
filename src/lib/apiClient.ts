@@ -16,6 +16,22 @@ type TimeSeriesParams = {
   metric?: string;
 };
 
+const MOCK_CONTROL_KEYS = ['mockFailure', 'mockDelayMs', 'mockRequireAuth', 'mockRequireTenant'];
+
+function applyMockControls(search: URLSearchParams) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  MOCK_CONTROL_KEYS.forEach((key) => {
+    const value = params.get(key);
+    if (value !== null && !search.has(key)) {
+      search.set(key, value);
+    }
+  });
+}
+
 function validateResponse<T>(payload: unknown, schema: ZodType<T>, url: string): T {
   const result = schema.safeParse(payload);
 
@@ -63,6 +79,8 @@ export async function getMockData(params: ChunkParams = {}): Promise<DataChunk> 
     search.set('weightMax', String(params.filters.weightMax));
   }
 
+  applyMockControls(search);
+
   const url = `/api/mock-data?${search.toString()}`;
   const payload = await fetchJson<unknown>(url);
   return validateResponse(payload, dataChunkSchema, url);
@@ -73,13 +91,17 @@ export async function getTimeSeries(params: TimeSeriesParams = {}): Promise<Time
     metric: params.metric ?? 'ingestion',
   });
 
+  applyMockControls(search);
+
   const url = `/api/timeseries?${search.toString()}`;
   const payload = await fetchJson<unknown>(url);
   return validateResponse(payload, timeSeriesResponseSchema, url);
 }
 
 export async function getGraph(): Promise<GraphResponse> {
-  const url = '/api/graph';
+  const search = new URLSearchParams();
+  applyMockControls(search);
+  const url = search.toString() ? `/api/graph?${search.toString()}` : '/api/graph';
   const payload = await fetchJson<unknown>(url);
   return validateResponse(payload, graphResponseSchema, url);
 }
