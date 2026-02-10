@@ -34,7 +34,7 @@ function shouldRetry(error: unknown, status?: number) {
       return true;
     }
 
-    if (error.code === 'HTTP_ERROR' && status && status >= 500) {
+    if (error.code === 'HTTP_ERROR' && status && (status >= 500 || status === 429)) {
       return true;
     }
   }

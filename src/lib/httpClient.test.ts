@@ -46,6 +46,17 @@ describe('httpClient', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it('retries once for rate-limited responses when retryCount is set', async () => {
+    fetchMock
+      .mockResolvedValueOnce({ ok: false, status: 429, json: async () => ({}) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true }) });
+
+    const result = await fetchJson<{ ok: boolean }>('/api/test', { retryCount: 1 });
+
+    expect(result.ok).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it('wraps network failures as ApiError', async () => {
     fetchMock.mockRejectedValue(new Error('socket closed'));
 

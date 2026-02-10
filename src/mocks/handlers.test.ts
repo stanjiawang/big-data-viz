@@ -12,7 +12,7 @@ jest.mock('msw', () => {
   };
 });
 
-import { handlers, parseFilters, parseNumber } from '@/mocks/handlers';
+import { handlers, parseFilters, parseMockControls, parseNumber } from '@/mocks/handlers';
 
 describe('msw handlers', () => {
   it('registers expected handlers', () => {
@@ -46,6 +46,37 @@ describe('msw handlers', () => {
       search: 'batch-001',
       weightMin: 0.5,
       weightMax: 2.5,
+    });
+  });
+
+  it('parses mock controls from search params', () => {
+    const params = new URLSearchParams({
+      mockFailure: 'rate-limit',
+      mockDelayMs: '150',
+      mockRequireAuth: 'true',
+      mockRequireTenant: 'true',
+    });
+
+    expect(parseMockControls(params)).toEqual({
+      failure: 'rate-limit',
+      delayMs: 150,
+      requireAuth: true,
+      requireTenant: true,
+    });
+  });
+
+  it('normalizes invalid mock controls', () => {
+    const params = new URLSearchParams({
+      mockFailure: 'unknown-mode',
+      mockDelayMs: '999999',
+      mockRequireAuth: 'invalid',
+    });
+
+    expect(parseMockControls(params)).toEqual({
+      failure: undefined,
+      delayMs: 5000,
+      requireAuth: false,
+      requireTenant: false,
     });
   });
 });

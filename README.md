@@ -64,10 +64,20 @@ Query params:
 - `label`: `all | class-A | class-B | ...`
 - `source`: `all | user | sensor | system | synthetic`
 
+Mock controls (for resilience testing):
+
+- `mockFailure`: `unauthorized | forbidden | rate-limit | server-error | malformed`
+- `mockDelayMs`: response delay in milliseconds (clamped to `0..5000`)
+- `mockRequireAuth`: `true | false` (requires `Authorization` header)
+- `mockRequireTenant`: `true | false` (requires `X-Tenant-Id` header)
+
 Example:
 
 ```
 http://localhost:5173/?size=1000000&label=all&source=all
+
+# simulate throttling on mock-data endpoint
+http://localhost:5173/?size=1000000&mockFailure=rate-limit
 ```
 
 ## Project Structure
