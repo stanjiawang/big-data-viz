@@ -7,6 +7,7 @@ export type RuntimeConfig = {
   apiTimeoutMs: number;
   apiRetryCount: number;
   enableMocking: boolean;
+  enableAuth: boolean;
 };
 
 function resolveMode() {
@@ -88,11 +89,17 @@ export function getRuntimeConfig(): RuntimeConfig {
     mode === 'development',
   );
 
+  const enableAuth = parseBoolean(
+    typeof __APP_ENABLE_AUTH__ !== 'undefined' ? __APP_ENABLE_AUTH__ : undefined,
+    false,
+  );
+
   return {
     mode,
     apiBaseUrl,
     apiTimeoutMs,
     apiRetryCount,
     enableMocking,
+    enableAuth,
   };
 }

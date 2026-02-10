@@ -31,6 +31,7 @@ export default defineConfig(({ mode }) => {
       __APP_API_TIMEOUT_MS__: defineLiteral(env.VITE_API_TIMEOUT_MS),
       __APP_API_RETRY_COUNT__: defineLiteral(env.VITE_API_RETRY_COUNT),
       __APP_ENABLE_MSW__: defineLiteral(env.VITE_ENABLE_MSW),
+      __APP_ENABLE_AUTH__: defineLiteral(env.VITE_ENABLE_AUTH),
     },
   };
 });
