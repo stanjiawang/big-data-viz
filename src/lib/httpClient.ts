@@ -1,3 +1,4 @@
+import { AUTH_SESSION_STORAGE_KEY } from '@/auth/authClient';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { ApiError } from '@/lib/errors';
 import { emitTelemetry, recordMetric, reportError } from '@/lib/telemetry';
@@ -11,6 +12,13 @@ type HttpRequestOptions = {
 
 type RequestRetryState = {
   attempts: number;
+};
+
+type SessionShape = {
+  accessToken?: string;
+  user?: {
+    tenantId?: string;
+  };
 };
 
 function nowMs() {
@@ -81,6 +89,39 @@ function generateRequestId() {
   return `req-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function readAuthHeaders() {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return {} as Record<string, string>;
+  }
+
+  const authHeaders: Record<string, string> = {};
+  const sessionRaw = window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY);
+
+  if (sessionRaw) {
+    try {
+      const session = JSON.parse(sessionRaw) as SessionShape;
+
+      if (session.accessToken) {
+        authHeaders.Authorization = `Bearer ${session.accessToken}`;
+      }
+
+      if (session.user?.tenantId) {
+        authHeaders['X-Tenant-Id'] = session.user.tenantId;
+      }
+    } catch {
+      // Ignore bad session payloads and send request without auth context.
+    }
+  }
+
+  const search = new URLSearchParams(window.location.search);
+  const tenantOverride = search.get('mockTenantId');
+  if (tenantOverride) {
+    authHeaders['X-Tenant-Id'] = tenantOverride;
+  }
+
+  return authHeaders;
+}
+
 export async function fetchJson<T>(path: string, options: HttpRequestOptions = {}): Promise<T> {
   const config = getRuntimeConfig();
   const timeoutMs = options.timeoutMs ?? config.apiTimeoutMs;
@@ -102,6 +143,7 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
         headers: {
           Accept: 'application/json',
           'X-Request-Id': requestId,
+          ...readAuthHeaders(),
         },
       });
 

@@ -16,7 +16,13 @@ type TimeSeriesParams = {
   metric?: string;
 };
 
-const MOCK_CONTROL_KEYS = ['mockFailure', 'mockDelayMs', 'mockRequireAuth', 'mockRequireTenant'];
+const MOCK_CONTROL_KEYS = [
+  'mockFailure',
+  'mockDelayMs',
+  'mockRequireAuth',
+  'mockRequireTenant',
+  'mockTenantId',
+];
 
 function applyMockControls(search: URLSearchParams) {
   if (typeof window === 'undefined') {

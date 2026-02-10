@@ -6,13 +6,24 @@ const PANEL_CLASS =
 export function RequireAuth({
   enabled,
   requiredRoles = [],
+  requireTenant = false,
   children,
 }: {
   enabled: boolean;
   requiredRoles?: string[];
+  requireTenant?: boolean;
   children: React.ReactNode;
 }) {
-  const { isLoading, isAuthenticated, hasAnyRole, signIn, signOut, error, session } = useAuth();
+  const {
+    isLoading,
+    isAuthenticated,
+    hasAnyRole,
+    hasTenantContext,
+    signIn,
+    signOut,
+    error,
+    session,
+  } = useAuth();
 
   if (!enabled) {
     return <>{children}</>;
@@ -43,6 +54,27 @@ export function RequireAuth({
             onClick={() => void signIn()}
           >
             Sign in
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (requireTenant && !hasTenantContext()) {
+    return (
+      <div className={PANEL_CLASS}>
+        <div className="w-full max-w-md space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h1 className="text-lg font-semibold text-slate-900">Tenant context required</h1>
+          <p className="text-sm text-slate-600">
+            Signed in as <span className="font-medium">{session?.user.name ?? 'unknown user'}</span>
+            , but no tenant is attached to this session.
+          </p>
+          <button
+            type="button"
+            className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            onClick={() => void signOut()}
+          >
+            Sign out
           </button>
         </div>
       </div>

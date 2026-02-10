@@ -3,6 +3,7 @@ export type AuthUser = {
   name: string;
   email?: string;
   roles: string[];
+  tenantId?: string;
 };
 
 export type AuthSession = {
@@ -19,4 +20,5 @@ export type AuthContextValue = {
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
   hasAnyRole: (_roles: string[]) => boolean;
+  hasTenantContext: () => boolean;
 };

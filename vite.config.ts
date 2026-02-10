@@ -33,6 +33,9 @@ export default defineConfig(({ mode }) => {
       __APP_ENABLE_MSW__: defineLiteral(env.VITE_ENABLE_MSW),
       __APP_ENABLE_AUTH__: defineLiteral(env.VITE_ENABLE_AUTH),
       __APP_ENABLE_TELEMETRY__: defineLiteral(env.VITE_ENABLE_TELEMETRY),
+      __APP_AUTH_REQUIRED_ROLES__: defineLiteral(env.VITE_AUTH_REQUIRED_ROLES),
+      __APP_AUTH_REQUIRE_TENANT__: defineLiteral(env.VITE_AUTH_REQUIRE_TENANT),
+      __APP_AUTH_TENANT_ID__: defineLiteral(env.VITE_AUTH_TENANT_ID),
     },
   };
 });

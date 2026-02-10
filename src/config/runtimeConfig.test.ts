@@ -9,6 +9,9 @@ describe('runtimeConfig', () => {
         apiRetryCount: 1,
         enableAuth: false,
         enableTelemetry: false,
+        authRequiredRoles: [],
+        authRequireTenant: false,
+        authTenantId: '',
       }),
     );
   });

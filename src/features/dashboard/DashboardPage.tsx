@@ -23,7 +23,13 @@ import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadge
 
 const DEFAULT_WEIGHT_MIN = 0.5;
 const DEFAULT_WEIGHT_MAX = 2.5;
-const MOCK_CONTROL_PARAMS = ['mockFailure', 'mockDelayMs', 'mockRequireAuth', 'mockRequireTenant'];
+const MOCK_CONTROL_PARAMS = [
+  'mockFailure',
+  'mockDelayMs',
+  'mockRequireAuth',
+  'mockRequireTenant',
+  'mockTenantId',
+];
 
 const ACTION_BUTTON_CLASS =
   'rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-700 focus-visible:border-blue-400 focus-visible:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-200';

@@ -85,6 +85,7 @@ export function AuthProvider({
         }
         return roles.some((role) => session.user.roles.includes(role));
       },
+      hasTenantContext: () => Boolean(session?.user.tenantId),
     }),
     [session, isLoading, error],
   );

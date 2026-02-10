@@ -8,6 +8,7 @@ jest.mock('@/lib/telemetry', () => ({
   reportError: (...args: unknown[]) => reportErrorMock(...args),
 }));
 
+import { AUTH_SESSION_STORAGE_KEY } from '@/auth/authClient';
 import { fetchJson } from '@/lib/httpClient';
 import { ApiError } from '@/lib/errors';
 
@@ -19,6 +20,8 @@ describe('httpClient', () => {
     emitTelemetryMock.mockReset();
     recordMetricMock.mockReset();
     reportErrorMock.mockReset();
+    window.localStorage.clear();
+    window.history.replaceState({}, '', '/');
     Object.defineProperty(globalThis, 'fetch', {
       value: fetchMock,
       writable: true,
@@ -38,6 +41,68 @@ describe('httpClient', () => {
       expect.objectContaining({
         url: '/api/test',
         status: undefined,
+      }),
+    );
+  });
+
+  it('adds auth and tenant headers from session context', async () => {
+    window.localStorage.setItem(
+      AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'token-123',
+        expiresAt: Date.now() + 60_000,
+        user: {
+          id: 'demo',
+          name: 'Demo',
+          roles: ['viewer'],
+          tenantId: 'tenant-a',
+        },
+      }),
+    );
+
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true }),
+    });
+
+    await fetchJson<{ ok: boolean }>('/api/test');
+
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(init.headers).toEqual(
+      expect.objectContaining({
+        Authorization: 'Bearer token-123',
+        'X-Tenant-Id': 'tenant-a',
+      }),
+    );
+  });
+
+  it('prefers tenant override from URL search params', async () => {
+    window.localStorage.setItem(
+      AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'token-123',
+        expiresAt: Date.now() + 60_000,
+        user: {
+          id: 'demo',
+          name: 'Demo',
+          roles: ['viewer'],
+          tenantId: 'tenant-a',
+        },
+      }),
+    );
+    window.history.replaceState({}, '', '/?mockTenantId=tenant-b');
+
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true }),
+    });
+
+    await fetchJson<{ ok: boolean }>('/api/test');
+
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(init.headers).toEqual(
+      expect.objectContaining({
+        'X-Tenant-Id': 'tenant-b',
       }),
     );
   });

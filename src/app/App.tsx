@@ -11,7 +11,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider enabled={runtimeConfig.enableAuth}>
-        <RequireAuth enabled={runtimeConfig.enableAuth}>
+        <RequireAuth
+          enabled={runtimeConfig.enableAuth}
+          requiredRoles={runtimeConfig.authRequiredRoles}
+          requireTenant={runtimeConfig.authRequireTenant}
+        >
           <DashboardPage />
         </RequireAuth>
       </AuthProvider>

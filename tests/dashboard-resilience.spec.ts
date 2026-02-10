@@ -18,3 +18,10 @@ test('surfaces parse failures from malformed mock payloads', async ({ page }) =>
 
   await expect(page.getByText('Failed to load table data.')).toBeVisible();
 });
+
+test('supports tenant-required mocks when tenant context is provided', async ({ page }) => {
+  await page.goto('/?mockRequireTenant=true&mockTenantId=tenant-e2e');
+
+  await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible();
+  await expect(page.getByTestId('relationship-graph')).toBeVisible();
+});

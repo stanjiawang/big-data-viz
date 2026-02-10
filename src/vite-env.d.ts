@@ -8,3 +8,6 @@ declare const __APP_ENABLE_MSW__: string | undefined;
 
 declare const __APP_ENABLE_AUTH__: string | undefined;
 declare const __APP_ENABLE_TELEMETRY__: string | undefined;
+declare const __APP_AUTH_REQUIRED_ROLES__: string | undefined;
+declare const __APP_AUTH_REQUIRE_TENANT__: string | undefined;
+declare const __APP_AUTH_TENANT_ID__: string | undefined;

@@ -9,6 +9,9 @@ export type RuntimeConfig = {
   enableMocking: boolean;
   enableAuth: boolean;
   enableTelemetry: boolean;
+  authRequiredRoles: string[];
+  authRequireTenant: boolean;
+  authTenantId: string;
 };
 
 function resolveMode() {
@@ -60,12 +63,35 @@ function parseBoolean(value: string | boolean | undefined, fallback: boolean) {
   return fallback;
 }
 
+function parseRoles(value: string | undefined) {
+  if (!value) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      value
+        .split(',')
+        .map((role) => role.trim())
+        .filter(Boolean),
+    ),
+  );
+}
+
 function normalizeBaseUrl(value: string | undefined) {
   if (!value) {
     return '';
   }
 
   return value.endsWith('/') ? value.slice(0, -1) : value;
+}
+
+function normalizeToken(value: string | undefined) {
+  if (!value) {
+    return '';
+  }
+
+  return value.trim();
 }
 
 export function getRuntimeConfig(): RuntimeConfig {
@@ -100,6 +126,19 @@ export function getRuntimeConfig(): RuntimeConfig {
     false,
   );
 
+  const authRequiredRoles = parseRoles(
+    typeof __APP_AUTH_REQUIRED_ROLES__ !== 'undefined' ? __APP_AUTH_REQUIRED_ROLES__ : undefined,
+  );
+
+  const authRequireTenant = parseBoolean(
+    typeof __APP_AUTH_REQUIRE_TENANT__ !== 'undefined' ? __APP_AUTH_REQUIRE_TENANT__ : undefined,
+    false,
+  );
+
+  const authTenantId = normalizeToken(
+    typeof __APP_AUTH_TENANT_ID__ !== 'undefined' ? __APP_AUTH_TENANT_ID__ : undefined,
+  );
+
   return {
     mode,
     apiBaseUrl,
@@ -108,5 +147,8 @@ export function getRuntimeConfig(): RuntimeConfig {
     enableMocking,
     enableAuth,
     enableTelemetry,
+    authRequiredRoles,
+    authRequireTenant,
+    authTenantId,
   };
 }

@@ -90,7 +90,11 @@ describe('apiClient', () => {
       }),
     });
 
-    window.history.replaceState({}, '', '/?mockFailure=server-error&mockDelayMs=100');
+    window.history.replaceState(
+      {},
+      '',
+      '/?mockFailure=server-error&mockDelayMs=100&mockTenantId=tenant-x',
+    );
 
     await getMockData({
       total: 10,
@@ -103,5 +107,6 @@ describe('apiClient', () => {
     const url = fetchMock.mock.calls[0][0] as string;
     expect(url).toContain('mockFailure=server-error');
     expect(url).toContain('mockDelayMs=100');
+    expect(url).toContain('mockTenantId=tenant-x');
   });
 });

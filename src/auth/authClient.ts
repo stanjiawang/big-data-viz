@@ -9,14 +9,14 @@ export type AuthClient = {
   subscribe: (_listener: SessionListener) => () => void;
 };
 
-const SESSION_KEY = 'bdv.auth.session';
+export const AUTH_SESSION_STORAGE_KEY = 'bdv.auth.session';
 
 function readSession(): AuthSession | null {
   if (typeof window === 'undefined' || !window.localStorage) {
     return null;
   }
 
-  const raw = window.localStorage.getItem(SESSION_KEY);
+  const raw = window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY);
   if (!raw) {
     return null;
   }
@@ -38,11 +38,19 @@ function writeSession(session: AuthSession | null) {
   }
 
   if (!session) {
-    window.localStorage.removeItem(SESSION_KEY);
+    window.localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
     return;
   }
 
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  window.localStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(session));
+}
+
+function resolveTenantId() {
+  if (typeof __APP_AUTH_TENANT_ID__ !== 'undefined' && __APP_AUTH_TENANT_ID__) {
+    return __APP_AUTH_TENANT_ID__.trim();
+  }
+
+  return 'tenant-demo';
 }
 
 function createMockSession(): AuthSession {
@@ -54,6 +62,7 @@ function createMockSession(): AuthSession {
       name: 'Demo User',
       email: 'demo@example.com',
       roles: ['viewer'],
+      tenantId: resolveTenantId(),
     },
   };
 }
@@ -68,7 +77,7 @@ export function createMockAuthClient(): AuthClient {
   };
 
   const onStorage = (event: StorageEvent) => {
-    if (event.key === SESSION_KEY) {
+    if (event.key === AUTH_SESSION_STORAGE_KEY) {
       emit(readSession());
     }
   };
