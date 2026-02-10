@@ -8,6 +8,7 @@ describe('runtimeConfig', () => {
         apiTimeoutMs: 10_000,
         apiRetryCount: 1,
         enableAuth: false,
+        enableTelemetry: false,
       }),
     );
   });

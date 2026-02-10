@@ -1,5 +1,6 @@
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { ApiError } from '@/lib/errors';
+import { emitTelemetry, recordMetric, reportError } from '@/lib/telemetry';
 
 type HttpRequestOptions = {
   timeoutMs?: number;
@@ -11,6 +12,14 @@ type HttpRequestOptions = {
 type RequestRetryState = {
   attempts: number;
 };
+
+function nowMs() {
+  if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+    return performance.now();
+  }
+
+  return Date.now();
+}
 
 function buildUrl(path: string, baseUrl: string) {
   if (/^https?:\/\//.test(path)) {
@@ -82,6 +91,7 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
 
   while (retryState.attempts <= retryCount) {
     retryState.attempts += 1;
+    const attemptStart = nowMs();
 
     const { signal, cleanup } = createTimeoutSignal(timeoutMs, options.signal);
 
@@ -105,7 +115,14 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
       }
 
       try {
-        return (await response.json()) as T;
+        const payload = (await response.json()) as T;
+        recordMetric('http.request.duration_ms', Math.round(nowMs() - attemptStart), {
+          url,
+          status: response.status,
+          attempt: retryState.attempts,
+          requestId,
+        });
+        return payload;
       } catch (error) {
         throw new ApiError({
           message: 'Failed to parse API response',
@@ -117,8 +134,21 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
     } catch (error) {
       if (error instanceof ApiError) {
         if (retryState.attempts <= retryCount && shouldRetry(error, error.status)) {
+          emitTelemetry('warn', 'http.retry', {
+            url,
+            code: error.code,
+            status: error.status,
+            attempt: retryState.attempts,
+            requestId,
+          });
           continue;
         }
+
+        reportError('http.request.failed', error, {
+          url,
+          attempt: retryState.attempts,
+          requestId,
+        });
         throw error;
       }
 
@@ -130,8 +160,20 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
           cause: error,
         });
         if (retryState.attempts <= retryCount) {
+          emitTelemetry('warn', 'http.retry', {
+            url,
+            code: timeoutError.code,
+            attempt: retryState.attempts,
+            requestId,
+          });
           continue;
         }
+
+        reportError('http.request.failed', timeoutError, {
+          url,
+          attempt: retryState.attempts,
+          requestId,
+        });
         throw timeoutError;
       }
 
@@ -143,18 +185,37 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
       });
 
       if (retryState.attempts <= retryCount && shouldRetry(networkError)) {
+        emitTelemetry('warn', 'http.retry', {
+          url,
+          code: networkError.code,
+          attempt: retryState.attempts,
+          requestId,
+        });
         continue;
       }
 
+      reportError('http.request.failed', networkError, {
+        url,
+        attempt: retryState.attempts,
+        requestId,
+      });
       throw networkError;
     } finally {
       cleanup();
     }
   }
 
-  throw new ApiError({
+  const finalError = new ApiError({
     message: 'Request failed after retries',
     code: 'NETWORK_ERROR',
     url,
   });
+
+  reportError('http.request.failed', finalError, {
+    url,
+    attempt: retryState.attempts,
+    requestId,
+  });
+
+  throw finalError;
 }

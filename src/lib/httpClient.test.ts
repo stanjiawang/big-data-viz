@@ -1,3 +1,13 @@
+const emitTelemetryMock = jest.fn();
+const recordMetricMock = jest.fn();
+const reportErrorMock = jest.fn();
+
+jest.mock('@/lib/telemetry', () => ({
+  emitTelemetry: (...args: unknown[]) => emitTelemetryMock(...args),
+  recordMetric: (...args: unknown[]) => recordMetricMock(...args),
+  reportError: (...args: unknown[]) => reportErrorMock(...args),
+}));
+
 import { fetchJson } from '@/lib/httpClient';
 import { ApiError } from '@/lib/errors';
 
@@ -6,6 +16,9 @@ describe('httpClient', () => {
 
   beforeEach(() => {
     fetchMock.mockReset();
+    emitTelemetryMock.mockReset();
+    recordMetricMock.mockReset();
+    reportErrorMock.mockReset();
     Object.defineProperty(globalThis, 'fetch', {
       value: fetchMock,
       writable: true,
@@ -19,6 +32,14 @@ describe('httpClient', () => {
     });
 
     await expect(fetchJson<{ ok: boolean }>('/api/test')).resolves.toEqual({ ok: true });
+    expect(recordMetricMock).toHaveBeenCalledWith(
+      'http.request.duration_ms',
+      expect.any(Number),
+      expect.objectContaining({
+        url: '/api/test',
+        status: undefined,
+      }),
+    );
   });
 
   it('throws ApiError for non-2xx responses', async () => {
@@ -33,6 +54,7 @@ describe('httpClient', () => {
       code: 'HTTP_ERROR',
       status: 503,
     });
+    expect(reportErrorMock).toHaveBeenCalled();
   });
 
   it('retries once for server errors when retryCount is set', async () => {
@@ -44,6 +66,15 @@ describe('httpClient', () => {
 
     expect(result.ok).toBe(true);
     expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(emitTelemetryMock).toHaveBeenCalledWith(
+      'warn',
+      'http.retry',
+      expect.objectContaining({
+        url: '/api/test',
+        status: 500,
+        code: 'HTTP_ERROR',
+      }),
+    );
   });
 
   it('retries once for rate-limited responses when retryCount is set', async () => {

@@ -5,6 +5,7 @@ const apiBaseUrl = process.env.VITE_API_BASE_URL;
 const timeout = process.env.VITE_API_TIMEOUT_MS;
 const retryCount = process.env.VITE_API_RETRY_COUNT;
 const enableAuth = process.env.VITE_ENABLE_AUTH;
+const enableTelemetry = process.env.VITE_ENABLE_TELEMETRY;
 
 const mocksEnabled = enableMsw === 'true';
 
@@ -37,6 +38,18 @@ if (retryCount !== undefined && retryCount !== '') {
   }
 }
 
+if (enableAuth !== undefined && enableAuth !== '' && !['true', 'false'].includes(enableAuth)) {
+  errors.push('VITE_ENABLE_AUTH must be true or false when set.');
+}
+
+if (
+  enableTelemetry !== undefined &&
+  enableTelemetry !== '' &&
+  !['true', 'false'].includes(enableTelemetry)
+) {
+  errors.push('VITE_ENABLE_TELEMETRY must be true or false when set.');
+}
+
 if (errors.length > 0) {
   console.error('Environment validation failed:');
   for (const message of errors) {
@@ -46,7 +59,3 @@ if (errors.length > 0) {
 }
 
 console.log('Environment validation passed.');
-
-if (enableAuth !== undefined && enableAuth !== '' && !['true', 'false'].includes(enableAuth)) {
-  errors.push('VITE_ENABLE_AUTH must be true or false when set.');
-}

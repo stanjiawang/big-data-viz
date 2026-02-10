@@ -8,6 +8,7 @@ export type RuntimeConfig = {
   apiRetryCount: number;
   enableMocking: boolean;
   enableAuth: boolean;
+  enableTelemetry: boolean;
 };
 
 function resolveMode() {
@@ -94,6 +95,11 @@ export function getRuntimeConfig(): RuntimeConfig {
     false,
   );
 
+  const enableTelemetry = parseBoolean(
+    typeof __APP_ENABLE_TELEMETRY__ !== 'undefined' ? __APP_ENABLE_TELEMETRY__ : undefined,
+    false,
+  );
+
   return {
     mode,
     apiBaseUrl,
@@ -101,5 +107,6 @@ export function getRuntimeConfig(): RuntimeConfig {
     apiRetryCount,
     enableMocking,
     enableAuth,
+    enableTelemetry,
   };
 }
