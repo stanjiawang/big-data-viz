@@ -96,6 +96,7 @@
 - F2 completed: API contract tests with schema-version CI gate
 - F3 completed: deterministic mock-data fixtures and stable assertions for test reproducibility
 - G1 completed: bundle-size performance budgets enforced in CI
+- G2 completed: deterministic render-performance benchmark gate for large table and graph flows
 - G3 foundation completed: incident template, generator script, and runbook wiring
 - E3 completed: release governance docs and CI validation gate
 

@@ -43,6 +43,8 @@ jobs:
         run: pnpm run test:contracts
       - name: Performance budgets
         run: pnpm run test:perf
+      - name: Render performance benchmarks
+        run: pnpm run test:render-perf
       - name: Reliability policy
         run: pnpm run test:reliability
       - name: Release governance

@@ -24,7 +24,8 @@
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
     "prepare": "husky",
-    "check:env": "node scripts/check-env.mjs"
+    "check:env": "node scripts/check-env.mjs",
+    "test:render-perf": "playwright test tests/render-performance.spec.ts --workers=1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
