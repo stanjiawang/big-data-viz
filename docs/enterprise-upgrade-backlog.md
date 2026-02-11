@@ -92,6 +92,7 @@
 
 ## Completed Foundation Items
 
+- F1 completed: Playwright critical-flow suite expanded to 10 scenarios in CI
 - F2 completed: API contract tests with schema-version CI gate
 - G1 completed: bundle-size performance budgets enforced in CI
 - G3 foundation completed: incident template, generator script, and runbook wiring
