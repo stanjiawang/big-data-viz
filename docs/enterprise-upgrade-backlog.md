@@ -102,6 +102,8 @@
 - A1 completed: security policy now defines private reporting channels and response SLAs
 - A2 completed: CODEOWNERS now maps core paths to active repository ownership
 - A3 completed: docs and ADR remain aligned on Jest as the standard unit/integration framework
+- E1 completed: CI dependency review now fails PRs on critical vulnerabilities
+- E2 completed: Jest coverage thresholds are enforced in CI via test:coverage gate
 - D1 completed: timeout and caller-cancelled API aborts now emit distinct error codes and retry behavior
 - C3 completed: structured API failure telemetry now includes requestId, errorCode, and httpStatus fields
 - G3 foundation completed: incident template, generator script, and runbook wiring
