@@ -61,7 +61,13 @@ function shouldRetry(error: unknown, status?: number) {
 
 function createTimeoutSignal(timeoutMs: number, externalSignal?: AbortSignal) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  let timedOut = false;
+  let cancelledByCaller = false;
+
+  const timeoutId = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
 
   const cleanup = () => {
     clearTimeout(timeoutId);
@@ -69,15 +75,25 @@ function createTimeoutSignal(timeoutMs: number, externalSignal?: AbortSignal) {
 
   if (externalSignal) {
     if (externalSignal.aborted) {
+      cancelledByCaller = true;
       controller.abort();
     } else {
-      externalSignal.addEventListener('abort', () => controller.abort(), { once: true });
+      externalSignal.addEventListener(
+        'abort',
+        () => {
+          cancelledByCaller = true;
+          controller.abort();
+        },
+        { once: true },
+      );
     }
   }
 
   return {
     signal: controller.signal,
     cleanup,
+    wasTimedOut: () => timedOut,
+    wasCancelledByCaller: () => cancelledByCaller,
   };
 }
 
@@ -157,7 +173,10 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
     retryState.attempts += 1;
     const attemptStart = nowMs();
 
-    const { signal, cleanup } = createTimeoutSignal(timeoutMs, options.signal);
+    const { signal, cleanup, wasTimedOut, wasCancelledByCaller } = createTimeoutSignal(
+      timeoutMs,
+      options.signal,
+    );
 
     try {
       const response = await fetch(url, {
@@ -230,6 +249,24 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
       }
 
       if (error instanceof DOMException && error.name === 'AbortError') {
+        if (wasCancelledByCaller() && !wasTimedOut()) {
+          const cancelledError = new ApiError({
+            message: 'Request was cancelled by caller',
+            code: 'CANCELLED_ERROR',
+            url,
+            cause: error,
+          });
+
+          emitTelemetry('info', 'http.cancelled', {
+            url,
+            code: cancelledError.code,
+            attempt: retryState.attempts,
+            requestId,
+          });
+
+          throw cancelledError;
+        }
+
         const timeoutError = new ApiError({
           message: `Request timed out after ${timeoutMs}ms`,
           code: 'TIMEOUT_ERROR',

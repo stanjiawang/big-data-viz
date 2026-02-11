@@ -1,4 +1,9 @@
-export type ApiErrorCode = 'HTTP_ERROR' | 'TIMEOUT_ERROR' | 'NETWORK_ERROR' | 'PARSE_ERROR';
+export type ApiErrorCode =
+  | 'HTTP_ERROR'
+  | 'TIMEOUT_ERROR'
+  | 'CANCELLED_ERROR'
+  | 'NETWORK_ERROR'
+  | 'PARSE_ERROR';
 
 export class ApiError extends Error {
   code: ApiErrorCode;

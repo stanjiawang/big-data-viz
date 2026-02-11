@@ -22,7 +22,7 @@ const DEFAULT_QUERY_ERROR_COPY: QueryErrorCopy = {
 
 export function shouldAutoRetryQueryError(error: unknown): boolean {
   if (error instanceof ApiError) {
-    if (error.code === 'PARSE_ERROR') {
+    if (error.code === 'PARSE_ERROR' || error.code === 'CANCELLED_ERROR') {
       return false;
     }
 
@@ -68,6 +68,13 @@ export function resolveQueryErrorCopy(
     return {
       title: 'Request timed out',
       message: 'The service took too long to respond.',
+    };
+  }
+
+  if (error.code === 'CANCELLED_ERROR') {
+    return {
+      title: 'Request cancelled',
+      message: 'The request was cancelled before completion.',
     };
   }
 

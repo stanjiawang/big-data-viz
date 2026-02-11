@@ -199,6 +199,34 @@ describe('httpClient', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it('does not retry requests cancelled by caller', async () => {
+    const controller = new AbortController();
+    controller.abort();
+
+    fetchMock.mockRejectedValue(new DOMException('aborted', 'AbortError'));
+
+    await expect(
+      fetchJson('/api/test', {
+        retryCount: 2,
+        signal: controller.signal,
+      }),
+    ).rejects.toMatchObject({
+      name: 'ApiError',
+      code: 'CANCELLED_ERROR',
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(emitTelemetryMock).toHaveBeenCalledWith(
+      'info',
+      'http.cancelled',
+      expect.objectContaining({
+        code: 'CANCELLED_ERROR',
+        requestId: expect.any(String),
+      }),
+    );
+    expect(reportErrorMock).not.toHaveBeenCalled();
+  });
+
   it('wraps network failures as ApiError', async () => {
     fetchMock.mockRejectedValue(new Error('socket closed'));
 

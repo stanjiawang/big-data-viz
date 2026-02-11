@@ -25,6 +25,20 @@ describe('queryErrorPolicy', () => {
     expect(shouldAutoRetryQueryError(nonRetryable)).toBe(false);
   });
 
+  it('does not retry cancellation errors', () => {
+    const cancelled = new ApiError({
+      message: 'cancelled by caller',
+      code: 'CANCELLED_ERROR',
+      url: '/api/cancelled',
+    });
+
+    expect(shouldAutoRetryQueryError(cancelled)).toBe(false);
+    expect(resolveQueryErrorCopy(cancelled)).toEqual({
+      title: 'Request cancelled',
+      message: 'The request was cancelled before completion.',
+    });
+  });
+
   it('caps exponential retry delay at max threshold', () => {
     expect(getQueryRetryDelayMs(1)).toBe(500);
     expect(getQueryRetryDelayMs(2)).toBe(1000);
