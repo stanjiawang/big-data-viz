@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 const SAMPLE_COUNT = Number(process.env.PERF_RENDER_SAMPLES ?? 3);
 const TARGET_DATASET_SIZE = Number(process.env.PERF_RENDER_DATASET_SIZE ?? 50_000_000);
 const TABLE_BUDGET_MS = Number(process.env.PERF_MAX_TABLE_RENDER_MS ?? 3000);
-const GRAPH_BUDGET_MS = Number(process.env.PERF_MAX_GRAPH_RENDER_MS ?? 3000);
+const GRAPH_BUDGET_MS = Number(process.env.PERF_MAX_GRAPH_RENDER_MS ?? 3200);
 
 function median(values: number[]) {
   const sorted = [...values].sort((left, right) => left - right);

@@ -5,6 +5,7 @@ import '@/styles/tailwind.css';
 import App from '@/app/App';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { initPerformanceTelemetry } from '@/lib/performanceTelemetry';
+import { initGlobalErrorTracking } from '@/lib/telemetry';
 
 export async function enableMocking(enabled: boolean) {
   if (enabled) {
@@ -41,6 +42,7 @@ export async function bootstrap({
 
   if (config.enableTelemetry) {
     initPerformanceTelemetry();
+    initGlobalErrorTracking();
   }
 }
 

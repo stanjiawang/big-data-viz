@@ -15,6 +15,8 @@ export type RuntimeConfig = {
   enableMocking: boolean;
   enableAuth: boolean;
   enableTelemetry: boolean;
+  appRelease: string;
+  appCommitSha: string;
   authRequiredRoles: string[];
   authRequireTenant: boolean;
   authTenantId: string;
@@ -171,6 +173,14 @@ export function getRuntimeConfig(): RuntimeConfig {
     false,
   );
 
+  const appRelease = normalizeToken(
+    typeof __APP_RELEASE__ !== 'undefined' ? __APP_RELEASE__ : undefined,
+  );
+
+  const appCommitSha = normalizeToken(
+    typeof __APP_COMMIT_SHA__ !== 'undefined' ? __APP_COMMIT_SHA__ : undefined,
+  );
+
   const authRequiredRoles = parseRoles(
     typeof __APP_AUTH_REQUIRED_ROLES__ !== 'undefined' ? __APP_AUTH_REQUIRED_ROLES__ : undefined,
   );
@@ -195,6 +205,8 @@ export function getRuntimeConfig(): RuntimeConfig {
     enableMocking,
     enableAuth,
     enableTelemetry,
+    appRelease,
+    appCommitSha,
     authRequiredRoles,
     authRequireTenant,
     authTenantId,

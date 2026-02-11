@@ -9,6 +9,17 @@ function canEmit() {
   return config.enableTelemetry || config.mode === 'development';
 }
 
+function getBaseContext() {
+  const config = getRuntimeConfig();
+
+  return {
+    env: config.mode,
+    release: config.appRelease || 'unknown',
+    commitSha: config.appCommitSha || 'unknown',
+    path: typeof window !== 'undefined' ? window.location.pathname : undefined,
+  };
+}
+
 function stringifyError(error: unknown) {
   if (error instanceof Error) {
     return {
@@ -35,6 +46,7 @@ export function emitTelemetry(
   const record = {
     ts: new Date().toISOString(),
     event,
+    ...getBaseContext(),
     ...payload,
   };
 
@@ -64,4 +76,34 @@ export function recordMetric(name: string, value: number, context: TelemetryPayl
     value,
     ...context,
   });
+}
+
+export function initGlobalErrorTracking() {
+  if (typeof window === 'undefined') {
+    return () => undefined;
+  }
+
+  const onWindowError = (event: ErrorEvent) => {
+    const fallbackError = new Error(event.message || 'Unknown uncaught error');
+    reportError('frontend.uncaught_error', event.error ?? fallbackError, {
+      source: 'window.error',
+    });
+  };
+
+  const onUnhandledRejection = (event: Event) => {
+    const rejectionEvent = event as Event & { reason?: unknown };
+    const fallbackError = new Error('Unknown unhandled rejection');
+
+    reportError('frontend.unhandled_rejection', rejectionEvent.reason ?? fallbackError, {
+      source: 'window.unhandledrejection',
+    });
+  };
+
+  window.addEventListener('error', onWindowError);
+  window.addEventListener('unhandledrejection', onUnhandledRejection);
+
+  return () => {
+    window.removeEventListener('error', onWindowError);
+    window.removeEventListener('unhandledrejection', onUnhandledRejection);
+  };
 }

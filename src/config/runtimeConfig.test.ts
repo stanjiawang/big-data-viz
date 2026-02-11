@@ -12,6 +12,8 @@ describe('runtimeConfig', () => {
         apiRetryJitterRatio: 0.2,
         enableAuth: false,
         enableTelemetry: false,
+        appRelease: '',
+        appCommitSha: '',
         authRequiredRoles: [],
         authRequireTenant: false,
         authTenantId: '',

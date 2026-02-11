@@ -9,6 +9,8 @@ const retryMaxDelayMs = process.env.VITE_API_RETRY_MAX_DELAY_MS;
 const retryJitterRatio = process.env.VITE_API_RETRY_JITTER_RATIO;
 const enableAuth = process.env.VITE_ENABLE_AUTH;
 const enableTelemetry = process.env.VITE_ENABLE_TELEMETRY;
+const appRelease = process.env.VITE_APP_RELEASE;
+const appCommitSha = process.env.VITE_APP_COMMIT_SHA;
 const authRequiredRoles = process.env.VITE_AUTH_REQUIRED_ROLES;
 const authRequireTenant = process.env.VITE_AUTH_REQUIRE_TENANT;
 const authTenantId = process.env.VITE_AUTH_TENANT_ID;
@@ -88,6 +90,14 @@ if (
   !['true', 'false'].includes(enableTelemetry)
 ) {
   errors.push('VITE_ENABLE_TELEMETRY must be true or false when set.');
+}
+
+if (appRelease !== undefined && appRelease !== '' && !/^[a-zA-Z0-9._-]+$/.test(appRelease)) {
+  errors.push('VITE_APP_RELEASE must contain only letters, numbers, dot, underscore, or dash.');
+}
+
+if (appCommitSha !== undefined && appCommitSha !== '' && !/^[a-fA-F0-9]{7,40}$/.test(appCommitSha)) {
+  errors.push('VITE_APP_COMMIT_SHA must be a 7-40 character hexadecimal git SHA when set.');
 }
 
 if (
