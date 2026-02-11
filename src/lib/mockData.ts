@@ -14,6 +14,10 @@ const LABELS = ['class-A', 'class-B', 'class-C', 'class-D', 'class-E'];
 const DEFAULT_WEIGHT_MIN = 0.5;
 const DEFAULT_WEIGHT_MAX = 2.5;
 
+type MockDataOptions = {
+  nowMs?: number;
+};
+
 function resolveSources(filters?: MockFilters) {
   if (!filters?.source || filters.source === 'all') return SOURCES;
   return [filters.source];
@@ -70,6 +74,7 @@ function generateRecord(
   next: () => number,
   index: number,
   vectorSize: number,
+  nowMs: number,
   filters?: MockFilters,
 ) {
   const features = Array.from({ length: vectorSize }, () =>
@@ -77,7 +82,7 @@ function generateRecord(
   );
 
   const timestamp = new Date(
-    Date.now() - Math.floor(randomInRange(next, 0, 1000 * 60 * 60 * 24 * 30)),
+    nowMs - Math.floor(randomInRange(next, 0, 1000 * 60 * 60 * 24 * 30)),
   ).toISOString();
 
   const idPrefix = filters?.search ? filters.search.replace(/\s+/g, '-') : 'rec';
@@ -92,21 +97,19 @@ function generateRecord(
   } satisfies TrainingRecord;
 }
 
-export function generateChunk({
-  total,
-  offset,
-  limit,
-  vectorSize,
-  filters,
-}: MockDataRequest): DataChunk {
+export function generateChunk(
+  { total, offset, limit, vectorSize, filters }: MockDataRequest,
+  options: MockDataOptions = {},
+): DataChunk {
   const safeLimit = Math.min(limit, Math.max(total - offset, 0));
   const next = mulberry32(42 + offset);
+  const nowMs = options.nowMs ?? Date.now();
 
   const records: TrainingRecord[] = [];
   let attempts = 0;
 
   while (records.length < safeLimit && attempts < safeLimit * 5) {
-    const record = generateRecord(next, offset + records.length, vectorSize, filters);
+    const record = generateRecord(next, offset + records.length, vectorSize, nowMs, filters);
     if (matchesFilters(record, filters)) {
       records.push(record);
     }
@@ -124,10 +127,14 @@ export function generateChunk({
   } satisfies DataChunk;
 }
 
-export function generateTimeSeries(metric = 'ingestion'): TimeSeriesResponse {
+export function generateTimeSeries(
+  metric = 'ingestion',
+  options: MockDataOptions = {},
+): TimeSeriesResponse {
   const next = mulberry32(7);
+  const nowMs = options.nowMs ?? Date.now();
   const points = Array.from({ length: 30 }, (_, i) => {
-    const date = new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000);
+    const date = new Date(nowMs - (29 - i) * 24 * 60 * 60 * 1000);
     return {
       timestamp: date.toISOString(),
       value: Math.round(randomInRange(next, 800, 1800)),
