@@ -4,6 +4,9 @@ const enableMsw = process.env.VITE_ENABLE_MSW;
 const apiBaseUrl = process.env.VITE_API_BASE_URL;
 const timeout = process.env.VITE_API_TIMEOUT_MS;
 const retryCount = process.env.VITE_API_RETRY_COUNT;
+const retryBaseDelayMs = process.env.VITE_API_RETRY_BASE_DELAY_MS;
+const retryMaxDelayMs = process.env.VITE_API_RETRY_MAX_DELAY_MS;
+const retryJitterRatio = process.env.VITE_API_RETRY_JITTER_RATIO;
 const enableAuth = process.env.VITE_ENABLE_AUTH;
 const enableTelemetry = process.env.VITE_ENABLE_TELEMETRY;
 const authRequiredRoles = process.env.VITE_AUTH_REQUIRED_ROLES;
@@ -38,6 +41,40 @@ if (retryCount !== undefined && retryCount !== '') {
   const value = Number(retryCount);
   if (!Number.isInteger(value) || value < 0) {
     errors.push('VITE_API_RETRY_COUNT must be a non-negative integer.');
+  }
+}
+
+if (retryBaseDelayMs !== undefined && retryBaseDelayMs !== '') {
+  const value = Number(retryBaseDelayMs);
+  if (!Number.isFinite(value) || value <= 0) {
+    errors.push('VITE_API_RETRY_BASE_DELAY_MS must be a positive number.');
+  }
+}
+
+if (retryMaxDelayMs !== undefined && retryMaxDelayMs !== '') {
+  const value = Number(retryMaxDelayMs);
+  if (!Number.isFinite(value) || value <= 0) {
+    errors.push('VITE_API_RETRY_MAX_DELAY_MS must be a positive number.');
+  }
+}
+
+if (
+  retryBaseDelayMs !== undefined &&
+  retryBaseDelayMs !== '' &&
+  retryMaxDelayMs !== undefined &&
+  retryMaxDelayMs !== ''
+) {
+  const baseValue = Number(retryBaseDelayMs);
+  const maxValue = Number(retryMaxDelayMs);
+  if (Number.isFinite(baseValue) && Number.isFinite(maxValue) && maxValue < baseValue) {
+    errors.push('VITE_API_RETRY_MAX_DELAY_MS must be greater than or equal to base delay.');
+  }
+}
+
+if (retryJitterRatio !== undefined && retryJitterRatio !== '') {
+  const value = Number(retryJitterRatio);
+  if (!Number.isFinite(value) || value < 0 || value > 1) {
+    errors.push('VITE_API_RETRY_JITTER_RATIO must be between 0 and 1.');
   }
 }
 

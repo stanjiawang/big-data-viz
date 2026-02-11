@@ -28,6 +28,11 @@ describe('httpClient', () => {
     });
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
   it('returns parsed JSON on success', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
@@ -140,6 +145,38 @@ describe('httpClient', () => {
         code: 'HTTP_ERROR',
       }),
     );
+  });
+
+  it('waits for computed retry delay before next attempt', async () => {
+    jest.useFakeTimers();
+    jest.spyOn(Math, 'random').mockReturnValue(0.5);
+
+    fetchMock
+      .mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({}) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true }) });
+
+    const requestPromise = fetchJson<{ ok: boolean }>('/api/test', { retryCount: 1 });
+
+    await Promise.resolve();
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(emitTelemetryMock).toHaveBeenCalledWith(
+      'warn',
+      'http.retry',
+      expect.objectContaining({
+        url: '/api/test',
+        status: 500,
+        code: 'HTTP_ERROR',
+        retryDelayMs: 200,
+      }),
+    );
+
+    await jest.advanceTimersByTimeAsync(199);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(1);
+    await expect(requestPromise).resolves.toEqual({ ok: true });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it('retries once for rate-limited responses when retryCount is set', async () => {

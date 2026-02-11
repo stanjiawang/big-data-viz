@@ -1,11 +1,17 @@
 const DEFAULT_TIMEOUT_MS = 10_000;
 const DEFAULT_RETRY_COUNT = 1;
+const DEFAULT_RETRY_BASE_DELAY_MS = 200;
+const DEFAULT_RETRY_MAX_DELAY_MS = 2_000;
+const DEFAULT_RETRY_JITTER_RATIO = 0.2;
 
 export type RuntimeConfig = {
   mode: string;
   apiBaseUrl: string;
   apiTimeoutMs: number;
   apiRetryCount: number;
+  apiRetryBaseDelayMs: number;
+  apiRetryMaxDelayMs: number;
+  apiRetryJitterRatio: number;
   enableMocking: boolean;
   enableAuth: boolean;
   enableTelemetry: boolean;
@@ -41,6 +47,24 @@ function parseRetryCount(value: string | number | undefined, fallback: number) {
 
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function parsePositiveNumber(value: string | number | undefined, fallback: number) {
+  if (value === undefined || value === '') {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parseJitterRatio(value: string | number | undefined, fallback: number) {
+  if (value === undefined || value === '') {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 1 ? parsed : fallback;
 }
 
 function parseBoolean(value: string | boolean | undefined, fallback: boolean) {
@@ -111,6 +135,27 @@ export function getRuntimeConfig(): RuntimeConfig {
     DEFAULT_RETRY_COUNT,
   );
 
+  const apiRetryBaseDelayMs = parsePositiveNumber(
+    typeof __APP_API_RETRY_BASE_DELAY_MS__ !== 'undefined'
+      ? __APP_API_RETRY_BASE_DELAY_MS__
+      : undefined,
+    DEFAULT_RETRY_BASE_DELAY_MS,
+  );
+
+  const apiRetryMaxDelayMs = parsePositiveNumber(
+    typeof __APP_API_RETRY_MAX_DELAY_MS__ !== 'undefined'
+      ? __APP_API_RETRY_MAX_DELAY_MS__
+      : undefined,
+    DEFAULT_RETRY_MAX_DELAY_MS,
+  );
+
+  const apiRetryJitterRatio = parseJitterRatio(
+    typeof __APP_API_RETRY_JITTER_RATIO__ !== 'undefined'
+      ? __APP_API_RETRY_JITTER_RATIO__
+      : undefined,
+    DEFAULT_RETRY_JITTER_RATIO,
+  );
+
   const enableMocking = parseBoolean(
     typeof __APP_ENABLE_MSW__ !== 'undefined' ? __APP_ENABLE_MSW__ : undefined,
     mode === 'development',
@@ -144,6 +189,9 @@ export function getRuntimeConfig(): RuntimeConfig {
     apiBaseUrl,
     apiTimeoutMs,
     apiRetryCount,
+    apiRetryBaseDelayMs,
+    apiRetryMaxDelayMs,
+    apiRetryJitterRatio,
     enableMocking,
     enableAuth,
     enableTelemetry,

@@ -122,6 +122,29 @@ function readAuthHeaders() {
   return authHeaders;
 }
 
+function computeRetryDelayMs(
+  attempt: number,
+  baseDelayMs: number,
+  maxDelayMs: number,
+  jitterRatio: number,
+): number {
+  const exponentialDelay = Math.min(maxDelayMs, baseDelayMs * 2 ** Math.max(0, attempt - 1));
+  const jitterRange = exponentialDelay * jitterRatio;
+  const jitterOffset = (Math.random() * 2 - 1) * jitterRange;
+
+  return Math.max(0, Math.round(exponentialDelay + jitterOffset));
+}
+
+function sleep(delayMs: number) {
+  if (delayMs <= 0) {
+    return Promise.resolve();
+  }
+
+  return new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), delayMs);
+  });
+}
+
 export async function fetchJson<T>(path: string, options: HttpRequestOptions = {}): Promise<T> {
   const config = getRuntimeConfig();
   const timeoutMs = options.timeoutMs ?? config.apiTimeoutMs;
@@ -176,13 +199,23 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
     } catch (error) {
       if (error instanceof ApiError) {
         if (retryState.attempts <= retryCount && shouldRetry(error, error.status)) {
+          const retryDelayMs = computeRetryDelayMs(
+            retryState.attempts,
+            config.apiRetryBaseDelayMs,
+            config.apiRetryMaxDelayMs,
+            config.apiRetryJitterRatio,
+          );
+
           emitTelemetry('warn', 'http.retry', {
             url,
             code: error.code,
             status: error.status,
             attempt: retryState.attempts,
             requestId,
+            retryDelayMs,
           });
+
+          await sleep(retryDelayMs);
           continue;
         }
 
@@ -202,12 +235,22 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
           cause: error,
         });
         if (retryState.attempts <= retryCount) {
+          const retryDelayMs = computeRetryDelayMs(
+            retryState.attempts,
+            config.apiRetryBaseDelayMs,
+            config.apiRetryMaxDelayMs,
+            config.apiRetryJitterRatio,
+          );
+
           emitTelemetry('warn', 'http.retry', {
             url,
             code: timeoutError.code,
             attempt: retryState.attempts,
             requestId,
+            retryDelayMs,
           });
+
+          await sleep(retryDelayMs);
           continue;
         }
 
@@ -227,12 +270,22 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
       });
 
       if (retryState.attempts <= retryCount && shouldRetry(networkError)) {
+        const retryDelayMs = computeRetryDelayMs(
+          retryState.attempts,
+          config.apiRetryBaseDelayMs,
+          config.apiRetryMaxDelayMs,
+          config.apiRetryJitterRatio,
+        );
+
         emitTelemetry('warn', 'http.retry', {
           url,
           code: networkError.code,
           attempt: retryState.attempts,
           requestId,
+          retryDelayMs,
         });
+
+        await sleep(retryDelayMs);
         continue;
       }
 
