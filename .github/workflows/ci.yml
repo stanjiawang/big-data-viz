@@ -45,6 +45,8 @@ jobs:
         run: pnpm run test:perf
       - name: Reliability policy
         run: pnpm run test:reliability
+      - name: Release governance
+        run: pnpm run test:release-governance
       - name: Unit tests
         run: pnpm run test:coverage
       - name: Install Playwright browsers

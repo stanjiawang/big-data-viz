@@ -95,6 +95,7 @@
 - F2 completed: API contract tests with schema-version CI gate
 - G1 completed: bundle-size performance budgets enforced in CI
 - G3 foundation completed: incident template, generator script, and runbook wiring
+- E3 completed: release governance docs and CI validation gate
 
 ## Suggested Delivery Sequence
 

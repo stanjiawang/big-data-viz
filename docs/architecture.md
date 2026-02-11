@@ -55,6 +55,13 @@ Current enforced feature mapping:
 - Incident automation: `pnpm run incident:new -- --severity SEV2 --title "..."`
 - Incident docs template: `docs/templates/incident.md`
 
+## Release Governance Gates (Current)
+
+- CI runs `pnpm run test:release-governance` to validate:
+  - `CHANGELOG.md` contains `Unreleased` and `Release Procedure` sections
+  - `docs/release-checklist.md` contains mandatory pre-release controls
+  - `docs/rollback-checklist.md` contains mandatory rollback controls
+
 ## Non-Functional Targets
 
 - Availability: 99.9% monthly target for production UI

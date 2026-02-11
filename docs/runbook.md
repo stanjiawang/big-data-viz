@@ -14,8 +14,9 @@
 4. `pnpm run test:contracts`
 5. `pnpm run test:perf`
 6. `pnpm run test:reliability`
-7. `pnpm test`
-8. `pnpm test:e2e`
+7. `pnpm run test:release-governance`
+8. `pnpm test`
+9. `pnpm test:e2e`
 
 ## Common Failures
 
@@ -52,3 +53,10 @@
   - Page load p95: 1500ms
   - Route transition p95: 1500ms
   - Incident MTTR target: 60 minutes
+
+## Release Governance
+
+- Changelog source: `CHANGELOG.md`
+- Release checklist: `docs/release-checklist.md`
+- Rollback checklist: `docs/rollback-checklist.md`
+- Governance validator: `pnpm run test:release-governance`
