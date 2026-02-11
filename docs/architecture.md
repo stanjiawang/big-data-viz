@@ -48,6 +48,13 @@ Current enforced feature mapping:
   - `PERF_MAX_TOTAL_CSS_GZIP_KB=30`
   - `PERF_MAX_TOTAL_ASSETS_GZIP_KB=760`
 
+## Reliability Gates (Current)
+
+- CI runs `pnpm run test:reliability`, validating SLO and incident policy consistency.
+- Reliability policy source of truth: `config/reliability/slo.json`
+- Incident automation: `pnpm run incident:new -- --severity SEV2 --title "..."`
+- Incident docs template: `docs/templates/incident.md`
+
 ## Non-Functional Targets
 
 - Availability: 99.9% monthly target for production UI

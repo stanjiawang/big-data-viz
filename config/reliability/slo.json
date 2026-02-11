@@ -1,0 +1,23 @@
+{
+  "service": "big-data-viz-frontend",
+  "availability": {
+    "targetPercent": 99.9,
+    "errorBudgetPercent": 0.1,
+    "measurementWindowDays": 30
+  },
+  "latency": {
+    "pageLoadP95Ms": 1500,
+    "routeTransitionP95Ms": 1500
+  },
+  "incident": {
+    "sev1AckMinutes": 5,
+    "sev2AckMinutes": 15,
+    "sev3AckMinutes": 60,
+    "sev4AckMinutes": 240,
+    "targetMttrMinutes": 60
+  },
+  "alerting": {
+    "onCallSlackChannel": "#frontend-oncall",
+    "pagerService": "big-data-viz-frontend"
+  }
+}

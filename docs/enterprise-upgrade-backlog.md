@@ -90,6 +90,12 @@
   - Estimate: 1d
   - Acceptance: documented runbook exercised once
 
+## Completed Foundation Items
+
+- F2 completed: API contract tests with schema-version CI gate
+- G1 completed: bundle-size performance budgets enforced in CI
+- G3 foundation completed: incident template, generator script, and runbook wiring
+
 ## Suggested Delivery Sequence
 
 1. Epic A
