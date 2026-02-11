@@ -39,6 +39,8 @@ jobs:
         run: pnpm run typecheck
       - name: Stylelint
         run: pnpm run stylelint
+      - name: Contract tests
+        run: pnpm run test:contracts
       - name: Unit tests
         run: pnpm run test:coverage
       - name: Install Playwright browsers

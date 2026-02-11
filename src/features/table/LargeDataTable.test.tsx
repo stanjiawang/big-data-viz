@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { API_SCHEMA_VERSION } from '@/lib/contracts';
 import type { DataChunk, MockFilters } from '@/lib/types';
 import { queryKeys } from '@/features/data/queries/queryKeys';
 import { LargeDataTable } from '@/features/table/LargeDataTable';
@@ -31,6 +32,7 @@ describe('LargeDataTable', () => {
   it('renders header and rows', () => {
     const queryClient = new QueryClient();
     const chunk: DataChunk = {
+      schemaVersion: API_SCHEMA_VERSION,
       total: 2,
       offset: 0,
       limit: 2,
@@ -56,6 +58,7 @@ describe('LargeDataTable', () => {
 
     useMockDataMock.mockReturnValue({
       data: {
+        schemaVersion: API_SCHEMA_VERSION,
         total: 2,
         offset: 0,
         limit: 2,
@@ -100,6 +103,7 @@ describe('LargeDataTable', () => {
   it('renders empty state', () => {
     useMockDataMock.mockReturnValue({
       data: {
+        schemaVersion: API_SCHEMA_VERSION,
         total: 0,
         offset: 0,
         limit: 1,
@@ -121,6 +125,7 @@ describe('LargeDataTable', () => {
   it('toggles compact view', async () => {
     useMockDataMock.mockReturnValue({
       data: {
+        schemaVersion: API_SCHEMA_VERSION,
         total: 2,
         offset: 0,
         limit: 2,

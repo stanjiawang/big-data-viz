@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { useMockData, useMockDataSuspense } from '@/features/data/queries/useMockData';
+import { API_SCHEMA_VERSION } from '@/lib/contracts';
 import type { DataChunk } from '@/lib/types';
 
 const getMockData = jest.fn();
@@ -16,7 +17,13 @@ describe('useMockData', () => {
   });
 
   it('calls getMockData with params', async () => {
-    const chunk: DataChunk = { total: 1, offset: 0, limit: 1, records: [] };
+    const chunk: DataChunk = {
+      schemaVersion: API_SCHEMA_VERSION,
+      total: 1,
+      offset: 0,
+      limit: 1,
+      records: [],
+    };
     getMockData.mockResolvedValue(chunk);
 
     const queryClient = new QueryClient();
@@ -47,7 +54,13 @@ describe('useMockData', () => {
   });
 
   it('respects disabled queries', async () => {
-    getMockData.mockResolvedValue({ total: 1, offset: 0, limit: 1, records: [] });
+    getMockData.mockResolvedValue({
+      schemaVersion: API_SCHEMA_VERSION,
+      total: 1,
+      offset: 0,
+      limit: 1,
+      records: [],
+    });
 
     const queryClient = new QueryClient();
     const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -74,7 +87,13 @@ describe('useMockData', () => {
 
 describe('useMockDataSuspense', () => {
   it('renders data with suspense', async () => {
-    const chunk: DataChunk = { total: 2, offset: 0, limit: 2, records: [] };
+    const chunk: DataChunk = {
+      schemaVersion: API_SCHEMA_VERSION,
+      total: 2,
+      offset: 0,
+      limit: 2,
+      records: [],
+    };
     getMockData.mockResolvedValue(chunk);
 
     const queryClient = new QueryClient();

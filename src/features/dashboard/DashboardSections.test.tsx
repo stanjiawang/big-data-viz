@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { API_SCHEMA_VERSION } from '@/lib/contracts';
 import type { DataChunk, MockFilters } from '@/lib/types';
 import {
   ChartsSection,
@@ -33,6 +34,7 @@ jest.mock('@/features/table/LargeDataTable', () => ({
 }));
 
 const mockChunk: DataChunk = {
+  schemaVersion: API_SCHEMA_VERSION,
   total: 1000,
   offset: 0,
   limit: 1000,
@@ -54,11 +56,13 @@ jest.mock('@/features/data/queries/useMockData', () => ({
 }));
 
 jest.mock('@/features/data/queries/useTimeSeries', () => ({
-  useTimeSeriesSuspense: () => ({ data: { metric: 'ingestion', points: [] } }),
+  useTimeSeriesSuspense: () => ({
+    data: { schemaVersion: API_SCHEMA_VERSION, metric: 'ingestion', points: [] },
+  }),
 }));
 
 jest.mock('@/features/data/queries/useGraph', () => ({
-  useGraphSuspense: () => ({ data: { nodes: [], edges: [] } }),
+  useGraphSuspense: () => ({ data: { schemaVersion: API_SCHEMA_VERSION, nodes: [], edges: [] } }),
 }));
 
 describe('DashboardSections', () => {

@@ -1,5 +1,6 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { API_SCHEMA_VERSION } from '@/lib/contracts';
 import type { GraphResponse } from '@/lib/types';
 import { RelationshipGraph } from '@/features/graph/RelationshipGraph';
 
@@ -45,13 +46,14 @@ describe('RelationshipGraph', () => {
   });
 
   it('shows empty state', () => {
-    const data: GraphResponse = { nodes: [], edges: [] };
+    const data: GraphResponse = { schemaVersion: API_SCHEMA_VERSION, nodes: [], edges: [] };
     render(<RelationshipGraph data={data} />);
     expect(screen.getByText('No graph data.')).toBeInTheDocument();
   });
 
   it('renders cluster filters when data is present', () => {
     const data: GraphResponse = {
+      schemaVersion: API_SCHEMA_VERSION,
       nodes: [
         { id: 'node-1', group: 'cluster-1', weight: 1 },
         { id: 'node-2', group: 'cluster-2', weight: 1 },
@@ -67,6 +69,7 @@ describe('RelationshipGraph', () => {
 
   it('toggles edges and cluster filters', async () => {
     const data: GraphResponse = {
+      schemaVersion: API_SCHEMA_VERSION,
       nodes: [{ id: 'node-1', group: 'cluster-1', weight: 1 }],
       edges: [],
     };
@@ -83,6 +86,7 @@ describe('RelationshipGraph', () => {
 
   it('shows tooltip and selected node details', async () => {
     const data: GraphResponse = {
+      schemaVersion: API_SCHEMA_VERSION,
       nodes: [{ id: 'node-1', group: 'cluster-1', weight: 2 }],
       edges: [],
     };

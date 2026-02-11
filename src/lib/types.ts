@@ -8,6 +8,7 @@ export type TrainingRecord = {
 };
 
 export type DataChunk = {
+  schemaVersion: string;
   total: number;
   offset: number;
   limit: number;
@@ -37,6 +38,7 @@ export type TimeSeriesPoint = {
 };
 
 export type TimeSeriesResponse = {
+  schemaVersion: string;
   metric: string;
   points: TimeSeriesPoint[];
 };
@@ -54,6 +56,7 @@ export type GraphEdge = {
 };
 
 export type GraphResponse = {
+  schemaVersion: string;
   nodes: GraphNode[];
   edges: GraphEdge[];
 };

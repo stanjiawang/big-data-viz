@@ -1,4 +1,5 @@
 import { mulberry32, pick, randomInRange } from '@/lib/random';
+import { API_SCHEMA_VERSION } from '@/lib/contracts';
 import type {
   DataChunk,
   GraphResponse,
@@ -115,6 +116,7 @@ export function generateChunk({
   const effectiveTotal = hasActiveFilters(filters) ? records.length : total;
 
   return {
+    schemaVersion: API_SCHEMA_VERSION,
     total: effectiveTotal,
     offset,
     limit: records.length,
@@ -122,9 +124,7 @@ export function generateChunk({
   } satisfies DataChunk;
 }
 
-export function generateTimeSeries(
-  metric = 'ingestion',
-): TimeSeriesResponse | { metric: string; points: [] } {
+export function generateTimeSeries(metric = 'ingestion'): TimeSeriesResponse {
   const next = mulberry32(7);
   const points = Array.from({ length: 30 }, (_, i) => {
     const date = new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000);
@@ -135,6 +135,7 @@ export function generateTimeSeries(
   });
 
   return {
+    schemaVersion: API_SCHEMA_VERSION,
     metric,
     points,
   };
@@ -158,5 +159,5 @@ export function generateGraph(): GraphResponse {
     };
   });
 
-  return { nodes, edges };
+  return { schemaVersion: API_SCHEMA_VERSION, nodes, edges };
 }

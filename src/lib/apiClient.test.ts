@@ -1,4 +1,5 @@
 import { getGraph, getMockData, getTimeSeries } from '@/lib/apiClient';
+import { API_SCHEMA_VERSION } from '@/lib/contracts';
 import { ApiError } from '@/lib/errors';
 
 describe('apiClient', () => {
@@ -17,6 +18,7 @@ describe('apiClient', () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
+        schemaVersion: API_SCHEMA_VERSION,
         total: 0,
         offset: 0,
         limit: 0,
@@ -46,7 +48,7 @@ describe('apiClient', () => {
   it('fetches time series with metric', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
-      json: async () => ({ metric: 'ingestion', points: [] }),
+      json: async () => ({ schemaVersion: API_SCHEMA_VERSION, metric: 'ingestion', points: [] }),
     });
 
     await getTimeSeries({ metric: 'latency' });
@@ -57,7 +59,7 @@ describe('apiClient', () => {
   it('fetches graph data', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
-      json: async () => ({ nodes: [], edges: [] }),
+      json: async () => ({ schemaVersion: API_SCHEMA_VERSION, nodes: [], edges: [] }),
     });
 
     await getGraph();
@@ -83,6 +85,7 @@ describe('apiClient', () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
+        schemaVersion: API_SCHEMA_VERSION,
         total: 0,
         offset: 0,
         limit: 0,
@@ -108,5 +111,26 @@ describe('apiClient', () => {
     expect(url).toContain('mockFailure=server-error');
     expect(url).toContain('mockDelayMs=100');
     expect(url).toContain('mockTenantId=tenant-x');
+  });
+
+  it('throws parse error when schema version mismatches', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        schemaVersion: '1999-01-01',
+        total: 0,
+        offset: 0,
+        limit: 0,
+        records: [],
+      }),
+    });
+
+    try {
+      await getMockData();
+      throw new Error('Expected getMockData to fail for schema version mismatch');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).code).toBe('PARSE_ERROR');
+    }
   });
 });

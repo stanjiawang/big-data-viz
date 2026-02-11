@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { API_SCHEMA_VERSION } from '@/lib/contracts';
 import { TimeSeriesChart } from '@/features/charts/TimeSeriesChart';
 
 jest.mock('echarts/core', () => ({
@@ -31,7 +32,11 @@ describe('TimeSeriesChart', () => {
   });
 
   it('shows empty overlay when no points', () => {
-    render(<TimeSeriesChart data={{ metric: 'ingestion', points: [] }} />);
+    render(
+      <TimeSeriesChart
+        data={{ schemaVersion: API_SCHEMA_VERSION, metric: 'ingestion', points: [] }}
+      />,
+    );
     expect(screen.getByText('No time-series data.')).toBeInTheDocument();
   });
 });

@@ -6,6 +6,7 @@ import type {
   TimeSeriesResponse,
   TrainingRecord,
 } from '@/lib/types';
+import { API_SCHEMA_VERSION } from '@/lib/contracts';
 
 describe('types', () => {
   it('compiles type usage', () => {
@@ -19,6 +20,7 @@ describe('types', () => {
     };
 
     const chunk: DataChunk = {
+      schemaVersion: API_SCHEMA_VERSION,
       total: 1,
       offset: 0,
       limit: 1,
@@ -36,11 +38,13 @@ describe('types', () => {
     };
 
     const series: TimeSeriesResponse = {
+      schemaVersion: API_SCHEMA_VERSION,
       metric: 'ingestion',
       points: [{ timestamp: '2024-01-01', value: 10 }],
     };
 
     const graph: GraphResponse = {
+      schemaVersion: API_SCHEMA_VERSION,
       nodes: [{ id: 'node-1', group: 'cluster-1', weight: 1 }],
       edges: [{ source: 'node-1', target: 'node-1', weight: 1 }],
     };

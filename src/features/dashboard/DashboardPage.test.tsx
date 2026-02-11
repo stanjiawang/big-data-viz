@@ -3,10 +3,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { AUTH_SESSION_STORAGE_KEY } from '@/auth/authClient';
+import { API_SCHEMA_VERSION } from '@/lib/contracts';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import type { DataChunk, GraphResponse, TimeSeriesResponse } from '@/lib/types';
 
 const mockChunk: DataChunk = {
+  schemaVersion: API_SCHEMA_VERSION,
   total: 1000,
   offset: 0,
   limit: 2,
@@ -31,6 +33,7 @@ const mockChunk: DataChunk = {
 };
 
 const mockTimeSeries: TimeSeriesResponse = {
+  schemaVersion: API_SCHEMA_VERSION,
   metric: 'ingestion',
   points: [
     { timestamp: '2026-01-01T00:00:00.000Z', value: 100 },
@@ -39,6 +42,7 @@ const mockTimeSeries: TimeSeriesResponse = {
 };
 
 const mockGraph: GraphResponse = {
+  schemaVersion: API_SCHEMA_VERSION,
   nodes: [{ id: 'node-1', group: 'cluster-1', weight: 1 }],
   edges: [],
 };
