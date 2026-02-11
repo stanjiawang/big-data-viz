@@ -2,6 +2,11 @@ import type { ReactNode } from 'react';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useQueryErrorResetBoundary } from '@tanstack/react-query';
+import {
+  QUERY_BOUNDARY_DEFAULTS,
+  resolveQueryErrorCopy,
+  shouldAutoRetryQueryError,
+} from '@/app/queryErrorPolicy';
 import { ErrorState } from '@/components/ui/ErrorState';
 
 type AsyncBoundaryProps = {
@@ -15,15 +20,17 @@ type AsyncBoundaryProps = {
 };
 
 type ErrorFallbackProps = {
+  error: unknown;
   onReset: () => void;
   errorTitle?: string;
   errorMessage?: string;
-  autoRetry: boolean;
+  autoRetry?: boolean;
   maxRetries: number;
   baseDelayMs: number;
 };
 
 function ErrorFallback({
+  error,
   onReset,
   errorTitle,
   errorMessage,
@@ -32,12 +39,14 @@ function ErrorFallback({
   baseDelayMs,
 }: ErrorFallbackProps) {
   const [retryCount, setRetryCount] = useState(0);
+  const resolvedAutoRetry = autoRetry ?? shouldAutoRetryQueryError(error);
+  const resolvedCopy = resolveQueryErrorCopy(error, errorTitle, errorMessage);
 
   const delaySeconds = useMemo(() => {
-    if (!autoRetry || retryCount >= maxRetries) return null;
+    if (!resolvedAutoRetry || retryCount >= maxRetries) return null;
     const delayMs = baseDelayMs * Math.pow(2, retryCount);
     return Math.max(1, Math.ceil(delayMs / 1000));
-  }, [autoRetry, baseDelayMs, maxRetries, retryCount]);
+  }, [resolvedAutoRetry, baseDelayMs, maxRetries, retryCount]);
 
   const [nextRetryIn, setNextRetryIn] = useState<number | null>(delaySeconds);
 
@@ -66,8 +75,8 @@ function ErrorFallback({
 
   return (
     <ErrorState
-      title={errorTitle}
-      message={errorMessage}
+      title={resolvedCopy.title}
+      message={resolvedCopy.message}
       onRetry={onReset}
       retryCount={retryCount}
       nextRetryInSeconds={nextRetryIn}
@@ -80,17 +89,18 @@ export function AsyncBoundary({
   fallback,
   errorTitle,
   errorMessage,
-  autoRetry = true,
-  maxRetries = 3,
-  baseDelayMs = 1000,
+  autoRetry,
+  maxRetries = QUERY_BOUNDARY_DEFAULTS.maxRetries,
+  baseDelayMs = QUERY_BOUNDARY_DEFAULTS.baseDelayMs,
 }: AsyncBoundaryProps) {
   const { reset } = useQueryErrorResetBoundary();
 
   return (
     <ErrorBoundary
       onReset={reset}
-      fallbackRender={({ resetErrorBoundary }) => (
+      fallbackRender={({ error, resetErrorBoundary }) => (
         <ErrorFallback
+          error={error}
           onReset={resetErrorBoundary}
           errorTitle={errorTitle}
           errorMessage={errorMessage}

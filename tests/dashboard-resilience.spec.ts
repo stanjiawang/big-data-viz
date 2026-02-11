@@ -10,13 +10,13 @@ test('renders dashboard in healthy mode', async ({ page }) => {
 test('shows async boundary errors when server failures are simulated', async ({ page }) => {
   await page.goto('/?mockFailure=server-error');
 
-  await expect(page.getByText('Failed to load table data.')).toBeVisible();
+  await expect(page.getByText("We couldn't load table data.")).toBeVisible();
 });
 
 test('surfaces parse failures from malformed mock payloads', async ({ page }) => {
   await page.goto('/?mockFailure=malformed');
 
-  await expect(page.getByText('Failed to load table data.')).toBeVisible();
+  await expect(page.getByText("We couldn't load table data.")).toBeVisible();
 });
 
 test('supports tenant-required mocks when tenant context is provided', async ({ page }) => {

@@ -26,11 +26,11 @@ test('renders label count badge from URL state', async ({ page }) => {
 test('shows data failure when tenant context is required but not provided', async ({ page }) => {
   await page.goto('/?mockRequireTenant=true');
 
-  await expect(page.getByText('Failed to load table data.')).toBeVisible();
+  await expect(page.getByText("We couldn't load table data.")).toBeVisible();
 });
 
 test('shows data failure for rate-limited backend responses', async ({ page }) => {
   await page.goto('/?mockFailure=rate-limit');
 
-  await expect(page.getByText('Failed to load table data.')).toBeVisible();
+  await expect(page.getByText("We couldn't load table data.")).toBeVisible();
 });
