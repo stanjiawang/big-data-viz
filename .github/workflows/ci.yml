@@ -41,6 +41,8 @@ jobs:
         run: pnpm run stylelint
       - name: Contract tests
         run: pnpm run test:contracts
+      - name: Performance budgets
+        run: pnpm run test:perf
       - name: Unit tests
         run: pnpm run test:coverage
       - name: Install Playwright browsers

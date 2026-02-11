@@ -16,6 +16,7 @@
     "stylelint:fix": "stylelint \"src/**/*.{css,scss}\" --fix",
     "test": "jest",
     "test:contracts": "jest src/lib/contracts.test.ts --runInBand",
+    "test:perf": "pnpm run build && node scripts/check-performance.mjs",
     "test:coverage": "jest --coverage --runInBand",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",

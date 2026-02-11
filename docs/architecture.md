@@ -38,6 +38,16 @@ Current enforced feature mapping:
 
 - `compare_mode`: `analyst` or `admin` (`src/auth/useAuth.ts`, `src/features/dashboard/DashboardPage.tsx`)
 
+## Performance Gates (Current)
+
+- CI runs `pnpm run test:perf`, which builds production assets and enforces gzip budgets.
+- Gate script: `scripts/check-performance.mjs`
+- Default budgets (override via env):
+  - `PERF_MAX_MAIN_JS_GZIP_KB=550`
+  - `PERF_MAX_TOTAL_JS_GZIP_KB=700`
+  - `PERF_MAX_TOTAL_CSS_GZIP_KB=30`
+  - `PERF_MAX_TOTAL_ASSETS_GZIP_KB=760`
+
 ## Non-Functional Targets
 
 - Availability: 99.9% monthly target for production UI
