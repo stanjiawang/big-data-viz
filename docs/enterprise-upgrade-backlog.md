@@ -99,6 +99,9 @@
 - G2 completed: deterministic render-performance benchmark gate for large table and graph flows
 - C1 completed: global uncaught error tracking with release and commit metadata tags
 - C2 completed: Web Vitals and route-transition performance telemetry wired into frontend metrics
+- A1 completed: security policy now defines private reporting channels and response SLAs
+- A2 completed: CODEOWNERS now maps core paths to active repository ownership
+- A3 completed: docs and ADR remain aligned on Jest as the standard unit/integration framework
 - D1 completed: timeout and caller-cancelled API aborts now emit distinct error codes and retry behavior
 - C3 completed: structured API failure telemetry now includes requestId, errorCode, and httpStatus fields
 - G3 foundation completed: incident template, generator script, and runbook wiring

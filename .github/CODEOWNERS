@@ -1,15 +1,18 @@
-# Global owners
-* @your-org/frontend-platform
+# Repository default owner
+* @stanjiawang
 
-# Core app
-/src/app/ @your-org/frontend-platform
-/src/lib/ @your-org/frontend-platform
-/src/config/ @your-org/frontend-platform
+# Core app and runtime
+/src/app/ @stanjiawang
+/src/lib/ @stanjiawang
+/src/config/ @stanjiawang
 
-# Data/visualization features
-/src/features/ @your-org/data-viz
+# Features and UI
+/src/features/ @stanjiawang
+/src/components/ @stanjiawang
+/src/auth/ @stanjiawang
 
-# Tooling and CI
-/.github/ @your-org/devex
-/package.json @your-org/devex
-/pnpm-lock.yaml @your-org/devex
+# Tooling, docs, and CI
+/.github/ @stanjiawang
+/docs/ @stanjiawang
+/package.json @stanjiawang
+/pnpm-lock.yaml @stanjiawang
