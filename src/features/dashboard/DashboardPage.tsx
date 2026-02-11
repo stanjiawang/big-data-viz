@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useIsFetching, useQueryClient } from '@tanstack/react-query';
+import { AuthContext } from '@/auth/AuthContext';
+import { canAccessFeature } from '@/auth/useAuth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
+import { getRuntimeConfig } from '@/config/runtimeConfig';
 import type { MockFilters } from '@/lib/types';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
 import { DATASET_SIZES } from '@/features/dashboard/dashboardFilters';
@@ -73,8 +76,23 @@ export function DashboardPage() {
   const [compareEnabled, setCompareEnabled] = useState(false);
   const [compareDatasetSize, setCompareDatasetSize] = useState(DATASET_SIZES[2]);
 
+  const runtimeConfig = getRuntimeConfig();
+  const authContext = useContext(AuthContext);
+  const canUseCompareMode = canAccessFeature(
+    authContext?.session ?? null,
+    'compare_mode',
+    runtimeConfig.enableAuth,
+  );
+
   const queryClient = useQueryClient();
   const isFetching = useIsFetching() > 0;
+  const effectiveCompareEnabled = compareEnabled && canUseCompareMode;
+
+  useEffect(() => {
+    if (!canUseCompareMode && compareEnabled) {
+      setCompareEnabled(false);
+    }
+  }, [canUseCompareMode, compareEnabled]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -152,11 +170,17 @@ export function DashboardPage() {
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
-            checked={compareEnabled}
+            checked={effectiveCompareEnabled}
             onChange={(event) => setCompareEnabled(event.target.checked)}
+            disabled={!canUseCompareMode}
           />
           Compare mode
         </label>
+        {!canUseCompareMode ? (
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-600">
+            Requires analyst or admin role
+          </span>
+        ) : null}
         <span className="hidden h-4 w-px bg-slate-200 sm:inline" />
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-semibold uppercase tracking-wide">Compare dataset</span>
@@ -171,7 +195,7 @@ export function DashboardPage() {
                 setCompareDatasetSize(nextSize);
               }
             }}
-            disabled={!compareEnabled}
+            disabled={!effectiveCompareEnabled}
           >
             {DATASET_SIZES.map((option) => (
               <option key={option.value} value={option.value}>
@@ -218,7 +242,7 @@ export function DashboardPage() {
             <SummarySection
               datasetSize={datasetSize}
               compareDatasetSize={compareDatasetSize}
-              compareEnabled={compareEnabled}
+              compareEnabled={effectiveCompareEnabled}
               filters={filters}
             />
           </AsyncBoundary>
@@ -233,7 +257,7 @@ export function DashboardPage() {
         <KpiSection
           datasetSize={datasetSize}
           compareDatasetSize={compareDatasetSize}
-          compareEnabled={compareEnabled}
+          compareEnabled={effectiveCompareEnabled}
           filters={filters}
         />
       </AsyncBoundary>
@@ -246,7 +270,7 @@ export function DashboardPage() {
         <ChartsSection
           datasetSize={datasetSize}
           compareDatasetSize={compareDatasetSize}
-          compareEnabled={compareEnabled}
+          compareEnabled={effectiveCompareEnabled}
           filters={filters}
         />
       </AsyncBoundary>
@@ -259,7 +283,7 @@ export function DashboardPage() {
         <TableSection
           datasetSize={datasetSize}
           compareDatasetSize={compareDatasetSize}
-          compareEnabled={compareEnabled}
+          compareEnabled={effectiveCompareEnabled}
           filters={filters}
         />
       </AsyncBoundary>

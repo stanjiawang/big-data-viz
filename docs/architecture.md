@@ -28,6 +28,16 @@ Big Data Viz Lab is a frontend analytics console for large-scale AI training dat
 - `src/features`: feature modules (dashboards/charts/table/graph)
 - `src/components`: reusable UI primitives
 
+## RBAC Feature Policy (Current)
+
+- `viewer`: access dashboard, filters, and read-only analytics views
+- `analyst`: viewer permissions plus compare mode workflows
+- `admin`: analyst permissions plus future admin controls
+
+Current enforced feature mapping:
+
+- `compare_mode`: `analyst` or `admin` (`src/auth/useAuth.ts`, `src/features/dashboard/DashboardPage.tsx`)
+
 ## Non-Functional Targets
 
 - Availability: 99.9% monthly target for production UI

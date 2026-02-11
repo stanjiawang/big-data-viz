@@ -1,8 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { DataChunk, GraphResponse, TimeSeriesResponse } from '@/lib/types';
+import { AuthProvider } from '@/auth/AuthProvider';
+import { AUTH_SESSION_STORAGE_KEY } from '@/auth/authClient';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
+import type { DataChunk, GraphResponse, TimeSeriesResponse } from '@/lib/types';
 
 const mockChunk: DataChunk = {
   total: 1000,
@@ -99,12 +101,55 @@ jest.mock('@/features/charts/BarChart', () => ({
   BarChart: () => <div>BarChart</div>,
 }));
 
+type RenderOptions = {
+  enableAuth?: boolean;
+  roles?: string[];
+};
+
 describe('DashboardPage', () => {
-  function renderPage() {
+  beforeEach(() => {
+    window.localStorage.clear();
+    (globalThis as { __APP_ENABLE_AUTH__?: string }).__APP_ENABLE_AUTH__ = undefined;
+  });
+
+  afterEach(() => {
+    window.localStorage.clear();
+    (globalThis as { __APP_ENABLE_AUTH__?: string }).__APP_ENABLE_AUTH__ = undefined;
+  });
+
+  function seedSession(roles: string[]) {
+    window.localStorage.setItem(
+      AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'test-token',
+        expiresAt: Date.now() + 60_000,
+        user: {
+          id: 'demo-user',
+          name: 'Demo User',
+          roles,
+          tenantId: 'tenant-demo',
+        },
+      }),
+    );
+  }
+
+  function renderPage(options: RenderOptions = {}) {
+    const { enableAuth = false, roles = ['viewer'] } = options;
+    (globalThis as { __APP_ENABLE_AUTH__?: string }).__APP_ENABLE_AUTH__ = enableAuth
+      ? 'true'
+      : 'false';
+
+    if (enableAuth) {
+      seedSession(roles);
+    }
+
     const queryClient = new QueryClient();
+
     return render(
       <QueryClientProvider client={queryClient}>
-        <DashboardPage />
+        <AuthProvider enabled={enableAuth}>
+          <DashboardPage />
+        </AuthProvider>
       </QueryClientProvider>,
     );
   }
@@ -117,14 +162,36 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Source: all')).toBeInTheDocument();
   });
 
-  it('enables compare mode', async () => {
+  it('enables compare mode in non-auth mode', async () => {
     const user = userEvent.setup();
-    renderPage();
+    renderPage({ enableAuth: false });
 
     const checkbox = screen.getByRole('checkbox', { name: /Compare mode/i });
     await user.click(checkbox);
 
     expect(screen.getByText('Primary dataset')).toBeInTheDocument();
     expect(screen.getAllByText('Compare dataset').length).toBeGreaterThan(0);
+  });
+
+  it('disables compare mode for viewer role when auth is enabled', async () => {
+    renderPage({ enableAuth: true, roles: ['viewer'] });
+
+    await waitFor(() => {
+      expect(screen.getByRole('checkbox', { name: /Compare mode/i })).toBeDisabled();
+    });
+    expect(screen.getByText('Requires analyst or admin role')).toBeInTheDocument();
+  });
+
+  it('allows compare mode for analyst role when auth is enabled', async () => {
+    const user = userEvent.setup();
+    renderPage({ enableAuth: true, roles: ['analyst'] });
+
+    await waitFor(() => {
+      expect(screen.getByRole('checkbox', { name: /Compare mode/i })).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole('checkbox', { name: /Compare mode/i }));
+
+    expect(screen.getByText('Primary dataset')).toBeInTheDocument();
   });
 });
