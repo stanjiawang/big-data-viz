@@ -4,6 +4,7 @@ import '@react-sigma/core/lib/style.css';
 import '@/styles/tailwind.css';
 import App from '@/app/App';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
+import { initPerformanceTelemetry } from '@/lib/performanceTelemetry';
 
 export async function enableMocking(enabled: boolean) {
   if (enabled) {
@@ -37,6 +38,10 @@ export async function bootstrap({
       <App />
     </StrictMode>,
   );
+
+  if (config.enableTelemetry) {
+    initPerformanceTelemetry();
+  }
 }
 
 if (getRuntimeConfig().mode !== 'test') {
