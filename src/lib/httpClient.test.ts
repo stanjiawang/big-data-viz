@@ -124,7 +124,16 @@ describe('httpClient', () => {
       code: 'HTTP_ERROR',
       status: 503,
     });
-    expect(reportErrorMock).toHaveBeenCalled();
+    expect(reportErrorMock).toHaveBeenCalledWith(
+      'http.request.failed',
+      expect.any(ApiError),
+      expect.objectContaining({
+        url: '/api/test',
+        errorCode: 'HTTP_ERROR',
+        httpStatus: 503,
+        requestId: expect.any(String),
+      }),
+    );
   });
 
   it('retries once for server errors when retryCount is set', async () => {

@@ -223,6 +223,8 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
           url,
           attempt: retryState.attempts,
           requestId,
+          errorCode: error.code,
+          httpStatus: error.status,
         });
         throw error;
       }
@@ -258,6 +260,8 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
           url,
           attempt: retryState.attempts,
           requestId,
+          errorCode: timeoutError.code,
+          httpStatus: timeoutError.status,
         });
         throw timeoutError;
       }
@@ -293,6 +297,8 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
         url,
         attempt: retryState.attempts,
         requestId,
+        errorCode: networkError.code,
+        httpStatus: networkError.status,
       });
       throw networkError;
     } finally {
@@ -310,6 +316,8 @@ export async function fetchJson<T>(path: string, options: HttpRequestOptions = {
     url,
     attempt: retryState.attempts,
     requestId,
+    errorCode: finalError.code,
+    httpStatus: finalError.status,
   });
 
   throw finalError;

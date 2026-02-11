@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/errors';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 
 type TelemetryLevel = 'info' | 'warn' | 'error';
@@ -21,6 +22,17 @@ function getBaseContext() {
 }
 
 function stringifyError(error: unknown) {
+  if (error instanceof ApiError) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+      status: error.status,
+      url: error.url,
+    };
+  }
+
   if (error instanceof Error) {
     return {
       name: error.name,
