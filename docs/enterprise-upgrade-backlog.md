@@ -109,7 +109,7 @@
 - D3 completed: centralized query error policy standardizes retry behavior and user-safe messaging
 - B2 completed: RBAC guards now gate privileged compare workflows by role
 - B3 completed: tenant context now propagates via `X-Tenant-Id` request headers
-- B1 foundation completed: auth-enabled sign-in gating and session lifecycle are wired with a mock auth client
+- B1 completed: OIDC PKCE auth flow is supported via runtime config with mock auth fallback for demo mode
 - C3 completed: structured API failure telemetry now includes requestId, errorCode, and httpStatus fields
 - G3 foundation completed: incident template, generator script, and runbook wiring
 - E3 completed: release governance docs and CI validation gate

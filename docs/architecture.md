@@ -7,6 +7,7 @@ Big Data Viz Lab is a frontend analytics console for large-scale AI training dat
 ## Current Topology
 
 - Client: React + Vite + TypeScript
+- Auth: runtime-selectable `mock` or OIDC Authorization Code + PKCE SPA flow
 - Server state: TanStack Query
 - API transport: `src/lib/httpClient.ts` and `src/lib/apiClient.ts`
 - Mock backend: MSW handlers in `src/mocks/handlers.ts`
@@ -37,6 +38,12 @@ Big Data Viz Lab is a frontend analytics console for large-scale AI training dat
 Current enforced feature mapping:
 
 - `compare_mode`: `analyst` or `admin` (`src/auth/useAuth.ts`, `src/features/dashboard/DashboardPage.tsx`)
+
+Current auth runtime knobs:
+
+- `VITE_AUTH_PROVIDER=mock|oidc`
+- OIDC settings: `VITE_AUTH_OIDC_AUTHORIZE_URL`, `VITE_AUTH_OIDC_TOKEN_URL`, `VITE_AUTH_OIDC_CLIENT_ID`
+- Optional OIDC mapping: role claim, tenant claim, redirect URIs, audience, logout URL
 
 ## Performance Gates (Current)
 

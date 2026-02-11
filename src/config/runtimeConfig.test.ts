@@ -17,6 +17,17 @@ describe('runtimeConfig', () => {
         authRequiredRoles: [],
         authRequireTenant: false,
         authTenantId: '',
+        authProvider: 'mock',
+        authOidcAuthorizeUrl: '',
+        authOidcTokenUrl: '',
+        authOidcClientId: '',
+        authOidcScope: 'openid profile email',
+        authOidcAudience: '',
+        authOidcRedirectUri: '',
+        authOidcRoleClaim: 'roles',
+        authOidcTenantClaim: 'tenant_id',
+        authOidcPostLogoutRedirectUri: '',
+        authOidcLogoutUrl: '',
       }),
     );
   });

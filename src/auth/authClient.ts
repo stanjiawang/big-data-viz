@@ -1,3 +1,5 @@
+import { getRuntimeConfig } from '@/config/runtimeConfig';
+import type { RuntimeConfig } from '@/config/runtimeConfig';
 import type { AuthSession } from '@/auth/types';
 
 type SessionListener = (_session: AuthSession | null) => void;
@@ -10,6 +12,20 @@ export type AuthClient = {
 };
 
 export const AUTH_SESSION_STORAGE_KEY = 'bdv.auth.session';
+const AUTH_OIDC_TRANSACTION_STORAGE_KEY = 'bdv.auth.oidc.transaction';
+
+type OidcTransaction = {
+  codeVerifier: string;
+  state: string;
+  returnTo: string;
+};
+
+type OidcTokenResponse = {
+  access_token?: string;
+  expires_in?: number;
+  id_token?: string;
+  token_type?: string;
+};
 
 function readSession(): AuthSession | null {
   if (typeof window === 'undefined' || !window.localStorage) {
@@ -45,12 +61,193 @@ function writeSession(session: AuthSession | null) {
   window.localStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(session));
 }
 
+function readOidcTransaction(): OidcTransaction | null {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return null;
+  }
+
+  const raw = window.localStorage.getItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY);
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as OidcTransaction;
+    if (!parsed.codeVerifier || !parsed.state) {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeOidcTransaction(transaction: OidcTransaction | null) {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return;
+  }
+
+  if (!transaction) {
+    window.localStorage.removeItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY);
+    return;
+  }
+
+  window.localStorage.setItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY, JSON.stringify(transaction));
+}
+
 function resolveTenantId() {
   if (typeof __APP_AUTH_TENANT_ID__ !== 'undefined' && __APP_AUTH_TENANT_ID__) {
     return __APP_AUTH_TENANT_ID__.trim();
   }
 
   return 'tenant-demo';
+}
+
+function resolveOidcRedirectUri(config: RuntimeConfig) {
+  if (config.authOidcRedirectUri) {
+    return config.authOidcRedirectUri;
+  }
+
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  return `${window.location.origin}${window.location.pathname}`;
+}
+
+function resolveOidcPostLogoutRedirectUri(config: RuntimeConfig) {
+  if (config.authOidcPostLogoutRedirectUri) {
+    return config.authOidcPostLogoutRedirectUri;
+  }
+
+  return resolveOidcRedirectUri(config);
+}
+
+function parseTokenClaims(token: string | undefined): Record<string, unknown> {
+  if (!token) {
+    return {};
+  }
+
+  const encoded = token.split('.')[1];
+  if (!encoded) {
+    return {};
+  }
+
+  const normalized = encoded.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), '=');
+
+  try {
+    if (typeof atob === 'function') {
+      return JSON.parse(atob(padded)) as Record<string, unknown>;
+    }
+  } catch {
+    return {};
+  }
+
+  return {};
+}
+
+function resolveClaimValue(claims: Record<string, unknown>, claimPath: string): unknown {
+  if (!claimPath) {
+    return undefined;
+  }
+
+  return claimPath
+    .split('.')
+    .filter(Boolean)
+    .reduce<unknown>((value, segment) => {
+      if (typeof value !== 'object' || value === null || !(segment in value)) {
+        return undefined;
+      }
+
+      return (value as Record<string, unknown>)[segment];
+    }, claims);
+}
+
+function parseRoles(claimValue: unknown): string[] {
+  if (Array.isArray(claimValue)) {
+    return claimValue
+      .map(String)
+      .map((role) => role.trim())
+      .filter(Boolean);
+  }
+
+  if (typeof claimValue === 'string') {
+    return claimValue
+      .split(/[,\s]+/)
+      .map((role) => role.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function parseTenant(claimValue: unknown): string | undefined {
+  if (typeof claimValue !== 'string') {
+    return undefined;
+  }
+
+  const trimmed = claimValue.trim();
+  return trimmed || undefined;
+}
+
+function sanitizeOidcCallbackParams() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.delete('code');
+  url.searchParams.delete('state');
+  url.searchParams.delete('error');
+  url.searchParams.delete('error_description');
+  window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+}
+
+function createRandomUrlSafeString(byteLength: number) {
+  const bytes = new Uint8Array(byteLength);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+async function createCodeChallenge(verifier: string) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+  const bytes = new Uint8Array(digest);
+  const base64 = btoa(String.fromCharCode(...bytes));
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function buildOidcSessionFromTokens(
+  config: RuntimeConfig,
+  tokenResponse: OidcTokenResponse,
+): AuthSession {
+  const idClaims = parseTokenClaims(tokenResponse.id_token);
+  const accessClaims = parseTokenClaims(tokenResponse.access_token);
+  const claims = Object.keys(idClaims).length > 0 ? idClaims : accessClaims;
+
+  const roles = parseRoles(resolveClaimValue(claims, config.authOidcRoleClaim));
+  const tenantId = parseTenant(resolveClaimValue(claims, config.authOidcTenantClaim));
+  const sub = typeof claims.sub === 'string' ? claims.sub : 'oidc-user';
+  const name =
+    (typeof claims.name === 'string' && claims.name) ||
+    (typeof claims.preferred_username === 'string' && claims.preferred_username) ||
+    (typeof claims.email === 'string' && claims.email) ||
+    sub;
+  const email = typeof claims.email === 'string' ? claims.email : undefined;
+  const exp = typeof claims.exp === 'number' ? claims.exp * 1000 : undefined;
+  const expiresAt = exp ?? Date.now() + (tokenResponse.expires_in ?? 3600) * 1000;
+
+  return {
+    accessToken: tokenResponse.access_token ?? '',
+    expiresAt,
+    user: {
+      id: sub,
+      name,
+      email,
+      roles,
+      tenantId,
+    },
+  };
 }
 
 function createMockSession(): AuthSession {
@@ -116,4 +313,182 @@ export function createMockAuthClient(): AuthClient {
       };
     },
   };
+}
+
+function createOidcAuthClient(config: RuntimeConfig): AuthClient {
+  const listeners = new Set<SessionListener>();
+
+  const emit = (session: AuthSession | null) => {
+    listeners.forEach((listener) => {
+      listener(session);
+    });
+  };
+
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === AUTH_SESSION_STORAGE_KEY) {
+      emit(readSession());
+    }
+  };
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', onStorage);
+  }
+
+  const signIn = async () => {
+    if (!config.authOidcAuthorizeUrl || !config.authOidcClientId || !config.authOidcTokenUrl) {
+      throw new Error(
+        'OIDC is enabled but required auth config is missing (authorize URL, token URL, client ID).',
+      );
+    }
+
+    if (typeof window === 'undefined') {
+      throw new Error('OIDC sign-in can only run in a browser.');
+    }
+
+    if (typeof crypto === 'undefined' || !crypto.subtle) {
+      throw new Error('OIDC sign-in requires Web Crypto support.');
+    }
+
+    const state = createRandomUrlSafeString(16);
+    const codeVerifier = createRandomUrlSafeString(64);
+    const codeChallenge = await createCodeChallenge(codeVerifier);
+    const redirectUri = resolveOidcRedirectUri(config);
+
+    writeOidcTransaction({
+      codeVerifier,
+      state,
+      returnTo: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+    });
+
+    const authorizeUrl = new URL(config.authOidcAuthorizeUrl);
+    authorizeUrl.searchParams.set('response_type', 'code');
+    authorizeUrl.searchParams.set('client_id', config.authOidcClientId);
+    authorizeUrl.searchParams.set('redirect_uri', redirectUri);
+    authorizeUrl.searchParams.set('scope', config.authOidcScope);
+    authorizeUrl.searchParams.set('state', state);
+    authorizeUrl.searchParams.set('code_challenge', codeChallenge);
+    authorizeUrl.searchParams.set('code_challenge_method', 'S256');
+    if (config.authOidcAudience) {
+      authorizeUrl.searchParams.set('audience', config.authOidcAudience);
+    }
+
+    window.location.assign(authorizeUrl.toString());
+  };
+
+  const signOut = async () => {
+    writeSession(null);
+    writeOidcTransaction(null);
+    emit(null);
+
+    if (!config.authOidcLogoutUrl || typeof window === 'undefined') {
+      return;
+    }
+
+    const logoutUrl = new URL(config.authOidcLogoutUrl);
+    const redirectUri = resolveOidcPostLogoutRedirectUri(config);
+    if (redirectUri) {
+      logoutUrl.searchParams.set('post_logout_redirect_uri', redirectUri);
+    }
+    window.location.assign(logoutUrl.toString());
+  };
+
+  const getSession = async () => {
+    const session = readSession();
+    if (session && session.expiresAt > Date.now()) {
+      return session;
+    }
+
+    if (session && session.expiresAt <= Date.now()) {
+      writeSession(null);
+    }
+
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const currentUrl = new URL(window.location.href);
+    const code = currentUrl.searchParams.get('code');
+    const state = currentUrl.searchParams.get('state');
+    const authError = currentUrl.searchParams.get('error');
+
+    if (authError) {
+      writeOidcTransaction(null);
+      sanitizeOidcCallbackParams();
+      const description = currentUrl.searchParams.get('error_description') || authError;
+      throw new Error(`OIDC sign-in failed: ${description}`);
+    }
+
+    if (!code || !state) {
+      return null;
+    }
+
+    if (!config.authOidcTokenUrl || !config.authOidcClientId) {
+      sanitizeOidcCallbackParams();
+      throw new Error('OIDC callback received, but token exchange config is missing.');
+    }
+
+    const transaction = readOidcTransaction();
+    if (!transaction || transaction.state !== state) {
+      writeOidcTransaction(null);
+      sanitizeOidcCallbackParams();
+      throw new Error('OIDC state validation failed.');
+    }
+
+    const redirectUri = resolveOidcRedirectUri(config);
+    const body = new URLSearchParams();
+    body.set('grant_type', 'authorization_code');
+    body.set('client_id', config.authOidcClientId);
+    body.set('code', code);
+    body.set('redirect_uri', redirectUri);
+    body.set('code_verifier', transaction.codeVerifier);
+
+    const response = await fetch(config.authOidcTokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body,
+    });
+
+    if (!response.ok) {
+      writeOidcTransaction(null);
+      sanitizeOidcCallbackParams();
+      throw new Error(`OIDC token exchange failed (${response.status}).`);
+    }
+
+    const tokenResponse = (await response.json()) as OidcTokenResponse;
+    if (!tokenResponse.access_token) {
+      writeOidcTransaction(null);
+      sanitizeOidcCallbackParams();
+      throw new Error('OIDC token response did not include an access token.');
+    }
+
+    const nextSession = buildOidcSessionFromTokens(config, tokenResponse);
+    writeSession(nextSession);
+    writeOidcTransaction(null);
+    sanitizeOidcCallbackParams();
+    emit(nextSession);
+
+    return nextSession;
+  };
+
+  return {
+    getSession,
+    signIn,
+    signOut,
+    subscribe(listener: SessionListener) {
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+  };
+}
+
+export function createAuthClient(config = getRuntimeConfig()): AuthClient {
+  if (config.authProvider === 'oidc') {
+    return createOidcAuthClient(config);
+  }
+
+  return createMockAuthClient();
 }

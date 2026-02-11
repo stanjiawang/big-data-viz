@@ -41,6 +41,19 @@ export default defineConfig(({ mode }) => {
       __APP_AUTH_REQUIRED_ROLES__: defineLiteral(env.VITE_AUTH_REQUIRED_ROLES),
       __APP_AUTH_REQUIRE_TENANT__: defineLiteral(env.VITE_AUTH_REQUIRE_TENANT),
       __APP_AUTH_TENANT_ID__: defineLiteral(env.VITE_AUTH_TENANT_ID),
+      __APP_AUTH_PROVIDER__: defineLiteral(env.VITE_AUTH_PROVIDER),
+      __APP_AUTH_OIDC_AUTHORIZE_URL__: defineLiteral(env.VITE_AUTH_OIDC_AUTHORIZE_URL),
+      __APP_AUTH_OIDC_TOKEN_URL__: defineLiteral(env.VITE_AUTH_OIDC_TOKEN_URL),
+      __APP_AUTH_OIDC_CLIENT_ID__: defineLiteral(env.VITE_AUTH_OIDC_CLIENT_ID),
+      __APP_AUTH_OIDC_SCOPE__: defineLiteral(env.VITE_AUTH_OIDC_SCOPE),
+      __APP_AUTH_OIDC_AUDIENCE__: defineLiteral(env.VITE_AUTH_OIDC_AUDIENCE),
+      __APP_AUTH_OIDC_REDIRECT_URI__: defineLiteral(env.VITE_AUTH_OIDC_REDIRECT_URI),
+      __APP_AUTH_OIDC_ROLE_CLAIM__: defineLiteral(env.VITE_AUTH_OIDC_ROLE_CLAIM),
+      __APP_AUTH_OIDC_TENANT_CLAIM__: defineLiteral(env.VITE_AUTH_OIDC_TENANT_CLAIM),
+      __APP_AUTH_OIDC_POST_LOGOUT_REDIRECT_URI__: defineLiteral(
+        env.VITE_AUTH_OIDC_POST_LOGOUT_REDIRECT_URI,
+      ),
+      __APP_AUTH_OIDC_LOGOUT_URL__: defineLiteral(env.VITE_AUTH_OIDC_LOGOUT_URL),
     },
   };
 });

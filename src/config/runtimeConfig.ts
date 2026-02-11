@@ -20,6 +20,17 @@ export type RuntimeConfig = {
   authRequiredRoles: string[];
   authRequireTenant: boolean;
   authTenantId: string;
+  authProvider: 'mock' | 'oidc';
+  authOidcAuthorizeUrl: string;
+  authOidcTokenUrl: string;
+  authOidcClientId: string;
+  authOidcScope: string;
+  authOidcAudience: string;
+  authOidcRedirectUri: string;
+  authOidcRoleClaim: string;
+  authOidcTenantClaim: string;
+  authOidcPostLogoutRedirectUri: string;
+  authOidcLogoutUrl: string;
 };
 
 function resolveMode() {
@@ -120,6 +131,14 @@ function normalizeToken(value: string | undefined) {
   return value.trim();
 }
 
+function parseAuthProvider(value: string | undefined): 'mock' | 'oidc' {
+  if (value === 'oidc') {
+    return 'oidc';
+  }
+
+  return 'mock';
+}
+
 export function getRuntimeConfig(): RuntimeConfig {
   const mode = resolveMode();
 
@@ -194,6 +213,58 @@ export function getRuntimeConfig(): RuntimeConfig {
     typeof __APP_AUTH_TENANT_ID__ !== 'undefined' ? __APP_AUTH_TENANT_ID__ : undefined,
   );
 
+  const authProvider = parseAuthProvider(
+    typeof __APP_AUTH_PROVIDER__ !== 'undefined' ? __APP_AUTH_PROVIDER__ : undefined,
+  );
+
+  const authOidcAuthorizeUrl = normalizeToken(
+    typeof __APP_AUTH_OIDC_AUTHORIZE_URL__ !== 'undefined'
+      ? __APP_AUTH_OIDC_AUTHORIZE_URL__
+      : undefined,
+  );
+
+  const authOidcTokenUrl = normalizeToken(
+    typeof __APP_AUTH_OIDC_TOKEN_URL__ !== 'undefined' ? __APP_AUTH_OIDC_TOKEN_URL__ : undefined,
+  );
+
+  const authOidcClientId = normalizeToken(
+    typeof __APP_AUTH_OIDC_CLIENT_ID__ !== 'undefined' ? __APP_AUTH_OIDC_CLIENT_ID__ : undefined,
+  );
+
+  const authOidcScope = normalizeToken(
+    typeof __APP_AUTH_OIDC_SCOPE__ !== 'undefined' ? __APP_AUTH_OIDC_SCOPE__ : undefined,
+  );
+
+  const authOidcAudience = normalizeToken(
+    typeof __APP_AUTH_OIDC_AUDIENCE__ !== 'undefined' ? __APP_AUTH_OIDC_AUDIENCE__ : undefined,
+  );
+
+  const authOidcRedirectUri = normalizeToken(
+    typeof __APP_AUTH_OIDC_REDIRECT_URI__ !== 'undefined'
+      ? __APP_AUTH_OIDC_REDIRECT_URI__
+      : undefined,
+  );
+
+  const authOidcRoleClaim = normalizeToken(
+    typeof __APP_AUTH_OIDC_ROLE_CLAIM__ !== 'undefined' ? __APP_AUTH_OIDC_ROLE_CLAIM__ : undefined,
+  );
+
+  const authOidcTenantClaim = normalizeToken(
+    typeof __APP_AUTH_OIDC_TENANT_CLAIM__ !== 'undefined'
+      ? __APP_AUTH_OIDC_TENANT_CLAIM__
+      : undefined,
+  );
+
+  const authOidcPostLogoutRedirectUri = normalizeToken(
+    typeof __APP_AUTH_OIDC_POST_LOGOUT_REDIRECT_URI__ !== 'undefined'
+      ? __APP_AUTH_OIDC_POST_LOGOUT_REDIRECT_URI__
+      : undefined,
+  );
+
+  const authOidcLogoutUrl = normalizeToken(
+    typeof __APP_AUTH_OIDC_LOGOUT_URL__ !== 'undefined' ? __APP_AUTH_OIDC_LOGOUT_URL__ : undefined,
+  );
+
   return {
     mode,
     apiBaseUrl,
@@ -210,5 +281,16 @@ export function getRuntimeConfig(): RuntimeConfig {
     authRequiredRoles,
     authRequireTenant,
     authTenantId,
+    authProvider,
+    authOidcAuthorizeUrl,
+    authOidcTokenUrl,
+    authOidcClientId,
+    authOidcScope: authOidcScope || 'openid profile email',
+    authOidcAudience,
+    authOidcRedirectUri,
+    authOidcRoleClaim: authOidcRoleClaim || 'roles',
+    authOidcTenantClaim: authOidcTenantClaim || 'tenant_id',
+    authOidcPostLogoutRedirectUri,
+    authOidcLogoutUrl,
   };
 }

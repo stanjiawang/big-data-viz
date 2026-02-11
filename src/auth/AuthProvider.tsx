@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { createMockAuthClient } from '@/auth/authClient';
+import { createAuthClient } from '@/auth/authClient';
 import { AuthContext } from '@/auth/AuthContext';
 import type { AuthContextValue, AuthSession } from '@/auth/types';
-
-const authClient = createMockAuthClient();
+import { getRuntimeConfig } from '@/config/runtimeConfig';
 
 export function AuthProvider({
   enabled,
@@ -15,6 +14,7 @@ export function AuthProvider({
   const [session, setSession] = useState<AuthSession | null>(null);
   const [isLoading, setIsLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
+  const authClient = useMemo(() => createAuthClient(getRuntimeConfig()), []);
 
   useEffect(() => {
     if (!enabled) {

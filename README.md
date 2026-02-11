@@ -39,6 +39,9 @@ The app uses environment-driven runtime config and a resilient API client (timeo
 - `VITE_API_TIMEOUT_MS`: request timeout in milliseconds
 - `VITE_API_RETRY_COUNT`: retry count for retriable failures
 - `VITE_ENABLE_MSW`: `true` or `false`, enables mock API worker in development
+- `VITE_ENABLE_AUTH`: `true` or `false`, enables auth gate
+- `VITE_AUTH_PROVIDER`: `mock` (default) or `oidc`
+- OIDC minimum config: `VITE_AUTH_OIDC_AUTHORIZE_URL`, `VITE_AUTH_OIDC_TOKEN_URL`, `VITE_AUTH_OIDC_CLIENT_ID`
 
 ## Scripts
 
