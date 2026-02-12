@@ -82,6 +82,17 @@ export function D3EmbeddingScatter({
       .append('g')
       .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
+    const clipId = `d3-scatter-clip-${resetNonce}-${labels.length}-${visiblePoints.length}`;
+    svg
+      .append('defs')
+      .append('clipPath')
+      .attr('id', clipId)
+      .append('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', innerWidth)
+      .attr('height', innerHeight);
+
     const xExtent = d3.extent(visiblePoints, (point: ScatterPoint) => point.x) as [number, number];
     const yExtent = d3.extent(visiblePoints, (point: ScatterPoint) => point.y) as [number, number];
 
@@ -112,7 +123,7 @@ export function D3EmbeddingScatter({
       .attr('color', '#64748b')
       .attr('font-size', 10);
 
-    const plotLayer = root.append('g');
+    const plotLayer = root.append('g').attr('clip-path', `url(#${clipId})`);
 
     const circles = plotLayer
       .append('g')

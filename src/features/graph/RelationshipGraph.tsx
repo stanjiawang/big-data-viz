@@ -212,10 +212,12 @@ export function RelationshipGraph({
     let edgeCount = 0;
 
     nodes.forEach((node, index) => {
+      const theta = index * 2.399963229728653; // Golden-angle distribution
+      const radius = 28 + Math.sqrt(index + 1) * 12;
       graphInstance.addNode(node.id, {
         label: node.id,
-        x: Math.cos(index) * 10,
-        y: Math.sin(index) * 10,
+        x: Math.cos(theta) * radius,
+        y: Math.sin(theta) * radius,
         size: 6 + node.weight * 2,
         color: NODE_COLORS[index % NODE_COLORS.length],
       });
@@ -234,15 +236,17 @@ export function RelationshipGraph({
       }
     });
 
-    forceAtlas2.assign(graphInstance, {
-      iterations: 160,
-      settings: {
-        gravity: 1.4,
-        scalingRatio: 6,
-        strongGravityMode: true,
-        slowDown: 1,
-      },
-    });
+    if (nodes.length >= 16 && edgeCount >= 10) {
+      forceAtlas2.assign(graphInstance, {
+        iterations: 110,
+        settings: {
+          gravity: 1.2,
+          scalingRatio: 7,
+          strongGravityMode: true,
+          slowDown: 1.25,
+        },
+      });
+    }
 
     return graphInstance;
   }, [data, selectedClusters]);
@@ -255,6 +259,12 @@ export function RelationshipGraph({
         ? 'No graph data.'
         : null;
 
+  const sigmaKey = `${data?.nodes.length ?? 0}-${data?.edges.length ?? 0}-${Array.from(
+    selectedClusters,
+  )
+    .sort()
+    .join('|')}`;
+
   return (
     <div
       ref={containerRef}
@@ -262,20 +272,55 @@ export function RelationshipGraph({
       style={{ height }}
       data-testid="relationship-graph"
     >
-      <div className="flex min-h-0 flex-1 flex-col gap-2 p-2">
-        <div className="flex min-h-8 items-start justify-between gap-2">
-          {selectedNodeData ? (
-            <div className="max-w-[46%] rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm">
-              <div className="font-semibold">{selectedNodeData.id}</div>
-              <div>Cluster: {selectedNodeData.group}</div>
-              <div>Weight: {selectedNodeData.weight}</div>
-            </div>
-          ) : (
-            <div />
-          )}
+      <div className="grid min-h-0 flex-1 gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_220px]">
+        <div className="relative min-h-0 overflow-hidden rounded-lg bg-slate-50/60">
+          <div className="h-full">
+            <SigmaContainer
+              key={sigmaKey}
+              graph={graph}
+              settings={{
+                renderEdgeLabels: false,
+                labelRenderedSizeThreshold: 12,
+                defaultNodeColor: BASE_NODE_COLOR,
+                defaultEdgeColor: '#94a3b8',
+                allowInvalidContainer: true,
+                stagePadding: 28,
+                minCameraRatio: 0.35,
+                maxCameraRatio: 5,
+              }}
+              style={{ height: '100%', borderRadius: '0.375rem' }}
+            >
+              <GraphInteractions
+                containerRef={containerRef}
+                onHover={({ id, x, y }) => {
+                  setHoveredNode(id);
+                  setTooltip({ id, x, y });
+                }}
+                onLeave={() => {
+                  setHoveredNode(null);
+                  setTooltip(null);
+                }}
+                onSelect={(id) => {
+                  setSelectedNode(id);
+                }}
+                onClear={() => {
+                  setSelectedNode(null);
+                  setHoveredNode(null);
+                  setTooltip(null);
+                }}
+              />
+              <GraphStyling
+                hoveredNode={hoveredNode}
+                selectedNode={selectedNode}
+                showEdges={showEdges}
+              />
+            </SigmaContainer>
+          </div>
+        </div>
 
+        <aside className="flex min-h-0 flex-col gap-3 rounded-lg bg-white/70 p-3">
           {clusters.length > 0 ? (
-            <div className="flex max-w-[54%] flex-wrap justify-end gap-2 rounded-lg bg-slate-50/90 p-1 backdrop-blur">
+            <div className="flex flex-wrap gap-2 rounded-lg bg-white p-2">
               {clusters.map((cluster) => {
                 const active = selectedClusters.has(cluster);
                 return (
@@ -284,6 +329,9 @@ export function RelationshipGraph({
                     type="button"
                     className={active ? UI_CHIP_ACTIVE : UI_CHIP_INTERACTIVE}
                     onClick={() => {
+                      setSelectedNode(null);
+                      setHoveredNode(null);
+                      setTooltip(null);
                       setSelectedClusters((current) => {
                         const next = new Set(current);
                         if (next.has(cluster)) {
@@ -303,58 +351,41 @@ export function RelationshipGraph({
                 <button
                   type="button"
                   className={`${UI_BUTTON_GHOST_SM} h-8 px-2 text-xs`}
-                  onClick={() => setSelectedClusters(new Set())}
+                  onClick={() => {
+                    setSelectedNode(null);
+                    setHoveredNode(null);
+                    setTooltip(null);
+                    setSelectedClusters(new Set());
+                  }}
                 >
                   Clear
                 </button>
               ) : null}
             </div>
           ) : null}
-        </div>
 
-        <div className="relative min-h-0 flex-1 overflow-hidden rounded-md bg-white">
-          <SigmaContainer
-            graph={graph}
-            settings={{
-              renderEdgeLabels: false,
-              labelRenderedSizeThreshold: 12,
-              defaultNodeColor: BASE_NODE_COLOR,
-              defaultEdgeColor: '#94a3b8',
-              allowInvalidContainer: true,
-              stagePadding: 28,
-            }}
-            style={{ height: '100%', borderRadius: '0.375rem' }}
+          <button
+            type="button"
+            className={showEdges ? UI_BUTTON_PRIMARY_SM : UI_BUTTON_GHOST_SM}
+            onClick={() => setShowEdges((current) => !current)}
           >
-            <GraphInteractions
-              containerRef={containerRef}
-              onHover={({ id, x, y }) => {
-                setHoveredNode(id);
-                setTooltip({ id, x, y });
-              }}
-              onLeave={() => {
-                setHoveredNode(null);
-                setTooltip(null);
-              }}
-              onSelect={(id) => {
-                setSelectedNode(id);
-              }}
-              onClear={() => {
-                setSelectedNode(null);
-                setHoveredNode(null);
-                setTooltip(null);
-              }}
-            />
-            <GraphStyling
-              hoveredNode={hoveredNode}
-              selectedNode={selectedNode}
-              showEdges={showEdges}
-            />
-          </SigmaContainer>
-        </div>
+            {showEdges ? 'Hide edges' : 'Show edges'}
+          </button>
 
-        <div className="flex items-end justify-between gap-2">
+          {selectedNodeData ? (
+            <div className="rounded-lg bg-white px-3 py-2 text-xs text-slate-700">
+              <div className="font-semibold">{selectedNodeData.id}</div>
+              <div>Cluster: {selectedNodeData.group}</div>
+              <div>Weight: {selectedNodeData.weight}</div>
+            </div>
+          ) : (
+            <div className="rounded-lg bg-white px-3 py-2 text-xs text-slate-400">
+              Select a node to inspect details.
+            </div>
+          )}
+
           {legendItems.length > 0 ? (
-            <div className="max-w-[46%] space-y-1 rounded-lg bg-slate-50 p-2 text-xs text-slate-600">
+            <div className="min-h-0 flex-1 space-y-1 overflow-y-auto rounded-lg bg-white p-2 text-xs text-slate-600">
               <div className={UI_LABEL_CLASS}>Legend</div>
               {legendItems.map((item) => (
                 <div key={item.label} className="flex items-center gap-2">
@@ -363,22 +394,8 @@ export function RelationshipGraph({
                 </div>
               ))}
             </div>
-          ) : (
-            <div />
-          )}
-
-          <div className="flex items-center gap-2 text-xs text-slate-600">
-            <button
-              type="button"
-              className={
-                showEdges ? `${UI_BUTTON_PRIMARY_SM} h-9 px-2` : `${UI_BUTTON_GHOST_SM} h-9 px-2`
-              }
-              onClick={() => setShowEdges((current) => !current)}
-            >
-              {showEdges ? 'Hide edges' : 'Show edges'}
-            </button>
-          </div>
-        </div>
+          ) : null}
+        </aside>
       </div>
 
       {overlayMessage ? (

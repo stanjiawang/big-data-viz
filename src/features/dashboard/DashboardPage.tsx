@@ -42,6 +42,7 @@ function toDetailLabel(view: DetailView) {
   if (view === 'timeSeries') return 'Time Series';
   if (view === 'embedding') return 'Embedding Cloud';
   if (view === 'graph') return 'Relationship Graph';
+  if (view === 'd3') return 'D3 Mock Data Demo';
   if (view === 'table') return 'Large Table';
   return 'Summary';
 }
@@ -202,6 +203,17 @@ export function DashboardPage() {
             filters={filters}
             expanded
             focusView="graph"
+          />
+        ) : null}
+
+        {detailView === 'd3' ? (
+          <ChartsSection
+            datasetSize={datasetSize}
+            compareDatasetSize={compareDatasetSize}
+            compareEnabled={effectiveCompareEnabled}
+            filters={filters}
+            expanded
+            focusView="d3"
           />
         ) : null}
 

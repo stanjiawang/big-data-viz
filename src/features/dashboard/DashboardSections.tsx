@@ -26,10 +26,10 @@ export type DashboardSectionProps = {
   filters: MockFilters;
   expanded?: boolean;
   onOpenDetail?: (_view: DetailView) => void;
-  focusView?: Extract<DetailView, 'timeSeries' | 'embedding' | 'graph'>;
+  focusView?: Extract<DetailView, 'timeSeries' | 'embedding' | 'graph' | 'd3'>;
 };
 
-export type DetailView = 'summary' | 'timeSeries' | 'embedding' | 'graph' | 'table';
+export type DetailView = 'summary' | 'timeSeries' | 'embedding' | 'graph' | 'd3' | 'table';
 
 function DetailButton({ onClick }: { onClick: () => void }) {
   return (
@@ -418,13 +418,14 @@ export function ChartsSection({
           <RelationshipGraph data={graph} height={expanded ? 620 : 380} />
         </Card>
       )}
-      {focusView === undefined ? (
+      {focusView === undefined || focusView === 'd3' ? (
         <Card
           title="D3 Mock Data Demo"
           description="Label-aware embedding scatter based on mock records."
           subtitle="Tech stack: D3.js + SVG"
-          className="lg:col-span-6 flex h-full flex-col"
+          className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
+          actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('d3')} /> : null}
         >
           <D3EmbeddingScatter records={chunk?.records} height={expanded ? 620 : 380} />
         </Card>
