@@ -251,48 +251,133 @@ export function RelationshipGraph({
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-50/40"
+      className="relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white"
       style={{ height }}
       data-testid="relationship-graph"
     >
-      <div className="absolute inset-2 overflow-hidden rounded-md border border-slate-200 bg-white">
-        <SigmaContainer
-          graph={graph}
-          settings={{
-            renderEdgeLabels: false,
-            labelRenderedSizeThreshold: 12,
-            defaultNodeColor: BASE_NODE_COLOR,
-            defaultEdgeColor: '#94a3b8',
-            allowInvalidContainer: true,
-            stagePadding: 28,
-          }}
-          style={{ height: '100%', borderRadius: '0.375rem' }}
-        >
-          <GraphInteractions
-            containerRef={containerRef}
-            onHover={({ id, x, y }) => {
-              setHoveredNode(id);
-              setTooltip({ id, x, y });
+      <div className="flex min-h-0 flex-1 flex-col gap-2 p-2">
+        <div className="flex min-h-8 items-start justify-between gap-2">
+          {selectedNodeData ? (
+            <div className="max-w-[46%] rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm">
+              <div className="font-semibold">{selectedNodeData.id}</div>
+              <div>Cluster: {selectedNodeData.group}</div>
+              <div>Weight: {selectedNodeData.weight}</div>
+            </div>
+          ) : (
+            <div />
+          )}
+
+          {clusters.length > 0 ? (
+            <div className="flex max-w-[54%] flex-wrap justify-end gap-2 rounded-lg bg-slate-50/90 p-1 backdrop-blur">
+              {clusters.map((cluster) => {
+                const active = selectedClusters.has(cluster);
+                return (
+                  <button
+                    key={cluster}
+                    type="button"
+                    className={`rounded-full border px-2 py-1 text-xs font-medium ${
+                      active
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-slate-200 bg-white text-slate-500'
+                    }`}
+                    onClick={() => {
+                      setSelectedClusters((current) => {
+                        const next = new Set(current);
+                        if (next.has(cluster)) {
+                          next.delete(cluster);
+                        } else {
+                          next.add(cluster);
+                        }
+                        return next;
+                      });
+                    }}
+                  >
+                    {cluster}
+                  </button>
+                );
+              })}
+              {selectedClusters.size > 0 ? (
+                <button
+                  type="button"
+                  className="rounded-full border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500"
+                  onClick={() => setSelectedClusters(new Set())}
+                >
+                  Clear
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+
+        <div className="relative min-h-0 flex-1 overflow-hidden rounded-md bg-white">
+          <SigmaContainer
+            graph={graph}
+            settings={{
+              renderEdgeLabels: false,
+              labelRenderedSizeThreshold: 12,
+              defaultNodeColor: BASE_NODE_COLOR,
+              defaultEdgeColor: '#94a3b8',
+              allowInvalidContainer: true,
+              stagePadding: 28,
             }}
-            onLeave={() => {
-              setHoveredNode(null);
-              setTooltip(null);
-            }}
-            onSelect={(id) => {
-              setSelectedNode(id);
-            }}
-            onClear={() => {
-              setSelectedNode(null);
-              setHoveredNode(null);
-              setTooltip(null);
-            }}
-          />
-          <GraphStyling
-            hoveredNode={hoveredNode}
-            selectedNode={selectedNode}
-            showEdges={showEdges}
-          />
-        </SigmaContainer>
+            style={{ height: '100%', borderRadius: '0.375rem' }}
+          >
+            <GraphInteractions
+              containerRef={containerRef}
+              onHover={({ id, x, y }) => {
+                setHoveredNode(id);
+                setTooltip({ id, x, y });
+              }}
+              onLeave={() => {
+                setHoveredNode(null);
+                setTooltip(null);
+              }}
+              onSelect={(id) => {
+                setSelectedNode(id);
+              }}
+              onClear={() => {
+                setSelectedNode(null);
+                setHoveredNode(null);
+                setTooltip(null);
+              }}
+            />
+            <GraphStyling
+              hoveredNode={hoveredNode}
+              selectedNode={selectedNode}
+              showEdges={showEdges}
+            />
+          </SigmaContainer>
+        </div>
+
+        <div className="flex items-end justify-between gap-2">
+          {legendItems.length > 0 ? (
+            <div className="max-w-[46%] space-y-1 rounded-lg bg-slate-50 p-2 text-xs text-slate-600">
+              <div className="text-[10px] uppercase tracking-wide text-slate-400">Legend</div>
+              {legendItems.map((item) => (
+                <div key={item.label} className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span>{item.label}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div />
+          )}
+
+          <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-2 py-1 text-xs text-slate-600">
+            <button
+              type="button"
+              className={`rounded-full border px-2 py-1 ${
+                showEdges
+                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                  : 'border-slate-200 bg-white text-slate-500'
+              }`}
+              onClick={() => setShowEdges((current) => !current)}
+            >
+              {showEdges ? 'Hide edges' : 'Show edges'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {overlayMessage ? (
@@ -300,89 +385,6 @@ export function RelationshipGraph({
           {overlayMessage}
         </div>
       ) : null}
-
-      <div className="pointer-events-none absolute inset-x-3 top-3 z-10 flex items-start justify-between gap-3">
-        {selectedNodeData ? (
-          <div className="pointer-events-auto max-w-[46%] rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm">
-            <div className="font-semibold">{selectedNodeData.id}</div>
-            <div>Cluster: {selectedNodeData.group}</div>
-            <div>Weight: {selectedNodeData.weight}</div>
-          </div>
-        ) : (
-          <div />
-        )}
-
-        {clusters.length > 0 ? (
-          <div className="pointer-events-auto flex max-h-[42%] max-w-[54%] flex-wrap gap-2 overflow-y-auto rounded-lg bg-white/90 p-2 backdrop-blur">
-            {clusters.map((cluster) => {
-              const active = selectedClusters.has(cluster);
-              return (
-                <button
-                  key={cluster}
-                  type="button"
-                  className={`rounded-full border px-2 py-1 text-xs font-medium ${
-                    active
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-slate-200 bg-white text-slate-500'
-                  }`}
-                  onClick={() => {
-                    setSelectedClusters((current) => {
-                      const next = new Set(current);
-                      if (next.has(cluster)) {
-                        next.delete(cluster);
-                      } else {
-                        next.add(cluster);
-                      }
-                      return next;
-                    });
-                  }}
-                >
-                  {cluster}
-                </button>
-              );
-            })}
-            {selectedClusters.size > 0 ? (
-              <button
-                type="button"
-                className="rounded-full border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500"
-                onClick={() => setSelectedClusters(new Set())}
-              >
-                Clear
-              </button>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
-
-      <div className="pointer-events-none absolute inset-x-3 bottom-3 z-10 flex items-end justify-between gap-3">
-        {legendItems.length > 0 ? (
-          <div className="pointer-events-auto max-w-[46%] space-y-1 rounded-lg bg-white/90 p-2 text-xs text-slate-600 shadow-sm backdrop-blur">
-            <div className="text-[10px] uppercase tracking-wide text-slate-400">Legend</div>
-            {legendItems.map((item) => (
-              <div key={item.label} className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
-                <span>{item.label}</span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div />
-        )}
-
-        <div className="pointer-events-auto flex items-center gap-2 rounded-lg bg-white/90 px-2 py-1 text-xs text-slate-600 shadow-sm backdrop-blur">
-          <button
-            type="button"
-            className={`rounded-full border px-2 py-1 ${
-              showEdges
-                ? 'border-blue-500 bg-blue-50 text-blue-700'
-                : 'border-slate-200 bg-white text-slate-500'
-            }`}
-            onClick={() => setShowEdges((current) => !current)}
-          >
-            {showEdges ? 'Hide edges' : 'Show edges'}
-          </button>
-        </div>
-      </div>
 
       {tooltip ? (
         <div

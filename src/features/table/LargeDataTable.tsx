@@ -194,16 +194,17 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
     <div className="overflow-hidden rounded-lg border border-slate-200">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-white px-4 py-2 text-xs text-slate-500">
         <span className="font-semibold uppercase tracking-wide">Table controls</span>
-        <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+        <span className="inline-flex w-36 justify-center rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
           {isCompact ? 'Compact density' : 'Comfortable density'}
         </span>
         <button
           type="button"
-          className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 transition hover:border-slate-300 hover:text-slate-700 focus-visible:border-blue-500 focus-visible:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-200"
+          className="inline-flex w-32 justify-center rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 transition hover:border-slate-300 hover:text-slate-700 focus-visible:border-blue-500 focus-visible:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-200"
           aria-pressed={isCompact}
+          aria-label={isCompact ? 'Switch to comfortable view' : 'Switch to compact view'}
           onClick={() => setIsCompact((current) => !current)}
         >
-          {isCompact ? 'Comfortable view' : 'Compact view'}
+          Toggle density
         </button>
       </div>
 
@@ -230,7 +231,7 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
               />
             </div>
           ))}
-          <span>{`Embedding (first ${isCompact ? 2 : 6})`}</span>
+          <span>Embedding preview</span>
         </div>
 
         <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>

@@ -21,9 +21,9 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   const tableCard = page.locator('section', {
     has: page.getByRole('heading', { name: 'Large Table' }),
   });
-  await tableCard.getByRole('button', { name: 'Compact view' }).click();
+  await tableCard.getByRole('button', { name: 'Switch to compact view' }).click();
   await expect(page.getByText('Compact density')).toBeVisible();
-  await expect(page.getByText('Embedding (first 2)')).toBeVisible();
+  await expect(page.getByText('Embedding preview')).toBeVisible();
 
   const tableViewport = page.locator('div.h-80.overflow-auto').first();
   await tableViewport.evaluate((element) => {

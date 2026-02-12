@@ -79,7 +79,7 @@ describe('LargeDataTable', () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByText('Embedding (first 6)')).toBeInTheDocument();
+    expect(screen.getByText('Embedding preview')).toBeInTheDocument();
     expect(screen.getByText('rec_00000000')).toBeInTheDocument();
     expect(screen.getByText('rec_00000001')).toBeInTheDocument();
   });
@@ -141,10 +141,10 @@ describe('LargeDataTable', () => {
       </QueryClientProvider>,
     );
 
-    const toggle = screen.getByRole('button', { name: 'Compact view' });
+    const toggle = screen.getByRole('button', { name: 'Switch to compact view' });
     await userEvent.click(toggle);
-    expect(screen.getByRole('button', { name: 'Comfortable view' })).toBeInTheDocument();
-    expect(screen.getByText('Embedding (first 2)')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Switch to comfortable view' })).toBeInTheDocument();
     expect(screen.getByText('Compact density')).toBeInTheDocument();
+    expect(screen.getByText('Embedding preview')).toBeInTheDocument();
   });
 });
