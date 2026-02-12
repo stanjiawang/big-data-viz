@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { useAuth } from '@/auth/useAuth';
+import { MOCK_AUTH_ACCOUNTS } from '@/auth/authClient';
+import { getRuntimeConfig } from '@/config/runtimeConfig';
 
 const PANEL_CLASS =
   'mx-auto flex min-h-[50vh] w-full max-w-7xl items-center justify-center px-4 py-10 sm:px-6 lg:px-8';
@@ -24,6 +27,9 @@ export function RequireAuth({
     error,
     session,
   } = useAuth();
+  const [email, setEmail] = useState(MOCK_AUTH_ACCOUNTS[0]?.email ?? '');
+  const [password, setPassword] = useState(MOCK_AUTH_ACCOUNTS[0]?.password ?? '');
+  const authProvider = getRuntimeConfig().authProvider;
 
   if (!enabled) {
     return <>{children}</>;
@@ -42,19 +48,65 @@ export function RequireAuth({
   if (!isAuthenticated) {
     return (
       <div className={PANEL_CLASS}>
-        <div className="w-full max-w-md space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h1 className="text-lg font-semibold text-slate-900">Sign in required</h1>
-          <p className="text-sm text-slate-600">
-            Authentication is enabled for this environment. Sign in to access the dashboard.
-          </p>
-          {error ? <p className="text-sm text-rose-600">{error}</p> : null}
-          <button
-            type="button"
-            className="rounded-full border border-blue-500 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
-            onClick={() => void signIn()}
-          >
-            Sign in
-          </button>
+        <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
+          <div className="bg-gradient-to-r from-slate-900 to-blue-900 px-6 py-5 text-white">
+            <h1 className="text-xl font-semibold">Sign in required</h1>
+            <p className="mt-1 text-sm text-blue-100">
+              Authentication is enabled for this environment. Sign in to access the dashboard.
+            </p>
+          </div>
+          <div className="space-y-4 p-6">
+            {authProvider === 'mock' ? (
+              <>
+                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
+                  Mock account:
+                  <span className="ml-2 font-semibold">{MOCK_AUTH_ACCOUNTS[0]?.email}</span>
+                  <span className="ml-2 font-semibold">{MOCK_AUTH_ACCOUNTS[0]?.password}</span>
+                </div>
+                <label className="block space-y-1 text-sm text-slate-700">
+                  <span className="font-medium">Email</span>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 transition focus-visible:border-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
+                    autoComplete="username"
+                  />
+                </label>
+                <label className="block space-y-1 text-sm text-slate-700">
+                  <span className="font-medium">Password</span>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 transition focus-visible:border-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
+                    autoComplete="current-password"
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                  onClick={() =>
+                    void signIn({
+                      email,
+                      password,
+                    })
+                  }
+                >
+                  Sign in
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                onClick={() => void signIn()}
+              >
+                Continue with SSO
+              </button>
+            )}
+            {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+          </div>
         </div>
       </div>
     );

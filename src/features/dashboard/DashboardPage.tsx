@@ -156,6 +156,15 @@ export function DashboardPage() {
           >
             Refresh data
           </button>
+          {runtimeConfig.enableAuth && authContext?.isAuthenticated ? (
+            <button
+              type="button"
+              className={ACTION_BUTTON_CLASS}
+              onClick={() => void authContext.signOut()}
+            >
+              Sign out
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => setIsFilterOpen(true)}

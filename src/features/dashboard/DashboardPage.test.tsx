@@ -198,4 +198,12 @@ describe('DashboardPage', () => {
 
     expect(screen.getByText('Primary dataset')).toBeInTheDocument();
   });
+
+  it('shows sign out button when authenticated and auth is enabled', async () => {
+    renderPage({ enableAuth: true, roles: ['analyst'] });
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
+    });
+  });
 });

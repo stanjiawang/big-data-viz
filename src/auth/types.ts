@@ -14,12 +14,17 @@ export type AuthSession = {
   user: AuthUser;
 };
 
+export type AuthSignInInput = {
+  email: string;
+  password: string;
+};
+
 export type AuthContextValue = {
   session: AuthSession | null;
   isLoading: boolean;
   error: string | null;
   isAuthenticated: boolean;
-  signIn: () => Promise<void>;
+  signIn: (_credentials?: AuthSignInInput) => Promise<void>;
   signOut: () => Promise<void>;
   hasAnyRole: (_roles: string[]) => boolean;
   hasTenantContext: () => boolean;

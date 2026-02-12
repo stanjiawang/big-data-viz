@@ -46,6 +46,11 @@ The app uses environment-driven runtime config and a resilient API client (timeo
 When `VITE_AUTH_PROVIDER=oidc`, the client supports PKCE login callbacks and refresh-token renewal.
 If token renewal fails, the session is cleared and the user is prompted to sign in again.
 
+Mock sign-in account (when `VITE_AUTH_PROVIDER=mock`):
+
+- Email: `analyst@example.com`
+- Password: `DemoPass!123`
+
 ## Scripts
 
 ```bash

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AUTH_SESSION_STORAGE_KEY } from '@/auth/authClient';
+import { AUTH_SESSION_STORAGE_KEY, MOCK_AUTH_ACCOUNTS } from '@/auth/authClient';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { RequireAuth } from '@/auth/RequireAuth';
 
@@ -63,6 +63,20 @@ describe('RequireAuth', () => {
     await userEvent.click(signInButton);
 
     expect(await screen.findByText('Protected Content')).toBeInTheDocument();
+  });
+
+  it('shows mock credentials helper on sign in page', async () => {
+    render(
+      <AuthProvider enabled>
+        <RequireAuth enabled>
+          <div>Protected Content</div>
+        </RequireAuth>
+      </AuthProvider>,
+    );
+
+    expect(await screen.findByText('Sign in required')).toBeInTheDocument();
+    expect(screen.getByText(MOCK_AUTH_ACCOUNTS[0].email)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_AUTH_ACCOUNTS[0].password)).toBeInTheDocument();
   });
 
   it('blocks access when required role is missing', async () => {

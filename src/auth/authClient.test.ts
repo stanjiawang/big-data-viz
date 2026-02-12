@@ -1,4 +1,4 @@
-import { createAuthClient, AUTH_SESSION_STORAGE_KEY } from '@/auth/authClient';
+import { createAuthClient, AUTH_SESSION_STORAGE_KEY, MOCK_AUTH_ACCOUNTS } from '@/auth/authClient';
 import type { RuntimeConfig } from '@/config/runtimeConfig';
 
 function createRuntimeConfig(overrides: Partial<RuntimeConfig> = {}): RuntimeConfig {
@@ -41,12 +41,27 @@ describe('authClient', () => {
 
   it('uses mock auth provider by default', async () => {
     const client = createAuthClient(createRuntimeConfig());
-    await client.signIn();
+    await client.signIn({
+      email: MOCK_AUTH_ACCOUNTS[0].email,
+      password: MOCK_AUTH_ACCOUNTS[0].password,
+    });
 
     const session = await client.getSession();
     expect(session).not.toBeNull();
-    expect(session?.user.roles).toEqual(['viewer']);
+    expect(session?.user.roles).toEqual(['analyst']);
+    expect(session?.user.email).toBe(MOCK_AUTH_ACCOUNTS[0].email);
     expect(window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY)).toBeTruthy();
+  });
+
+  it('rejects invalid mock credentials', async () => {
+    const client = createAuthClient(createRuntimeConfig());
+
+    await expect(
+      client.signIn({
+        email: MOCK_AUTH_ACCOUNTS[0].email,
+        password: 'wrong-password',
+      }),
+    ).rejects.toThrow('Invalid mock account credentials.');
   });
 
   it('fails OIDC sign-in when required config is missing', async () => {

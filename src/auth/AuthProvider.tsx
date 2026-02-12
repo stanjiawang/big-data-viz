@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createAuthClient } from '@/auth/authClient';
 import { AuthContext } from '@/auth/AuthContext';
-import type { AuthContextValue, AuthSession } from '@/auth/types';
+import type { AuthContextValue, AuthSession, AuthSignInInput } from '@/auth/types';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { emitTelemetry, reportError } from '@/lib/telemetry';
 const SESSION_REFRESH_SKEW_MS = 30_000;
@@ -102,18 +102,22 @@ export function AuthProvider({
       isLoading,
       error,
       isAuthenticated: Boolean(session),
-      signIn: async () => {
+      signIn: async (credentials?: AuthSignInInput) => {
         setError(null);
         emitTelemetry('info', 'auth.signin.requested', {
           provider: getRuntimeConfig().authProvider,
         });
         try {
-          await authClient.signIn();
+          await authClient.signIn(credentials);
         } catch (authError) {
           reportError('auth.signin.failed', authError, {
             provider: getRuntimeConfig().authProvider,
           });
-          setError('Sign-in failed. Please try again.');
+          if (authError instanceof Error) {
+            setError(authError.message);
+          } else {
+            setError('Sign-in failed. Please try again.');
+          }
         }
       },
       signOut: async () => {

@@ -1,13 +1,13 @@
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import type { RuntimeConfig } from '@/config/runtimeConfig';
-import type { AuthSession } from '@/auth/types';
+import type { AuthSession, AuthSignInInput } from '@/auth/types';
 import { emitTelemetry, reportError } from '@/lib/telemetry';
 
 type SessionListener = (_session: AuthSession | null) => void;
 
 export type AuthClient = {
   getSession: () => Promise<AuthSession | null>;
-  signIn: () => Promise<void>;
+  signIn: (_credentials?: AuthSignInInput) => Promise<void>;
   signOut: () => Promise<void>;
   subscribe: (_listener: SessionListener) => () => void;
 };
@@ -15,6 +15,24 @@ export type AuthClient = {
 export const AUTH_SESSION_STORAGE_KEY = 'bdv.auth.session';
 const AUTH_OIDC_TRANSACTION_STORAGE_KEY = 'bdv.auth.oidc.transaction';
 const SESSION_REFRESH_SKEW_MS = 30_000;
+
+type MockAccount = {
+  email: string;
+  password: string;
+  name: string;
+  roles: string[];
+  tenantId: string;
+};
+
+export const MOCK_AUTH_ACCOUNTS: readonly MockAccount[] = [
+  {
+    email: 'analyst@example.com',
+    password: 'DemoPass!123',
+    name: 'Analyst User',
+    roles: ['analyst'],
+    tenantId: 'tenant-demo',
+  },
+] as const;
 
 type OidcTransaction = {
   codeVerifier: string;
@@ -293,18 +311,37 @@ async function exchangeRefreshToken(
   return payload;
 }
 
-function createMockSession(): AuthSession {
+function createMockSession(account: MockAccount): AuthSession {
   return {
     accessToken: 'mock-access-token',
     expiresAt: Date.now() + 8 * 60 * 60 * 1000,
     user: {
-      id: 'demo-user',
-      name: 'Demo User',
-      email: 'demo@example.com',
-      roles: ['viewer'],
-      tenantId: resolveTenantId(),
+      id: `mock-${account.email}`,
+      name: account.name,
+      email: account.email,
+      roles: account.roles,
+      tenantId: account.tenantId || resolveTenantId(),
     },
   };
+}
+
+function resolveMockAccount(credentials?: AuthSignInInput): MockAccount {
+  if (!credentials?.email || !credentials?.password) {
+    throw new Error('Email and password are required for mock sign-in.');
+  }
+
+  const normalizedEmail = credentials.email.trim().toLowerCase();
+  const account = MOCK_AUTH_ACCOUNTS.find(
+    (candidate) =>
+      candidate.email.toLowerCase() === normalizedEmail &&
+      candidate.password === credentials.password,
+  );
+
+  if (!account) {
+    throw new Error('Invalid mock account credentials.');
+  }
+
+  return account;
 }
 
 export function createMockAuthClient(): AuthClient {
@@ -340,8 +377,9 @@ export function createMockAuthClient(): AuthClient {
 
       return session;
     },
-    async signIn() {
-      const session = createMockSession();
+    async signIn(credentials?: AuthSignInInput) {
+      const account = resolveMockAccount(credentials);
+      const session = createMockSession(account);
       writeSession(session);
       emit(session);
     },
