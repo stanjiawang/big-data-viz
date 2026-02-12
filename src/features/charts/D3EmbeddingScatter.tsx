@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import type { TrainingRecord } from '@/lib/types';
 
@@ -16,6 +16,15 @@ type ScatterPoint = {
   label: string;
 };
 
+type HoverState = {
+  x: number;
+  y: number;
+  label: string;
+  weight: number;
+  px: number;
+  py: number;
+};
+
 const MARGIN = { top: 20, right: 20, bottom: 32, left: 36 };
 const MAX_POINTS = 600;
 
@@ -26,6 +35,11 @@ export function D3EmbeddingScatter({
   isError,
 }: D3EmbeddingScatterProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const [hiddenLabels, setHiddenLabels] = useState<Set<string>>(new Set());
+  const [pointScale, setPointScale] = useState(1);
+  const [pointOpacity, setPointOpacity] = useState(0.72);
+  const [hovered, setHovered] = useState<HoverState | null>(null);
+  const [resetNonce, setResetNonce] = useState(0);
 
   const points = useMemo(() => {
     return records.slice(0, MAX_POINTS).map((record) => ({
@@ -36,8 +50,16 @@ export function D3EmbeddingScatter({
     }));
   }, [records]);
 
+  const labels = useMemo(() => {
+    return Array.from(new Set(points.map((point) => point.label))).sort();
+  }, [points]);
+
+  const visiblePoints = useMemo(() => {
+    return points.filter((point) => !hiddenLabels.has(point.label));
+  }, [hiddenLabels, points]);
+
   useEffect(() => {
-    if (!svgRef.current || points.length === 0) return;
+    if (!svgRef.current || visiblePoints.length === 0) return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
@@ -52,8 +74,8 @@ export function D3EmbeddingScatter({
       .append('g')
       .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-    const xExtent = d3.extent(points, (point: ScatterPoint) => point.x) as [number, number];
-    const yExtent = d3.extent(points, (point: ScatterPoint) => point.y) as [number, number];
+    const xExtent = d3.extent(visiblePoints, (point: ScatterPoint) => point.x) as [number, number];
+    const yExtent = d3.extent(visiblePoints, (point: ScatterPoint) => point.y) as [number, number];
 
     const xScale = d3
       .scaleLinear()
@@ -67,51 +89,188 @@ export function D3EmbeddingScatter({
       .nice()
       .range([innerHeight, 0]);
 
-    const labels = Array.from(new Set(points.map((point) => point.label)));
     const colorScale = d3.scaleOrdinal<string, string>().domain(labels).range(d3.schemeTableau10);
 
-    root
+    const xAxisGroup = root
       .append('g')
       .attr('transform', `translate(0,${innerHeight})`)
       .call(d3.axisBottom(xScale).ticks(5).tickSizeOuter(0))
       .attr('color', '#64748b')
       .attr('font-size', 10);
 
-    root
+    const yAxisGroup = root
       .append('g')
       .call(d3.axisLeft(yScale).ticks(5).tickSizeOuter(0))
       .attr('color', '#64748b')
       .attr('font-size', 10);
 
-    root
+    const circles = root
       .append('g')
       .selectAll('circle')
-      .data<ScatterPoint>(points)
+      .data<ScatterPoint>(visiblePoints)
       .enter()
       .append('circle')
       .attr('cx', (point: ScatterPoint) => xScale(point.x))
       .attr('cy', (point: ScatterPoint) => yScale(point.y))
-      .attr('r', (point: ScatterPoint) => 3 + point.weight * 2)
+      .attr('r', (point: ScatterPoint) => (3 + point.weight * 2) * pointScale)
       .attr('fill', (point: ScatterPoint) => colorScale(point.label))
-      .attr('opacity', 0.72)
+      .attr('opacity', pointOpacity)
+      .on('mouseenter', (event: MouseEvent, point: ScatterPoint) => {
+        const [px, py] = d3.pointer(event, svgRef.current);
+        setHovered({
+          x: point.x,
+          y: point.y,
+          label: point.label,
+          weight: point.weight,
+          px,
+          py,
+        });
+      })
+      .on('mousemove', (event: MouseEvent, point: ScatterPoint) => {
+        const [px, py] = d3.pointer(event, svgRef.current);
+        setHovered({
+          x: point.x,
+          y: point.y,
+          label: point.label,
+          weight: point.weight,
+          px,
+          py,
+        });
+      })
+      .on('mouseleave', () => {
+        setHovered(null);
+      })
       .append('title')
       .text((point: ScatterPoint) => `${point.label} | weight ${point.weight.toFixed(2)}`);
-  }, [height, points]);
 
-  const overlayMessage = isError
-    ? 'Failed to load D3 chart.'
-    : isLoading
-      ? 'Loading D3 chart...'
-      : points.length === 0
-        ? 'No points for D3 chart.'
-        : null;
+    const zoomBehavior = d3
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.8, 8])
+      .translateExtent([
+        [0, 0],
+        [width, height],
+      ])
+      .on('zoom', (event) => {
+        const zx = event.transform.rescaleX(xScale);
+        const zy = event.transform.rescaleY(yScale);
+
+        xAxisGroup.call(d3.axisBottom(zx).ticks(5).tickSizeOuter(0));
+        yAxisGroup.call(d3.axisLeft(zy).ticks(5).tickSizeOuter(0));
+
+        circles
+          .attr('cx', (point: ScatterPoint) => zx(point.x))
+          .attr('cy', (point: ScatterPoint) => zy(point.y));
+      });
+
+    svg.call(zoomBehavior);
+
+    return () => {
+      svg.on('.zoom', null);
+    };
+  }, [height, visiblePoints, labels, pointOpacity, pointScale, resetNonce]);
+
+  let overlayMessage: string | null = null;
+  if (isError) {
+    overlayMessage = 'Failed to load D3 chart.';
+  } else if (isLoading) {
+    overlayMessage = 'Loading D3 chart...';
+  } else if (points.length === 0) {
+    overlayMessage = 'No points for D3 chart.';
+  } else if (visiblePoints.length === 0) {
+    overlayMessage = 'No points for selected labels.';
+  }
 
   return (
     <div
       className="relative overflow-hidden rounded-lg border border-slate-200 bg-white"
       style={{ height }}
     >
+      <div className="absolute left-2 top-2 z-10 flex flex-wrap items-center gap-1 rounded-md bg-white/95 p-1 shadow-sm">
+        {labels.map((label) => {
+          const active = !hiddenLabels.has(label);
+          return (
+            <button
+              key={label}
+              type="button"
+              className={`rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide ${
+                active
+                  ? 'border-blue-400 bg-blue-50 text-blue-700'
+                  : 'border-slate-200 bg-white text-slate-400'
+              }`}
+              onClick={() =>
+                setHiddenLabels((current) => {
+                  const next = new Set(current);
+                  if (active) {
+                    next.add(label);
+                  } else {
+                    next.delete(label);
+                  }
+                  return next;
+                })
+              }
+            >
+              {label}
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500"
+          onClick={() => {
+            setHiddenLabels(new Set());
+            setPointScale(1);
+            setPointOpacity(0.72);
+            setResetNonce((current) => current + 1);
+          }}
+        >
+          Reset view
+        </button>
+      </div>
+
+      <div className="absolute bottom-2 left-2 z-10 w-56 rounded-md bg-white/95 p-2 text-[10px] uppercase tracking-wide text-slate-500 shadow-sm">
+        <div className="mb-1 flex items-center justify-between">
+          <span>Point size</span>
+          <span>{pointScale.toFixed(1)}x</span>
+        </div>
+        <input
+          type="range"
+          min={0.6}
+          max={2}
+          step={0.1}
+          value={pointScale}
+          onChange={(event) => setPointScale(Number(event.target.value))}
+          className="w-full"
+        />
+        <div className="mb-1 mt-2 flex items-center justify-between">
+          <span>Opacity</span>
+          <span>{Math.round(pointOpacity * 100)}%</span>
+        </div>
+        <input
+          type="range"
+          min={0.2}
+          max={1}
+          step={0.05}
+          value={pointOpacity}
+          onChange={(event) => setPointOpacity(Number(event.target.value))}
+          className="w-full"
+        />
+      </div>
+
       <svg ref={svgRef} className="h-full w-full" data-testid="d3-embedding-scatter" />
+      {hovered ? (
+        <div
+          className="pointer-events-none absolute z-20 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 shadow-sm"
+          style={{
+            left: hovered.px + 8,
+            top: Math.max(8, hovered.py - 30),
+          }}
+        >
+          <div className="font-semibold">{hovered.label}</div>
+          <div>x: {hovered.x.toFixed(2)}</div>
+          <div>y: {hovered.y.toFixed(2)}</div>
+          <div>w: {hovered.weight.toFixed(2)}</div>
+        </div>
+      ) : null}
       {overlayMessage ? (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-50 text-sm text-slate-400">
           {overlayMessage}
