@@ -6,8 +6,8 @@ import {
   KpiSection,
   SummarySection,
   TableSection,
-} from '@/features/dashboard/DashboardSections';
-import { DATASET_SIZES } from '@/features/dashboard/dashboardFilters';
+} from '@/features/dashboard/sections';
+import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 
 jest.mock('@/features/charts/BarChart', () => ({
   BarChart: ({ title }: { title: string }) => <div>{title}</div>,
@@ -69,7 +69,7 @@ jest.mock('@/features/data/queries/useGraph', () => ({
   useGraphSuspense: () => ({ data: { schemaVersion: API_SCHEMA_VERSION, nodes: [], edges: [] } }),
 }));
 
-describe('DashboardSections', () => {
+describe('dashboard/sections', () => {
   const filters: MockFilters = { source: 'all', search: '' };
   const baseProps = {
     datasetSize: DATASET_SIZES[1],

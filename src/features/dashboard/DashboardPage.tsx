@@ -9,21 +9,21 @@ import { UI_BUTTON_GHOST_SM, UI_INPUT_MD, UI_LABEL_CLASS } from '@/components/ui
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import type { MockFilters } from '@/lib/types';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
-import { DATASET_SIZES } from '@/features/dashboard/dashboardFilters';
+import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import {
   ChartsSection,
   type DetailView,
   KpiSection,
   SummarySection,
   TableSection,
-} from '@/features/dashboard/DashboardSections';
+} from '@/features/dashboard/sections';
 import {
   ChartsRowSkeleton,
   FiltersSkeleton,
   KpiSkeletonGrid,
   SummarySkeleton,
   TableSkeleton,
-} from '@/features/dashboard/DashboardSkeletons';
+} from '@/features/dashboard/SectionSkeletons';
 import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadges';
 
 const DEFAULT_WEIGHT_MIN = 0.5;

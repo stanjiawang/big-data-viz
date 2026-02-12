@@ -2,9 +2,9 @@ import {
   DATASET_SIZES,
   LABEL_OPTIONS,
   SOURCE_OPTIONS,
-} from '@/features/dashboard/dashboardFilters';
+} from '@/features/dashboard/constants/filterOptions';
 
-describe('dashboardFilters', () => {
+describe('dashboard/constants/filterOptions', () => {
   it('exposes dataset sizes', () => {
     expect(DATASET_SIZES.length).toBeGreaterThan(0);
     expect(DATASET_SIZES.map((item) => item.label)).toContain('1M');

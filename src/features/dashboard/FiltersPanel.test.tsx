@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
-import { DATASET_SIZES } from '@/features/dashboard/dashboardFilters';
+import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import type { MockFilters } from '@/lib/types';
 
 function TestHarness() {

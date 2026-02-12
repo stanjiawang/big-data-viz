@@ -5,7 +5,7 @@ import {
   DATASET_SIZES,
   LABEL_OPTIONS,
   SOURCE_OPTIONS,
-} from '@/features/dashboard/dashboardFilters';
+} from '@/features/dashboard/constants/filterOptions';
 
 export type FiltersPanelProps = {
   datasetSize: (typeof DATASET_SIZES)[number];

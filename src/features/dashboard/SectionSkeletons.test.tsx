@@ -5,9 +5,9 @@ import {
   KpiSkeletonGrid,
   SummarySkeleton,
   TableSkeleton,
-} from '@/features/dashboard/DashboardSkeletons';
+} from '@/features/dashboard/SectionSkeletons';
 
-describe('DashboardSkeletons', () => {
+describe('SectionSkeletons', () => {
   it('renders KPI skeletons', () => {
     const { container } = render(<KpiSkeletonGrid />);
     expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
