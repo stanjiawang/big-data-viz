@@ -194,25 +194,23 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
     <div className="overflow-hidden rounded-lg border border-slate-200">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-white px-4 py-2 text-xs text-slate-500">
         <span className="font-semibold uppercase tracking-wide">Table controls</span>
-        <span className="inline-flex w-36 justify-center rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+        <span className="inline-flex h-9 w-40 items-center justify-center rounded-lg border border-slate-200 bg-gradient-to-b from-white to-slate-50 px-3 text-[11px] font-semibold tracking-wide text-slate-600 shadow-sm">
           {isCompact ? 'Compact density' : 'Comfortable density'}
         </span>
         <button
           type="button"
-          className="inline-flex w-32 justify-center rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 transition hover:border-slate-300 hover:text-slate-700 focus-visible:border-blue-500 focus-visible:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-200"
+          className="inline-flex h-9 w-40 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-3 text-[11px] font-semibold tracking-wide text-blue-700 shadow-sm transition hover:border-blue-300 hover:bg-blue-100 focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-200"
           aria-pressed={isCompact}
           aria-label={isCompact ? 'Switch to comfortable view' : 'Switch to compact view'}
           onClick={() => setIsCompact((current) => !current)}
         >
-          Toggle density
+          Toggle Density
         </button>
       </div>
 
       <div ref={parentRef} className="h-80 overflow-auto">
         <div
-          className={`sticky top-0 z-10 grid items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 text-xs font-semibold uppercase tracking-wide text-slate-500 shadow-sm ${
-            isCompact ? 'py-2' : 'py-3'
-          }`}
+          className="sticky top-0 z-10 grid h-11 items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 text-xs font-semibold uppercase tracking-wide text-slate-500 shadow-sm"
           style={{ gridTemplateColumns }}
         >
           {['ID', 'Timestamp', 'Source', 'Label'].map((label, index) => (
