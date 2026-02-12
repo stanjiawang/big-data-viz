@@ -251,7 +251,7 @@ export function RelationshipGraph({
   return (
     <div
       ref={containerRef}
-      className="relative"
+      className="relative overflow-hidden rounded-lg border border-slate-200"
       style={{ height }}
       data-testid="relationship-graph"
     >
@@ -295,7 +295,7 @@ export function RelationshipGraph({
       ) : null}
 
       {legendItems.length > 0 ? (
-        <div className="absolute left-3 top-3 space-y-1 rounded-lg bg-white/90 p-2 text-xs text-slate-600 shadow-sm backdrop-blur">
+        <div className="absolute left-3 bottom-3 z-10 max-w-[45%] space-y-1 rounded-lg bg-white/90 p-2 text-xs text-slate-600 shadow-sm backdrop-blur">
           <div className="text-[10px] uppercase tracking-wide text-slate-400">Legend</div>
           {legendItems.map((item) => (
             <div key={item.label} className="flex items-center gap-2">
@@ -307,7 +307,7 @@ export function RelationshipGraph({
       ) : null}
 
       {clusters.length > 0 ? (
-        <div className="absolute right-3 top-3 flex flex-wrap gap-2 rounded-lg bg-white/90 p-2 backdrop-blur">
+        <div className="absolute right-3 top-3 z-10 flex max-w-[60%] flex-wrap gap-2 rounded-lg bg-white/90 p-2 backdrop-blur">
           {clusters.map((cluster) => {
             const active = selectedClusters.has(cluster);
             return (
@@ -347,7 +347,7 @@ export function RelationshipGraph({
         </div>
       ) : null}
 
-      <div className="absolute left-3 bottom-3 flex items-center gap-2 rounded-lg bg-white/90 px-2 py-1 text-xs text-slate-600 shadow-sm backdrop-blur">
+      <div className="absolute right-3 bottom-3 z-10 flex items-center gap-2 rounded-lg bg-white/90 px-2 py-1 text-xs text-slate-600 shadow-sm backdrop-blur">
         <button
           type="button"
           className={`rounded-full border px-2 py-1 ${
@@ -363,7 +363,7 @@ export function RelationshipGraph({
 
       {tooltip ? (
         <div
-          className="pointer-events-none absolute rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 shadow-sm"
+          className="pointer-events-none absolute z-20 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 shadow-sm"
           style={{
             left: tooltip.x + TOOLTIP_OFFSET,
             top: tooltip.y + TOOLTIP_OFFSET,
@@ -374,7 +374,7 @@ export function RelationshipGraph({
       ) : null}
 
       {selectedNodeData ? (
-        <div className="absolute bottom-3 right-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm">
+        <div className="absolute left-3 top-3 z-10 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm">
           <div className="font-semibold">{selectedNodeData.id}</div>
           <div>Cluster: {selectedNodeData.group}</div>
           <div>Weight: {selectedNodeData.weight}</div>

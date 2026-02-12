@@ -25,9 +25,22 @@ type TimeSeriesChartProps = {
   height?: number;
   isLoading?: boolean;
   isError?: boolean;
+  xStartPercent?: number;
+  xEndPercent?: number;
+  yMin?: number;
+  yMax?: number;
 };
 
-export function TimeSeriesChart({ data, height = 280, isLoading, isError }: TimeSeriesChartProps) {
+export function TimeSeriesChart({
+  data,
+  height = 280,
+  isLoading,
+  isError,
+  xStartPercent = 0,
+  xEndPercent = 100,
+  yMin,
+  yMax,
+}: TimeSeriesChartProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
 
@@ -53,7 +66,23 @@ export function TimeSeriesChart({ data, height = 280, isLoading, isError }: Time
       },
       yAxis: {
         type: 'value',
+        min: yMin,
+        max: yMax,
       },
+      dataZoom: [
+        {
+          type: 'inside',
+          start: xStartPercent,
+          end: xEndPercent,
+        },
+        {
+          type: 'slider',
+          height: 12,
+          bottom: 2,
+          start: xStartPercent,
+          end: xEndPercent,
+        },
+      ],
       series: [
         {
           name: data?.metric ?? 'ingestion',
@@ -73,7 +102,7 @@ export function TimeSeriesChart({ data, height = 280, isLoading, isError }: Time
         },
       ],
     } satisfies EChartsOption;
-  }, [data]);
+  }, [data, xStartPercent, xEndPercent, yMin, yMax]);
 
   useEffect(() => {
     if (!chartRef.current) return;

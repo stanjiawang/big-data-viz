@@ -21,6 +21,7 @@ function isWebGLAvailable() {
 
 export function EmbeddingCloud({ records = [], isLoading, isError }: EmbeddingCloudProps) {
   const [webglOk] = useState(() => isWebGLAvailable());
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const points = useMemo(() => {
     return records.map((record) => ({
@@ -98,12 +99,32 @@ export function EmbeddingCloud({ records = [], isLoading, isError }: EmbeddingCl
   }
 
   return (
-    <div className="relative h-48 overflow-hidden rounded-lg border border-slate-200 bg-white">
+    <div className="relative h-56 overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-b from-slate-50 to-white">
+      <div className="absolute left-2 top-2 z-10 rounded-md bg-white/90 px-2 py-1 text-[10px] uppercase tracking-wide text-slate-500 shadow-sm backdrop-blur">
+        Zoom: scroll | Pan: drag
+      </div>
+      {hoveredId ? (
+        <div className="absolute right-2 top-2 z-10 rounded-md bg-white/90 px-2 py-1 text-xs text-slate-600 shadow-sm backdrop-blur">
+          Node: {hoveredId}
+        </div>
+      ) : null}
       <DeckGL
         views={view}
         viewState={viewState}
-        controller={false}
+        controller={true}
         layers={[layer]}
+        getTooltip={({ object }) => {
+          if (!object) return null;
+          const point = object as { id: string; label: string; weight: number };
+          return {
+            text: `${point.id}\n${point.label}\nweight: ${point.weight.toFixed(2)}`,
+          };
+        }}
+        onHover={({ object }) => {
+          if (!object) return setHoveredId(null);
+          const point = object as { id: string };
+          setHoveredId(point.id);
+        }}
         style={{ position: 'absolute', inset: '0' }}
       />
     </div>

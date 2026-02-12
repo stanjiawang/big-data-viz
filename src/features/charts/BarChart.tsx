@@ -14,6 +14,10 @@ type BarChartProps = {
   height?: number;
   isLoading?: boolean;
   isError?: boolean;
+  xStartPercent?: number;
+  xEndPercent?: number;
+  yMin?: number;
+  yMax?: number;
 };
 
 export function BarChart({
@@ -23,6 +27,10 @@ export function BarChart({
   height = 220,
   isLoading,
   isError,
+  xStartPercent = 0,
+  xEndPercent = 100,
+  yMin,
+  yMax,
 }: BarChartProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
@@ -55,7 +63,23 @@ export function BarChart({
       },
       yAxis: {
         type: 'value',
+        min: yMin,
+        max: yMax,
       },
+      dataZoom: [
+        {
+          type: 'inside',
+          start: xStartPercent,
+          end: xEndPercent,
+        },
+        {
+          type: 'slider',
+          height: 12,
+          bottom: 2,
+          start: xStartPercent,
+          end: xEndPercent,
+        },
+      ],
       series: [
         {
           type: 'bar',
@@ -67,7 +91,7 @@ export function BarChart({
         },
       ],
     } satisfies EChartsOption;
-  }, [categories, values, title]);
+  }, [categories, values, title, xStartPercent, xEndPercent, yMin, yMax]);
 
   useEffect(() => {
     if (!chartRef.current) return;

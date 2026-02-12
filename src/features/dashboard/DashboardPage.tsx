@@ -11,6 +11,7 @@ import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
 import { DATASET_SIZES } from '@/features/dashboard/dashboardFilters';
 import {
   ChartsSection,
+  type DetailView,
   KpiSection,
   SummarySection,
   TableSection,
@@ -58,6 +59,7 @@ function parseSearchParams() {
 
   return {
     datasetSize,
+    detail: (params.get('detail') as DetailView | null) ?? null,
     filters: {
       label,
       labels,
@@ -71,6 +73,7 @@ function parseSearchParams() {
 
 export function DashboardPage() {
   const [datasetSize, setDatasetSize] = useState(() => parseSearchParams().datasetSize);
+  const [detailView, setDetailView] = useState<DetailView | null>(() => parseSearchParams().detail);
   const [filters, setFilters] = useState<MockFilters>(() => parseSearchParams().filters);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [compareEnabled, setCompareEnabled] = useState(false);
@@ -115,6 +118,9 @@ export function DashboardPage() {
     if (filters.weightMax !== undefined) {
       params.set('weightMax', String(filters.weightMax));
     }
+    if (detailView) {
+      params.set('detail', detailView);
+    }
 
     MOCK_CONTROL_PARAMS.forEach((key) => {
       const value = currentParams.get(key);
@@ -125,7 +131,7 @@ export function DashboardPage() {
 
     const url = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState({}, '', url);
-  }, [datasetSize, filters]);
+  }, [datasetSize, filters, detailView]);
 
   const selectedLabels = filters.labels ?? [];
   const weightMinValue = filters.weightMin ?? DEFAULT_WEIGHT_MIN;
@@ -137,6 +143,78 @@ export function DashboardPage() {
     `Source: ${filters.source ?? 'all'}`,
     `Search: ${filters.search || '—'}`,
   ];
+
+  if (detailView) {
+    return (
+      <main className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <section className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+            Detailed View: {detailView}
+          </h2>
+          <button type="button" className={ACTION_BUTTON_CLASS} onClick={() => setDetailView(null)}>
+            Back to dashboard
+          </button>
+        </section>
+
+        {detailView === 'summary' ? (
+          <Card
+            title="Summary (Detailed)"
+            description="Adjust chart ranges and inspect distribution deeply."
+          >
+            <SummarySection
+              datasetSize={datasetSize}
+              compareDatasetSize={compareDatasetSize}
+              compareEnabled={effectiveCompareEnabled}
+              filters={filters}
+              expanded
+            />
+          </Card>
+        ) : null}
+
+        {detailView === 'timeSeries' ? (
+          <ChartsSection
+            datasetSize={datasetSize}
+            compareDatasetSize={compareDatasetSize}
+            compareEnabled={effectiveCompareEnabled}
+            filters={filters}
+            expanded
+            focusView="timeSeries"
+          />
+        ) : null}
+
+        {detailView === 'embedding' ? (
+          <ChartsSection
+            datasetSize={datasetSize}
+            compareDatasetSize={compareDatasetSize}
+            compareEnabled={effectiveCompareEnabled}
+            filters={filters}
+            expanded
+            focusView="embedding"
+          />
+        ) : null}
+
+        {detailView === 'graph' ? (
+          <ChartsSection
+            datasetSize={datasetSize}
+            compareDatasetSize={compareDatasetSize}
+            compareEnabled={effectiveCompareEnabled}
+            filters={filters}
+            expanded
+            focusView="graph"
+          />
+        ) : null}
+
+        {detailView === 'table' ? (
+          <TableSection
+            datasetSize={datasetSize}
+            compareDatasetSize={compareDatasetSize}
+            compareEnabled={effectiveCompareEnabled}
+            filters={filters}
+          />
+        ) : null}
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
@@ -242,6 +320,15 @@ export function DashboardPage() {
           title="Summary"
           description="Quick glance of ingestion health and distribution."
           className="lg:col-span-7"
+          actions={
+            <button
+              type="button"
+              className={ACTION_BUTTON_CLASS}
+              onClick={() => setDetailView('summary')}
+            >
+              Open detail
+            </button>
+          }
         >
           <AsyncBoundary
             fallback={<SummarySkeleton />}
@@ -281,6 +368,7 @@ export function DashboardPage() {
           compareDatasetSize={compareDatasetSize}
           compareEnabled={effectiveCompareEnabled}
           filters={filters}
+          onOpenDetail={(view) => setDetailView(view)}
         />
       </AsyncBoundary>
 
@@ -294,6 +382,7 @@ export function DashboardPage() {
           compareDatasetSize={compareDatasetSize}
           compareEnabled={effectiveCompareEnabled}
           filters={filters}
+          onOpenDetail={(view) => setDetailView(view)}
         />
       </AsyncBoundary>
 

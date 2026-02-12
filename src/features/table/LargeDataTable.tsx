@@ -10,7 +10,7 @@ import { useMockData } from '@/features/data/queries/useMockData';
 const PAGE_SIZE = 200;
 const VECTOR_SIZE = 128;
 const DEFAULT_ROW_HEIGHT = 44;
-const COMPACT_ROW_HEIGHT = 34;
+const COMPACT_ROW_HEIGHT = 28;
 const DEFAULT_COL_WIDTHS = [160, 200, 140, 140];
 const MIN_COL_WIDTH = 120;
 const MAX_COL_WIDTH = 360;
@@ -24,23 +24,33 @@ type RowProps = {
   record: TrainingRecord | null;
   style: CSSProperties;
   gridTemplateColumns: string;
+  isCompact: boolean;
 };
 
-const TableRow = memo(function TableRow({ record, style, gridTemplateColumns }: RowProps) {
+const TableRow = memo(function TableRow({
+  record,
+  style,
+  gridTemplateColumns,
+  isCompact,
+}: RowProps) {
+  const timestamp = record?.timestamp ? record.timestamp.replace('T', ' ').slice(0, 19) : 'Loading';
+
   return (
     <div className="absolute left-0 right-0" style={style}>
       <div
-        className="grid h-full items-center gap-2 border-b border-slate-100 px-4 text-sm transition-colors hover:bg-slate-50"
+        className={`grid h-full items-center gap-2 border-b border-slate-100 px-4 transition-colors hover:bg-slate-50 ${
+          isCompact ? 'text-xs' : 'text-sm'
+        }`}
         style={{ gridTemplateColumns }}
       >
         <span className="font-mono text-xs text-slate-500">{record?.id ?? '...'}</span>
-        <span className="text-xs text-slate-500">{record?.timestamp ?? 'Loading'}</span>
+        <span className="text-xs text-slate-500">{timestamp}</span>
         <span className="text-xs text-slate-600">{record?.source ?? '—'}</span>
         <span className="text-xs text-slate-600">{record?.label ?? '—'}</span>
         <span className="text-xs text-slate-500">
           {record
             ? record.features
-                .slice(0, 6)
+                .slice(0, isCompact ? 3 : 6)
                 .map((value) => value.toFixed(2))
                 .join(', ')
             : '...'}
@@ -195,7 +205,9 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
 
       <div ref={parentRef} className="h-80 overflow-auto">
         <div
-          className="sticky top-0 z-10 grid items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 shadow-sm"
+          className={`sticky top-0 z-10 grid items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 text-xs font-semibold uppercase tracking-wide text-slate-500 shadow-sm ${
+            isCompact ? 'py-2' : 'py-3'
+          }`}
           style={{ gridTemplateColumns }}
         >
           {['ID', 'Timestamp', 'Source', 'Label'].map((label, index) => (
@@ -228,6 +240,7 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
                 key={virtualRow.key}
                 record={record}
                 gridTemplateColumns={gridTemplateColumns}
+                isCompact={isCompact}
                 style={{
                   transform: `translateY(${virtualRow.start}px)`,
                   height: `${virtualRow.size}px`,

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { KpiCard } from '@/components/ui/KpiCard';
 import type { DataChunk, MockFilters } from '@/lib/types';
@@ -22,7 +22,24 @@ export type DashboardSectionProps = {
   compareDatasetSize: (typeof DATASET_SIZES)[number];
   compareEnabled: boolean;
   filters: MockFilters;
+  expanded?: boolean;
+  onOpenDetail?: (_view: DetailView) => void;
+  focusView?: Extract<DetailView, 'timeSeries' | 'embedding' | 'graph'>;
 };
+
+export type DetailView = 'summary' | 'timeSeries' | 'embedding' | 'graph' | 'table';
+
+function DetailButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
+      onClick={onClick}
+    >
+      Open detail
+    </button>
+  );
+}
 
 export function KpiSection({
   datasetSize,
@@ -135,7 +152,7 @@ export function KpiSection({
   );
 }
 
-export function SummarySection({ datasetSize, filters }: DashboardSectionProps) {
+export function SummarySection({ datasetSize, filters, expanded = false }: DashboardSectionProps) {
   const { data: chunk } = useMockDataSuspense({
     total: datasetSize.value,
     offset: 0,
@@ -168,20 +185,82 @@ export function SummarySection({ datasetSize, filters }: DashboardSectionProps) 
     };
   }, [chunk]);
 
+  const [barXStart, setBarXStart] = useState(0);
+  const [barXEnd, setBarXEnd] = useState(100);
+  const [barYMin, setBarYMin] = useState<string>('');
+  const [barYMax, setBarYMax] = useState<string>('');
+
+  const barYMinValue = barYMin === '' ? undefined : Number(barYMin);
+  const barYMaxValue = barYMax === '' ? undefined : Number(barYMax);
+
   return (
     <div className="space-y-4">
-      <PieChart title="Label Distribution" data={labelDistribution} height={200} />
+      <PieChart title="Label Distribution" data={labelDistribution} height={expanded ? 280 : 200} />
+      <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="space-y-1 text-xs text-slate-600">
+            <span className="font-semibold uppercase tracking-wide">X Range Start (%)</span>
+            <input
+              type="range"
+              min={0}
+              max={Math.max(0, barXEnd - 1)}
+              value={barXStart}
+              onChange={(event) => setBarXStart(Number(event.target.value))}
+              className="w-full"
+            />
+          </label>
+          <label className="space-y-1 text-xs text-slate-600">
+            <span className="font-semibold uppercase tracking-wide">X Range End (%)</span>
+            <input
+              type="range"
+              min={Math.min(100, barXStart + 1)}
+              max={100}
+              value={barXEnd}
+              onChange={(event) => setBarXEnd(Number(event.target.value))}
+              className="w-full"
+            />
+          </label>
+          <label className="space-y-1 text-xs text-slate-600">
+            <span className="font-semibold uppercase tracking-wide">Y Min</span>
+            <input
+              type="number"
+              value={barYMin}
+              onChange={(event) => setBarYMin(event.target.value)}
+              className="w-full rounded-md border border-slate-300 px-2 py-1"
+            />
+          </label>
+          <label className="space-y-1 text-xs text-slate-600">
+            <span className="font-semibold uppercase tracking-wide">Y Max</span>
+            <input
+              type="number"
+              value={barYMax}
+              onChange={(event) => setBarYMax(event.target.value)}
+              className="w-full rounded-md border border-slate-300 px-2 py-1"
+            />
+          </label>
+        </div>
+      </div>
       <BarChart
         title="Source Volume"
         categories={sourceDistribution.categories}
         values={sourceDistribution.values}
-        height={200}
+        height={expanded ? 280 : 200}
+        xStartPercent={barXStart}
+        xEndPercent={barXEnd}
+        yMin={barYMinValue}
+        yMax={barYMaxValue}
       />
     </div>
   );
 }
 
-export function ChartsSection({ datasetSize, filters }: DashboardSectionProps) {
+export function ChartsSection({
+  datasetSize,
+  filters,
+  expanded = false,
+  onOpenDetail,
+  focusView,
+}: DashboardSectionProps) {
   const { data: timeSeries } = useTimeSeriesSuspense('ingestion');
   const { data: graph } = useGraphSuspense();
   const { data: chunk } = useMockDataSuspense({
@@ -192,32 +271,102 @@ export function ChartsSection({ datasetSize, filters }: DashboardSectionProps) {
     filters,
   });
 
+  const [timeXStart, setTimeXStart] = useState(0);
+  const [timeXEnd, setTimeXEnd] = useState(100);
+  const [timeYMin, setTimeYMin] = useState<string>('');
+  const [timeYMax, setTimeYMax] = useState<string>('');
+
+  const timeYMinValue = timeYMin === '' ? undefined : Number(timeYMin);
+  const timeYMaxValue = timeYMax === '' ? undefined : Number(timeYMax);
+
   return (
     <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-12">
-      <Card
-        title="Time Series"
-        description="Ingestion and quality trends."
-        className="lg:col-span-4 flex h-full flex-col"
-        contentClassName="flex-1"
-      >
-        <TimeSeriesChart data={timeSeries} height={220} />
-      </Card>
-      <Card
-        title="Embedding Cloud"
-        description="High-density point cloud view."
-        className="lg:col-span-4 flex h-full flex-col"
-        contentClassName="flex-1"
-      >
-        <EmbeddingCloud records={chunk?.records} />
-      </Card>
-      <Card
-        title="Relationship Graph"
-        description="Entity linkage and clusters."
-        className="lg:col-span-4 flex h-full flex-col"
-        contentClassName="flex-1"
-      >
-        <RelationshipGraph data={graph} height={260} />
-      </Card>
+      {(focusView === undefined || focusView === 'timeSeries') && (
+        <Card
+          title="Time Series"
+          description="Ingestion and quality trends."
+          className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-4'} flex h-full flex-col`}
+          contentClassName="flex-1"
+          actions={
+            onOpenDetail ? <DetailButton onClick={() => onOpenDetail('timeSeries')} /> : null
+          }
+        >
+          <div className="space-y-3">
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className="space-y-1 text-xs text-slate-600">
+                <span className="font-semibold uppercase tracking-wide">X Start (%)</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={Math.max(0, timeXEnd - 1)}
+                  value={timeXStart}
+                  onChange={(event) => setTimeXStart(Number(event.target.value))}
+                  className="w-full"
+                />
+              </label>
+              <label className="space-y-1 text-xs text-slate-600">
+                <span className="font-semibold uppercase tracking-wide">X End (%)</span>
+                <input
+                  type="range"
+                  min={Math.min(100, timeXStart + 1)}
+                  max={100}
+                  value={timeXEnd}
+                  onChange={(event) => setTimeXEnd(Number(event.target.value))}
+                  className="w-full"
+                />
+              </label>
+              <label className="space-y-1 text-xs text-slate-600">
+                <span className="font-semibold uppercase tracking-wide">Y Min</span>
+                <input
+                  type="number"
+                  value={timeYMin}
+                  onChange={(event) => setTimeYMin(event.target.value)}
+                  className="w-full rounded-md border border-slate-300 px-2 py-1"
+                />
+              </label>
+              <label className="space-y-1 text-xs text-slate-600">
+                <span className="font-semibold uppercase tracking-wide">Y Max</span>
+                <input
+                  type="number"
+                  value={timeYMax}
+                  onChange={(event) => setTimeYMax(event.target.value)}
+                  className="w-full rounded-md border border-slate-300 px-2 py-1"
+                />
+              </label>
+            </div>
+            <TimeSeriesChart
+              data={timeSeries}
+              height={expanded ? 420 : 260}
+              xStartPercent={timeXStart}
+              xEndPercent={timeXEnd}
+              yMin={timeYMinValue}
+              yMax={timeYMaxValue}
+            />
+          </div>
+        </Card>
+      )}
+      {(focusView === undefined || focusView === 'embedding') && (
+        <Card
+          title="Embedding Cloud"
+          description="High-density point cloud view."
+          className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-4'} flex h-full flex-col`}
+          contentClassName="flex-1"
+          actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('embedding')} /> : null}
+        >
+          <EmbeddingCloud records={chunk?.records} />
+        </Card>
+      )}
+      {(focusView === undefined || focusView === 'graph') && (
+        <Card
+          title="Relationship Graph"
+          description="Entity linkage and clusters."
+          className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-4'} flex h-full flex-col`}
+          contentClassName="flex-1"
+          actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('graph')} /> : null}
+        >
+          <RelationshipGraph data={graph} height={expanded ? 500 : 300} />
+        </Card>
+      )}
     </section>
   );
 }
@@ -227,6 +376,7 @@ export function TableSection({
   compareDatasetSize,
   compareEnabled,
   filters,
+  onOpenDetail,
 }: DashboardSectionProps) {
   if (compareEnabled) {
     return (
@@ -234,6 +384,7 @@ export function TableSection({
         <Card
           title="Large Table (Primary)"
           description="Virtualized grid for multi-million row browsing."
+          actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('table')} /> : null}
         >
           <LargeDataTable total={datasetSize.value} filters={filters} />
         </Card>
@@ -248,7 +399,11 @@ export function TableSection({
   }
 
   return (
-    <Card title="Large Table" description="Virtualized grid for multi-million row browsing.">
+    <Card
+      title="Large Table"
+      description="Virtualized grid for multi-million row browsing."
+      actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('table')} /> : null}
+    >
       <LargeDataTable total={datasetSize.value} filters={filters} />
     </Card>
   );
