@@ -96,7 +96,11 @@ if (appRelease !== undefined && appRelease !== '' && !/^[a-zA-Z0-9._-]+$/.test(a
   errors.push('VITE_APP_RELEASE must contain only letters, numbers, dot, underscore, or dash.');
 }
 
-if (appCommitSha !== undefined && appCommitSha !== '' && !/^[a-fA-F0-9]{7,40}$/.test(appCommitSha)) {
+if (
+  appCommitSha !== undefined &&
+  appCommitSha !== '' &&
+  !/^[a-fA-F0-9]{7,40}$/.test(appCommitSha)
+) {
   errors.push('VITE_APP_COMMIT_SHA must be a 7-40 character hexadecimal git SHA when set.');
 }
 

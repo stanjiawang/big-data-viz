@@ -100,12 +100,6 @@ export function DashboardPage() {
   const effectiveCompareEnabled = compareEnabled && canUseCompareMode;
 
   useEffect(() => {
-    if (!canUseCompareMode && compareEnabled) {
-      setCompareEnabled(false);
-    }
-  }, [canUseCompareMode, compareEnabled]);
-
-  useEffect(() => {
     const params = new URLSearchParams();
     const currentParams = new URLSearchParams(window.location.search);
 

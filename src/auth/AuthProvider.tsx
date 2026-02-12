@@ -142,7 +142,7 @@ export function AuthProvider({
       },
       hasTenantContext: () => Boolean(session?.user.tenantId),
     }),
-    [session, isLoading, error],
+    [session, isLoading, error, authClient],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

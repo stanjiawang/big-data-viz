@@ -28,8 +28,13 @@ async function readFileOrNull(filePath) {
 async function run() {
   const errors = [];
 
-  const [changelog, releaseChecklist, rollbackChecklist, authRolloutChecklist, authIncidentPlaybook] =
-    await Promise.all([
+  const [
+    changelog,
+    releaseChecklist,
+    rollbackChecklist,
+    authRolloutChecklist,
+    authIncidentPlaybook,
+  ] = await Promise.all([
     readFileOrNull(changelogPath),
     readFileOrNull(releaseChecklistPath),
     readFileOrNull(rollbackChecklistPath),
@@ -103,7 +108,12 @@ async function run() {
   if (!authIncidentPlaybook) {
     errors.push(`Missing auth incident playbook: ${authIncidentPlaybookPath}`);
   } else {
-    const requiredSectionHeadings = ['Trigger Signals', 'Triage Steps', 'Mitigation', 'Recovery Verification'];
+    const requiredSectionHeadings = [
+      'Trigger Signals',
+      'Triage Steps',
+      'Mitigation',
+      'Recovery Verification',
+    ];
     for (const heading of requiredSectionHeadings) {
       if (!hasSection(authIncidentPlaybook, heading)) {
         errors.push(`docs/auth-incident-playbook.md missing section: "## ${heading}"`);
