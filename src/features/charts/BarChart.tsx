@@ -36,6 +36,17 @@ export function BarChart({
   const chartInstance = useRef<echarts.ECharts | null>(null);
 
   const option = useMemo<EChartsOption>(() => {
+    const safeStart = Math.max(0, Math.min(99, xStartPercent));
+    const safeEnd = Math.max(safeStart + 1, Math.min(100, xEndPercent));
+    const pointCount = categories.length;
+    const startIndex = pointCount <= 1 ? 0 : Math.floor((safeStart / 100) * (pointCount - 1));
+    const endIndexExclusive =
+      pointCount <= 1
+        ? pointCount
+        : Math.max(startIndex + 1, Math.ceil((safeEnd / 100) * pointCount));
+    const zoomedCategories = categories.slice(startIndex, endIndexExclusive);
+    const zoomedValues = values.slice(startIndex, endIndexExclusive);
+
     return {
       animation: false,
       title: {
@@ -59,31 +70,17 @@ export function BarChart({
       },
       xAxis: {
         type: 'category',
-        data: categories,
+        data: zoomedCategories,
       },
       yAxis: {
         type: 'value',
         min: yMin,
         max: yMax,
       },
-      dataZoom: [
-        {
-          type: 'inside',
-          start: xStartPercent,
-          end: xEndPercent,
-        },
-        {
-          type: 'slider',
-          height: 12,
-          bottom: 2,
-          start: xStartPercent,
-          end: xEndPercent,
-        },
-      ],
       series: [
         {
           type: 'bar',
-          data: values,
+          data: zoomedValues,
           itemStyle: {
             color: '#2563eb',
           },

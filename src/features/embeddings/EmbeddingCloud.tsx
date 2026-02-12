@@ -30,9 +30,9 @@ export function EmbeddingCloud({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [viewState, setViewState] = useState({
     target: [0, 0, 0] as [number, number, number],
-    zoom: 0.8,
-    minZoom: -2,
-    maxZoom: 4,
+    zoom: 1.8,
+    minZoom: -1,
+    maxZoom: 6,
   });
 
   const points = useMemo(() => {
@@ -126,9 +126,9 @@ export function EmbeddingCloud({
         onClick={() =>
           setViewState({
             target: [0, 0, 0],
-            zoom: 0.8,
-            minZoom: -2,
-            maxZoom: 4,
+            zoom: 1.8,
+            minZoom: -1,
+            maxZoom: 6,
           })
         }
       >

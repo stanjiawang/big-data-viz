@@ -403,7 +403,7 @@ export function ChartsSection({
           contentClassName="flex-1"
           actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('embedding')} /> : null}
         >
-          <EmbeddingCloud records={chunk?.records} height={expanded ? 500 : 260} />
+          <EmbeddingCloud records={chunk?.records} height={expanded ? 620 : 360} />
         </Card>
       )}
       {(focusView === undefined || focusView === 'graph') && (
@@ -414,7 +414,7 @@ export function ChartsSection({
           contentClassName="flex-1"
           actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('graph')} /> : null}
         >
-          <RelationshipGraph data={graph} height={expanded ? 500 : 300} />
+          <RelationshipGraph data={graph} height={expanded ? 620 : 380} />
         </Card>
       )}
     </section>

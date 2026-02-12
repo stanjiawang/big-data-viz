@@ -294,71 +294,87 @@ export function RelationshipGraph({
         </div>
       ) : null}
 
-      {legendItems.length > 0 ? (
-        <div className="absolute left-3 bottom-3 z-10 max-w-[45%] space-y-1 rounded-lg bg-white/90 p-2 text-xs text-slate-600 shadow-sm backdrop-blur">
-          <div className="text-[10px] uppercase tracking-wide text-slate-400">Legend</div>
-          {legendItems.map((item) => (
-            <div key={item.label} className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
-              <span>{item.label}</span>
-            </div>
-          ))}
-        </div>
-      ) : null}
+      <div className="pointer-events-none absolute inset-x-3 top-3 z-10 flex items-start justify-between gap-3">
+        {selectedNodeData ? (
+          <div className="pointer-events-auto max-w-[46%] rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm">
+            <div className="font-semibold">{selectedNodeData.id}</div>
+            <div>Cluster: {selectedNodeData.group}</div>
+            <div>Weight: {selectedNodeData.weight}</div>
+          </div>
+        ) : (
+          <div />
+        )}
 
-      {clusters.length > 0 ? (
-        <div className="absolute right-3 top-3 z-10 flex max-h-[44%] max-w-[65%] flex-wrap gap-2 overflow-y-auto rounded-lg bg-white/90 p-2 backdrop-blur">
-          {clusters.map((cluster) => {
-            const active = selectedClusters.has(cluster);
-            return (
+        {clusters.length > 0 ? (
+          <div className="pointer-events-auto flex max-h-[42%] max-w-[54%] flex-wrap gap-2 overflow-y-auto rounded-lg bg-white/90 p-2 backdrop-blur">
+            {clusters.map((cluster) => {
+              const active = selectedClusters.has(cluster);
+              return (
+                <button
+                  key={cluster}
+                  type="button"
+                  className={`rounded-full border px-2 py-1 text-xs font-medium ${
+                    active
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-slate-200 bg-white text-slate-500'
+                  }`}
+                  onClick={() => {
+                    setSelectedClusters((current) => {
+                      const next = new Set(current);
+                      if (next.has(cluster)) {
+                        next.delete(cluster);
+                      } else {
+                        next.add(cluster);
+                      }
+                      return next;
+                    });
+                  }}
+                >
+                  {cluster}
+                </button>
+              );
+            })}
+            {selectedClusters.size > 0 ? (
               <button
-                key={cluster}
                 type="button"
-                className={`rounded-full border px-2 py-1 text-xs font-medium ${
-                  active
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-slate-200 bg-white text-slate-500'
-                }`}
-                onClick={() => {
-                  setSelectedClusters((current) => {
-                    const next = new Set(current);
-                    if (next.has(cluster)) {
-                      next.delete(cluster);
-                    } else {
-                      next.add(cluster);
-                    }
-                    return next;
-                  });
-                }}
+                className="rounded-full border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500"
+                onClick={() => setSelectedClusters(new Set())}
               >
-                {cluster}
+                Clear
               </button>
-            );
-          })}
-          {selectedClusters.size > 0 ? (
-            <button
-              type="button"
-              className="rounded-full border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500"
-              onClick={() => setSelectedClusters(new Set())}
-            >
-              Clear
-            </button>
-          ) : null}
-        </div>
-      ) : null}
+            ) : null}
+          </div>
+        ) : null}
+      </div>
 
-      <div className="absolute right-3 bottom-3 z-10 flex items-center gap-2 rounded-lg bg-white/90 px-2 py-1 text-xs text-slate-600 shadow-sm backdrop-blur">
-        <button
-          type="button"
-          className={`rounded-full border px-2 py-1 ${
-            showEdges
-              ? 'border-blue-500 bg-blue-50 text-blue-700'
-              : 'border-slate-200 bg-white text-slate-500'
-          }`}
-          onClick={() => setShowEdges((current) => !current)}
-        >
-          {showEdges ? 'Hide edges' : 'Show edges'}
-        </button>
+      <div className="pointer-events-none absolute inset-x-3 bottom-3 z-10 flex items-end justify-between gap-3">
+        {legendItems.length > 0 ? (
+          <div className="pointer-events-auto max-w-[46%] space-y-1 rounded-lg bg-white/90 p-2 text-xs text-slate-600 shadow-sm backdrop-blur">
+            <div className="text-[10px] uppercase tracking-wide text-slate-400">Legend</div>
+            {legendItems.map((item) => (
+              <div key={item.label} className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
+                <span>{item.label}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div />
+        )}
+
+        <div className="pointer-events-auto flex items-center gap-2 rounded-lg bg-white/90 px-2 py-1 text-xs text-slate-600 shadow-sm backdrop-blur">
+          <button
+            type="button"
+            className={`rounded-full border px-2 py-1 ${
+              showEdges
+                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                : 'border-slate-200 bg-white text-slate-500'
+            }`}
+            onClick={() => setShowEdges((current) => !current)}
+          >
+            {showEdges ? 'Hide edges' : 'Show edges'}
+          </button>
+        </div>
       </div>
 
       {tooltip ? (
@@ -370,14 +386,6 @@ export function RelationshipGraph({
           }}
         >
           {tooltip.id}
-        </div>
-      ) : null}
-
-      {selectedNodeData ? (
-        <div className="absolute left-3 top-3 z-10 max-w-[50%] rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm">
-          <div className="font-semibold">{selectedNodeData.id}</div>
-          <div>Cluster: {selectedNodeData.group}</div>
-          <div>Weight: {selectedNodeData.weight}</div>
         </div>
       ) : null}
     </div>

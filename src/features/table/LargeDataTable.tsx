@@ -9,8 +9,8 @@ import { useMockData } from '@/features/data/queries/useMockData';
 
 const PAGE_SIZE = 200;
 const VECTOR_SIZE = 128;
-const DEFAULT_ROW_HEIGHT = 44;
-const COMPACT_ROW_HEIGHT = 28;
+const DEFAULT_ROW_HEIGHT = 52;
+const COMPACT_ROW_HEIGHT = 24;
 const DEFAULT_COL_WIDTHS = [160, 200, 140, 140];
 const MIN_COL_WIDTH = 120;
 const MAX_COL_WIDTH = 360;

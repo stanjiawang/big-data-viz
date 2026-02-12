@@ -46,6 +46,15 @@ export function TimeSeriesChart({
 
   const option = useMemo<EChartsOption>(() => {
     const points = data?.points ?? [];
+    const safeStart = Math.max(0, Math.min(99, xStartPercent));
+    const safeEnd = Math.max(safeStart + 1, Math.min(100, xEndPercent));
+    const pointCount = points.length;
+    const startIndex = pointCount <= 1 ? 0 : Math.floor((safeStart / 100) * (pointCount - 1));
+    const endIndexExclusive =
+      pointCount <= 1
+        ? pointCount
+        : Math.max(startIndex + 1, Math.ceil((safeEnd / 100) * pointCount));
+    const zoomedPoints = points.slice(startIndex, endIndexExclusive);
 
     return {
       animation: false,
@@ -61,7 +70,7 @@ export function TimeSeriesChart({
       },
       xAxis: {
         type: 'category',
-        data: points.map((point) => point.timestamp.slice(0, 10)),
+        data: zoomedPoints.map((point) => point.timestamp.slice(0, 10)),
         boundaryGap: false,
       },
       yAxis: {
@@ -69,26 +78,12 @@ export function TimeSeriesChart({
         min: yMin,
         max: yMax,
       },
-      dataZoom: [
-        {
-          type: 'inside',
-          start: xStartPercent,
-          end: xEndPercent,
-        },
-        {
-          type: 'slider',
-          height: 12,
-          bottom: 2,
-          start: xStartPercent,
-          end: xEndPercent,
-        },
-      ],
       series: [
         {
           name: data?.metric ?? 'ingestion',
           type: 'line',
           smooth: true,
-          data: points.map((point) => point.value),
+          data: zoomedPoints.map((point) => point.value),
           lineStyle: {
             width: 2,
             color: '#2563eb',
