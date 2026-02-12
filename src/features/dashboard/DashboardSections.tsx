@@ -217,7 +217,7 @@ export function SummarySection({ datasetSize, filters, expanded = false }: Dashb
           <RangeSummary xStart={barXStart} xEnd={barXEnd} yMin={barYMin} yMax={barYMax} />
           <button
             type="button"
-            className={`${UI_BUTTON_GHOST_SM} h-8 px-2 text-[11px]`}
+            className={`${UI_BUTTON_GHOST_SM} h-9 px-2`}
             onClick={() => {
               setBarXStart(0);
               setBarXEnd(100);
@@ -330,7 +330,7 @@ export function ChartsSection({
               <RangeSummary xStart={timeXStart} xEnd={timeXEnd} yMin={timeYMin} yMax={timeYMax} />
               <button
                 type="button"
-                className={`${UI_BUTTON_GHOST_SM} h-8 px-2 text-[11px]`}
+                className={`${UI_BUTTON_GHOST_SM} h-9 px-2`}
                 onClick={() => {
                   setTimeXStart(0);
                   setTimeXEnd(100);

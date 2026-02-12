@@ -6,6 +6,7 @@ import forceAtlas2 from 'graphology-layout-forceatlas2';
 import type { GraphResponse } from '@/lib/types';
 import {
   UI_BUTTON_GHOST_SM,
+  UI_BUTTON_PRIMARY_SM,
   UI_CHIP_ACTIVE,
   UI_CHIP_INTERACTIVE,
   UI_LABEL_CLASS,
@@ -369,7 +370,9 @@ export function RelationshipGraph({
           <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-2 py-1 text-xs text-slate-600">
             <button
               type="button"
-              className={showEdges ? `${UI_CHIP_ACTIVE} px-2` : `${UI_CHIP_INTERACTIVE} px-2`}
+              className={
+                showEdges ? `${UI_BUTTON_PRIMARY_SM} h-9 px-2` : `${UI_BUTTON_GHOST_SM} h-9 px-2`
+              }
               onClick={() => setShowEdges((current) => !current)}
             >
               {showEdges ? 'Hide edges' : 'Show edges'}

@@ -150,9 +150,7 @@ export function DashboardPage() {
     return (
       <main className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Detailed View: {toDetailLabel(detailView)}
-          </h2>
+          <h2 className={UI_LABEL_CLASS}>Detailed View: {toDetailLabel(detailView)}</h2>
           <button type="button" className={ACTION_BUTTON_CLASS} onClick={() => setDetailView(null)}>
             Back to dashboard
           </button>

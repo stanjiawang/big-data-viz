@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { getMockData } from '@/lib/apiClient';
 import type { DataChunk, MockFilters, TrainingRecord } from '@/lib/types';
-import { UI_BUTTON_PRIMARY_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
+import { UI_BUTTON_PRIMARY_SM, UI_LABEL_CLASS, UI_STATUS_PILL } from '@/components/ui/styleTokens';
 import { queryKeys } from '@/features/data/queries/queryKeys';
 import { useMockData } from '@/features/data/queries/useMockData';
 
@@ -195,12 +195,12 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
     <div className="overflow-hidden rounded-lg border border-slate-200">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-white px-4 py-2 text-xs text-slate-500">
         <span className={UI_LABEL_CLASS}>Table controls</span>
-        <span className="inline-flex h-9 w-40 items-center justify-center rounded-lg border border-slate-200 bg-gradient-to-b from-white to-slate-50 px-3 text-[11px] font-semibold tracking-wide text-slate-600 shadow-sm">
+        <span className={UI_STATUS_PILL}>
           {isCompact ? 'Compact density' : 'Comfortable density'}
         </span>
         <button
           type="button"
-          className={`${UI_BUTTON_PRIMARY_SM} w-40 text-[11px]`}
+          className={`${UI_BUTTON_PRIMARY_SM} w-40`}
           aria-pressed={isCompact}
           aria-label={isCompact ? 'Switch to comfortable view' : 'Switch to compact view'}
           onClick={() => setIsCompact((current) => !current)}

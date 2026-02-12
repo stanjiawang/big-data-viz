@@ -232,7 +232,7 @@ export function D3EmbeddingScatter({
         })}
         <button
           type="button"
-          className={`${UI_BUTTON_GHOST_SM} h-8 px-2`}
+          className={`${UI_BUTTON_GHOST_SM} h-9 px-2`}
           onClick={() => {
             setHiddenLabels(new Set());
             setPointScale(1);

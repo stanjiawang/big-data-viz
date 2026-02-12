@@ -123,7 +123,7 @@ export function EmbeddingCloud({
       </div>
       <button
         type="button"
-        className={`absolute left-2 top-9 z-10 ${UI_BUTTON_GHOST_SM} h-7 bg-white/90 px-2 text-[10px] shadow-sm backdrop-blur`}
+        className={`absolute left-2 top-9 z-10 ${UI_BUTTON_GHOST_SM} h-9 bg-white/90 px-2 shadow-sm backdrop-blur`}
         onClick={() =>
           setViewState({
             target: [0, 0, 0],

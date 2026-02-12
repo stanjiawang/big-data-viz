@@ -6,6 +6,9 @@ import {
   UI_BUTTON_PRIMARY_SM,
   UI_INPUT_MD,
   UI_LABEL_CLASS,
+  UI_TEXT_BODY_SM,
+  UI_TEXT_SUBTITLE,
+  UI_TEXT_TITLE_MD,
 } from '@/components/ui/styleTokens';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 
@@ -56,8 +59,8 @@ export function RequireAuth({
       <div className={PANEL_CLASS}>
         <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
           <div className="bg-gradient-to-r from-slate-900 to-blue-900 px-6 py-5 text-white">
-            <h1 className="text-xl font-semibold">Sign in required</h1>
-            <p className="mt-1 text-sm text-blue-100">
+            <h1 className={UI_TEXT_TITLE_MD}>Sign in required</h1>
+            <p className={`${UI_TEXT_SUBTITLE} mt-1 text-blue-100`}>
               Authentication is enabled for this environment. Sign in to access the dashboard.
             </p>
           </div>
@@ -111,7 +114,7 @@ export function RequireAuth({
                 Continue with SSO
               </button>
             )}
-            {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+            {error ? <p className={`${UI_TEXT_BODY_SM} text-rose-600`}>{error}</p> : null}
           </div>
         </div>
       </div>
@@ -122,8 +125,8 @@ export function RequireAuth({
     return (
       <div className={PANEL_CLASS}>
         <div className="w-full max-w-md space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h1 className="text-lg font-semibold text-slate-900">Tenant context required</h1>
-          <p className="text-sm text-slate-600">
+          <h1 className={UI_TEXT_TITLE_MD}>Tenant context required</h1>
+          <p className={UI_TEXT_SUBTITLE}>
             Signed in as <span className="font-medium">{session?.user.name ?? 'unknown user'}</span>
             , but no tenant is attached to this session.
           </p>
@@ -139,8 +142,8 @@ export function RequireAuth({
     return (
       <div className={PANEL_CLASS}>
         <div className="w-full max-w-md space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h1 className="text-lg font-semibold text-slate-900">Insufficient permissions</h1>
-          <p className="text-sm text-slate-600">
+          <h1 className={UI_TEXT_TITLE_MD}>Insufficient permissions</h1>
+          <p className={UI_TEXT_SUBTITLE}>
             Signed in as <span className="font-medium">{session?.user.name ?? 'unknown user'}</span>
             , but required roles are missing.
           </p>
