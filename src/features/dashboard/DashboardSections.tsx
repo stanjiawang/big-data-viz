@@ -423,9 +423,10 @@ export function ChartsSection({
           title="D3 Mock Data Demo"
           description="Label-aware embedding scatter based on mock records."
           subtitle="Tech stack: D3.js + SVG"
-          className="lg:col-span-6 self-start"
+          className="lg:col-span-6 flex h-full flex-col"
+          contentClassName="flex-1"
         >
-          <D3EmbeddingScatter records={chunk?.records} height={expanded ? 420 : 320} />
+          <D3EmbeddingScatter records={chunk?.records} height={expanded ? 620 : 380} />
         </Card>
       ) : null}
     </section>
