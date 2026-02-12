@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { useAuth } from '@/auth/useAuth';
 import { MOCK_AUTH_ACCOUNTS } from '@/auth/authClient';
-import { UI_BUTTON_GHOST_SM, UI_BUTTON_PRIMARY_SM } from '@/components/ui/styleTokens';
+import {
+  UI_BUTTON_GHOST_SM,
+  UI_BUTTON_PRIMARY_SM,
+  UI_INPUT_MD,
+  UI_LABEL_CLASS,
+} from '@/components/ui/styleTokens';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 
 const PANEL_CLASS =
@@ -65,28 +70,28 @@ export function RequireAuth({
                   <span className="ml-2 font-semibold">{MOCK_AUTH_ACCOUNTS[0]?.password}</span>
                 </div>
                 <label className="block space-y-1 text-sm text-slate-700">
-                  <span className="font-medium">Email</span>
+                  <span className={UI_LABEL_CLASS}>Email</span>
                   <input
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 transition focus-visible:border-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
+                    className={UI_INPUT_MD}
                     autoComplete="username"
                   />
                 </label>
                 <label className="block space-y-1 text-sm text-slate-700">
-                  <span className="font-medium">Password</span>
+                  <span className={UI_LABEL_CLASS}>Password</span>
                   <input
                     type="password"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 transition focus-visible:border-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
+                    className={UI_INPUT_MD}
                     autoComplete="current-password"
                   />
                 </label>
                 <button
                   type="button"
-                  className={`${UI_BUTTON_PRIMARY_SM} w-full text-sm`}
+                  className={`${UI_BUTTON_PRIMARY_SM} w-full`}
                   onClick={() =>
                     void signIn({
                       email,
@@ -100,7 +105,7 @@ export function RequireAuth({
             ) : (
               <button
                 type="button"
-                className={`${UI_BUTTON_PRIMARY_SM} w-full text-sm`}
+                className={`${UI_BUTTON_PRIMARY_SM} w-full`}
                 onClick={() => void signIn()}
               >
                 Continue with SSO

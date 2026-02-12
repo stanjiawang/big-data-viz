@@ -206,16 +206,14 @@ export function D3EmbeddingScatter({
   return (
     <div className="relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white">
       <div className="flex flex-wrap items-center gap-1 border-b border-slate-100 px-2 py-2">
-        <span className={`${UI_LABEL_CLASS} mr-1 text-[10px]`}>Zoom: {zoomLevel.toFixed(1)}x</span>
+        <span className={`${UI_LABEL_CLASS} mr-1`}>Zoom: {zoomLevel.toFixed(1)}x</span>
         {labels.map((label) => {
           const active = !hiddenLabels.has(label);
           return (
             <button
               key={label}
               type="button"
-              className={
-                active ? `${UI_CHIP_ACTIVE} text-[10px]` : `${UI_CHIP_INTERACTIVE} text-[10px]`
-              }
+              className={active ? UI_CHIP_ACTIVE : UI_CHIP_INTERACTIVE}
               onClick={() =>
                 setHiddenLabels((current) => {
                   const next = new Set(current);
@@ -234,7 +232,7 @@ export function D3EmbeddingScatter({
         })}
         <button
           type="button"
-          className={`${UI_BUTTON_GHOST_SM} h-7 px-2 text-[10px]`}
+          className={`${UI_BUTTON_GHOST_SM} h-8 px-2`}
           onClick={() => {
             setHiddenLabels(new Set());
             setPointScale(1);
@@ -265,7 +263,7 @@ export function D3EmbeddingScatter({
         ) : null}
       </div>
 
-      <div className="grid gap-2 border-t border-slate-100 px-2 py-2 text-[10px] uppercase tracking-wide text-slate-500 sm:grid-cols-2">
+      <div className="grid gap-2 border-t border-slate-100 px-2 py-2 text-xs uppercase tracking-wide text-slate-500 sm:grid-cols-2">
         <label className="space-y-1">
           <div className="flex items-center justify-between">
             <span className={UI_LABEL_CLASS}>Point size</span>

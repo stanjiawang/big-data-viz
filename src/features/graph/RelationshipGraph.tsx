@@ -301,7 +301,7 @@ export function RelationshipGraph({
               {selectedClusters.size > 0 ? (
                 <button
                   type="button"
-                  className={`${UI_BUTTON_GHOST_SM} h-7 px-2 text-[11px]`}
+                  className={`${UI_BUTTON_GHOST_SM} h-8 px-2 text-xs`}
                   onClick={() => setSelectedClusters(new Set())}
                 >
                   Clear
@@ -369,9 +369,7 @@ export function RelationshipGraph({
           <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-2 py-1 text-xs text-slate-600">
             <button
               type="button"
-              className={
-                showEdges ? `${UI_CHIP_ACTIVE} px-2 py-1` : `${UI_CHIP_INTERACTIVE} px-2 py-1`
-              }
+              className={showEdges ? `${UI_CHIP_ACTIVE} px-2` : `${UI_CHIP_INTERACTIVE} px-2`}
               onClick={() => setShowEdges((current) => !current)}
             >
               {showEdges ? 'Hide edges' : 'Show edges'}

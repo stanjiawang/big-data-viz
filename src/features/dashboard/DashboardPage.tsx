@@ -5,7 +5,7 @@ import { canAccessFeature } from '@/auth/useAuth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
-import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
+import { UI_BUTTON_GHOST_SM, UI_INPUT_MD, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import type { MockFilters } from '@/lib/types';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
@@ -220,8 +220,8 @@ export function DashboardPage() {
   }
 
   return (
-    <main className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <main className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="grid gap-3 lg:grid-cols-12 lg:items-start">
           <div className="lg:col-span-7">
             <PageHeader
@@ -260,7 +260,7 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <section className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500 shadow-sm">
+      <section className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs text-slate-500 shadow-sm">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -279,7 +279,7 @@ export function DashboardPage() {
         <div className="flex flex-wrap items-center gap-2">
           <span className={UI_LABEL_CLASS}>Compare dataset</span>
           <select
-            className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 transition focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-200"
+            className={`${UI_INPUT_MD} h-9 w-28 px-2 text-xs`}
             value={compareDatasetSize.value}
             onChange={(event) => {
               const nextSize = DATASET_SIZES.find(
@@ -406,9 +406,7 @@ export function DashboardPage() {
           <div className="relative z-10 w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                  Filters
-                </h3>
+                <h3 className={UI_LABEL_CLASS}>Filters</h3>
                 <p className="text-sm text-slate-600">
                   Global filters for time range, labels, source, and quality.
                 </p>
