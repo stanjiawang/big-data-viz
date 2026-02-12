@@ -251,42 +251,49 @@ export function RelationshipGraph({
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden rounded-lg border border-slate-200"
+      className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-50/40"
       style={{ height }}
       data-testid="relationship-graph"
     >
-      <SigmaContainer
-        graph={graph}
-        settings={{
-          renderEdgeLabels: false,
-          labelRenderedSizeThreshold: 12,
-          defaultNodeColor: BASE_NODE_COLOR,
-          defaultEdgeColor: '#94a3b8',
-          allowInvalidContainer: true,
-        }}
-        style={{ height: '100%', borderRadius: '0.5rem' }}
-      >
-        <GraphInteractions
-          containerRef={containerRef}
-          onHover={({ id, x, y }) => {
-            setHoveredNode(id);
-            setTooltip({ id, x, y });
+      <div className="absolute inset-2 overflow-hidden rounded-md border border-slate-200 bg-white">
+        <SigmaContainer
+          graph={graph}
+          settings={{
+            renderEdgeLabels: false,
+            labelRenderedSizeThreshold: 12,
+            defaultNodeColor: BASE_NODE_COLOR,
+            defaultEdgeColor: '#94a3b8',
+            allowInvalidContainer: true,
+            stagePadding: 28,
           }}
-          onLeave={() => {
-            setHoveredNode(null);
-            setTooltip(null);
-          }}
-          onSelect={(id) => {
-            setSelectedNode(id);
-          }}
-          onClear={() => {
-            setSelectedNode(null);
-            setHoveredNode(null);
-            setTooltip(null);
-          }}
-        />
-        <GraphStyling hoveredNode={hoveredNode} selectedNode={selectedNode} showEdges={showEdges} />
-      </SigmaContainer>
+          style={{ height: '100%', borderRadius: '0.375rem' }}
+        >
+          <GraphInteractions
+            containerRef={containerRef}
+            onHover={({ id, x, y }) => {
+              setHoveredNode(id);
+              setTooltip({ id, x, y });
+            }}
+            onLeave={() => {
+              setHoveredNode(null);
+              setTooltip(null);
+            }}
+            onSelect={(id) => {
+              setSelectedNode(id);
+            }}
+            onClear={() => {
+              setSelectedNode(null);
+              setHoveredNode(null);
+              setTooltip(null);
+            }}
+          />
+          <GraphStyling
+            hoveredNode={hoveredNode}
+            selectedNode={selectedNode}
+            showEdges={showEdges}
+          />
+        </SigmaContainer>
+      </div>
 
       {overlayMessage ? (
         <div className="absolute inset-0 flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">
