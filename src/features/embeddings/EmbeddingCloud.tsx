@@ -8,6 +8,7 @@ type EmbeddingCloudProps = {
   records?: TrainingRecord[];
   isLoading?: boolean;
   isError?: boolean;
+  height?: number;
 };
 
 function isWebGLAvailable() {
@@ -19,7 +20,12 @@ function isWebGLAvailable() {
   }
 }
 
-export function EmbeddingCloud({ records = [], isLoading, isError }: EmbeddingCloudProps) {
+export function EmbeddingCloud({
+  records = [],
+  isLoading,
+  isError,
+  height = 224,
+}: EmbeddingCloudProps) {
   const [webglOk] = useState(() => isWebGLAvailable());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
@@ -68,7 +74,10 @@ export function EmbeddingCloud({ records = [], isLoading, isError }: EmbeddingCl
 
   if (isError) {
     return (
-      <div className="flex h-48 items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">
+      <div
+        className="flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400"
+        style={{ height }}
+      >
         Failed to load embedding cloud.
       </div>
     );
@@ -76,7 +85,10 @@ export function EmbeddingCloud({ records = [], isLoading, isError }: EmbeddingCl
 
   if (isLoading) {
     return (
-      <div className="flex h-48 items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">
+      <div
+        className="flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400"
+        style={{ height }}
+      >
         Loading embeddings...
       </div>
     );
@@ -84,7 +96,10 @@ export function EmbeddingCloud({ records = [], isLoading, isError }: EmbeddingCl
 
   if (!webglOk) {
     return (
-      <div className="flex h-48 items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">
+      <div
+        className="flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400"
+        style={{ height }}
+      >
         WebGL is not available in this browser.
       </div>
     );
@@ -92,14 +107,20 @@ export function EmbeddingCloud({ records = [], isLoading, isError }: EmbeddingCl
 
   if (points.length === 0) {
     return (
-      <div className="flex h-48 items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">
+      <div
+        className="flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400"
+        style={{ height }}
+      >
         No embedding data.
       </div>
     );
   }
 
   return (
-    <div className="relative h-56 overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-b from-slate-50 to-white">
+    <div
+      className="relative overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-b from-slate-50 to-white"
+      style={{ height }}
+    >
       <div className="absolute left-2 top-2 z-10 rounded-md bg-white/90 px-2 py-1 text-[10px] uppercase tracking-wide text-slate-500 shadow-sm backdrop-blur">
         Zoom: scroll | Pan: drag
       </div>

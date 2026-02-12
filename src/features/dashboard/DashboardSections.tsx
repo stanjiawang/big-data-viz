@@ -41,6 +41,24 @@ function DetailButton({ onClick }: { onClick: () => void }) {
   );
 }
 
+function RangeSummary({
+  xStart,
+  xEnd,
+  yMin,
+  yMax,
+}: {
+  xStart: number;
+  xEnd: number;
+  yMin: string;
+  yMax: string;
+}) {
+  return (
+    <div className="text-[11px] text-slate-500">
+      X: {xStart}% - {xEnd}% | Y: {yMin || 'auto'} - {yMax || 'auto'}
+    </div>
+  );
+}
+
 export function KpiSection({
   datasetSize,
   compareDatasetSize,
@@ -197,6 +215,21 @@ export function SummarySection({ datasetSize, filters, expanded = false }: Dashb
     <div className="space-y-4">
       <PieChart title="Label Distribution" data={labelDistribution} height={expanded ? 280 : 200} />
       <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <RangeSummary xStart={barXStart} xEnd={barXEnd} yMin={barYMin} yMax={barYMax} />
+          <button
+            type="button"
+            className="rounded-full border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500"
+            onClick={() => {
+              setBarXStart(0);
+              setBarXEnd(100);
+              setBarYMin('');
+              setBarYMax('');
+            }}
+          >
+            Reset
+          </button>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="space-y-1 text-xs text-slate-600">
             <span className="font-semibold uppercase tracking-wide">X Range Start (%)</span>
@@ -280,7 +313,9 @@ export function ChartsSection({
   const timeYMaxValue = timeYMax === '' ? undefined : Number(timeYMax);
 
   return (
-    <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-12">
+    <section
+      className={`grid gap-6 ${focusView ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-12'}`}
+    >
       {(focusView === undefined || focusView === 'timeSeries') && (
         <Card
           title="Time Series"
@@ -292,6 +327,21 @@ export function ChartsSection({
           }
         >
           <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <RangeSummary xStart={timeXStart} xEnd={timeXEnd} yMin={timeYMin} yMax={timeYMax} />
+              <button
+                type="button"
+                className="rounded-full border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500"
+                onClick={() => {
+                  setTimeXStart(0);
+                  setTimeXEnd(100);
+                  setTimeYMin('');
+                  setTimeYMax('');
+                }}
+              >
+                Reset
+              </button>
+            </div>
             <div className="grid gap-2 sm:grid-cols-2">
               <label className="space-y-1 text-xs text-slate-600">
                 <span className="font-semibold uppercase tracking-wide">X Start (%)</span>
@@ -353,7 +403,7 @@ export function ChartsSection({
           contentClassName="flex-1"
           actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('embedding')} /> : null}
         >
-          <EmbeddingCloud records={chunk?.records} />
+          <EmbeddingCloud records={chunk?.records} height={expanded ? 500 : 260} />
         </Card>
       )}
       {(focusView === undefined || focusView === 'graph') && (

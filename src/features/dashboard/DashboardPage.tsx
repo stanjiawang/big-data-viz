@@ -38,6 +38,14 @@ const MOCK_CONTROL_PARAMS = [
 const ACTION_BUTTON_CLASS =
   'rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-700 focus-visible:border-blue-400 focus-visible:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-200';
 
+function toDetailLabel(view: DetailView) {
+  if (view === 'timeSeries') return 'Time Series';
+  if (view === 'embedding') return 'Embedding Cloud';
+  if (view === 'graph') return 'Relationship Graph';
+  if (view === 'table') return 'Large Table';
+  return 'Summary';
+}
+
 function parseSearchParams() {
   const params = new URLSearchParams(window.location.search);
   const sizeValue = Number(params.get('size'));
@@ -147,9 +155,9 @@ export function DashboardPage() {
   if (detailView) {
     return (
       <main className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <section className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Detailed View: {detailView}
+            Detailed View: {toDetailLabel(detailView)}
           </h2>
           <button type="button" className={ACTION_BUTTON_CLASS} onClick={() => setDetailView(null)}>
             Back to dashboard
@@ -218,38 +226,42 @@ export function DashboardPage() {
 
   return (
     <main className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <section className="grid gap-4 lg:grid-cols-12 lg:items-center">
-        <div className="lg:col-span-6">
-          <PageHeader
-            title="Big Data Viz Lab"
-            subtitle="Enterprise-ready workspace for large-scale AI training data analytics."
-          />
-        </div>
-        <div className="flex flex-wrap items-center justify-end gap-3 lg:col-span-6">
-          <DashboardHeaderBadges items={badgeItems} isLoading={isFetching} />
-          <button
-            type="button"
-            className={ACTION_BUTTON_CLASS}
-            onClick={() => void queryClient.invalidateQueries()}
-          >
-            Refresh data
-          </button>
-          {runtimeConfig.enableAuth && authContext?.isAuthenticated ? (
+      <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="grid gap-3 lg:grid-cols-12 lg:items-start">
+          <div className="lg:col-span-7">
+            <PageHeader
+              title="Big Data Viz Lab"
+              subtitle="Enterprise-ready workspace for large-scale AI training data analytics."
+            />
+          </div>
+          <div className="flex flex-wrap items-center justify-start gap-2 lg:col-span-5 lg:justify-end">
             <button
               type="button"
               className={ACTION_BUTTON_CLASS}
-              onClick={() => void authContext.signOut()}
+              onClick={() => void queryClient.invalidateQueries()}
             >
-              Sign out
+              Refresh data
             </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => setIsFilterOpen(true)}
-            className={`${ACTION_BUTTON_CLASS} lg:hidden`}
-          >
-            Filters
-          </button>
+            {runtimeConfig.enableAuth && authContext?.isAuthenticated ? (
+              <button
+                type="button"
+                className={ACTION_BUTTON_CLASS}
+                onClick={() => void authContext.signOut()}
+              >
+                Sign out
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setIsFilterOpen(true)}
+              className={`${ACTION_BUTTON_CLASS} lg:hidden`}
+            >
+              Filters
+            </button>
+          </div>
+        </div>
+        <div className="border-t border-slate-100 pt-3">
+          <DashboardHeaderBadges items={badgeItems} isLoading={isFetching} />
         </div>
       </section>
 
