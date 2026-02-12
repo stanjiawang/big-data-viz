@@ -367,7 +367,7 @@ export function RelationshipGraph({
             <div />
           )}
 
-          <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-2 py-1 text-xs text-slate-600">
+          <div className="flex items-center gap-2 text-xs text-slate-600">
             <button
               type="button"
               className={
