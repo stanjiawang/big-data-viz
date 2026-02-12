@@ -3,6 +3,7 @@ import { createAuthClient } from '@/auth/authClient';
 import { AuthContext } from '@/auth/AuthContext';
 import type { AuthContextValue, AuthSession } from '@/auth/types';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
+import { emitTelemetry, reportError } from '@/lib/telemetry';
 const SESSION_REFRESH_SKEW_MS = 30_000;
 
 export function AuthProvider({
@@ -36,6 +37,9 @@ export function AuthProvider({
           setSession(nextSession);
         }
       } catch (authError) {
+        reportError('auth.session.load_failed', authError, {
+          provider: getRuntimeConfig().authProvider,
+        });
         if (active) {
           if (authError instanceof Error && authError.message.includes('expired')) {
             setError('Session expired. Sign in again to continue.');
@@ -75,6 +79,9 @@ export function AuthProvider({
           setSession(nextSession);
         })
         .catch((authError: unknown) => {
+          reportError('auth.session.refresh_failed', authError, {
+            provider: getRuntimeConfig().authProvider,
+          });
           if (authError instanceof Error && authError.message.includes('expired')) {
             setError('Session expired. Sign in again to continue.');
           } else {
@@ -97,17 +104,29 @@ export function AuthProvider({
       isAuthenticated: Boolean(session),
       signIn: async () => {
         setError(null);
+        emitTelemetry('info', 'auth.signin.requested', {
+          provider: getRuntimeConfig().authProvider,
+        });
         try {
           await authClient.signIn();
-        } catch {
+        } catch (authError) {
+          reportError('auth.signin.failed', authError, {
+            provider: getRuntimeConfig().authProvider,
+          });
           setError('Sign-in failed. Please try again.');
         }
       },
       signOut: async () => {
         setError(null);
+        emitTelemetry('info', 'auth.signout.requested', {
+          provider: getRuntimeConfig().authProvider,
+        });
         try {
           await authClient.signOut();
-        } catch {
+        } catch (authError) {
+          reportError('auth.signout.failed', authError, {
+            provider: getRuntimeConfig().authProvider,
+          });
           setError('Sign-out failed. Please try again.');
         }
       },

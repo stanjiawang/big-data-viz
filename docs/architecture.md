@@ -45,6 +45,7 @@ Current auth runtime knobs:
 - OIDC settings: `VITE_AUTH_OIDC_AUTHORIZE_URL`, `VITE_AUTH_OIDC_TOKEN_URL`, `VITE_AUTH_OIDC_CLIENT_ID`
 - Optional OIDC mapping: role claim, tenant claim, redirect URIs, audience, logout URL
 - Session lifecycle: refresh-token renewal is attempted before expiry; failures force re-authentication
+- Auth observability: sign-in, callback, refresh, and sign-out events/errors are emitted to telemetry
 
 ## Performance Gates (Current)
 

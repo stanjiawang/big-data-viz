@@ -1,6 +1,7 @@
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import type { RuntimeConfig } from '@/config/runtimeConfig';
 import type { AuthSession } from '@/auth/types';
+import { emitTelemetry, reportError } from '@/lib/telemetry';
 
 type SessionListener = (_session: AuthSession | null) => void;
 
@@ -414,6 +415,10 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
       authorizeUrl.searchParams.set('audience', config.authOidcAudience);
     }
 
+    emitTelemetry('info', 'auth.signin.redirect_started', {
+      provider: 'oidc',
+      redirectUri,
+    });
     window.location.assign(authorizeUrl.toString());
   };
 
@@ -431,6 +436,10 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
     if (redirectUri) {
       logoutUrl.searchParams.set('post_logout_redirect_uri', redirectUri);
     }
+    emitTelemetry('info', 'auth.signout.redirect_started', {
+      provider: 'oidc',
+      redirectUri,
+    });
     window.location.assign(logoutUrl.toString());
   };
 
@@ -446,11 +455,18 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
         const refreshedSession = buildOidcSessionFromTokens(config, tokenResponse, session);
         writeSession(refreshedSession);
         emit(refreshedSession);
+        emitTelemetry('info', 'auth.session.refresh_succeeded', {
+          provider: 'oidc',
+          expiresAt: refreshedSession.expiresAt,
+        });
         return refreshedSession;
-      } catch {
+      } catch (error) {
         writeSession(null);
         writeOidcTransaction(null);
         emit(null);
+        reportError('auth.session.refresh_failed', error, {
+          provider: 'oidc',
+        });
         throw new Error('Authentication session expired. Please sign in again.');
       }
     }
@@ -472,6 +488,9 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
       writeOidcTransaction(null);
       sanitizeOidcCallbackParams();
       const description = currentUrl.searchParams.get('error_description') || authError;
+      reportError('auth.callback.failed', new Error(`OIDC sign-in failed: ${description}`), {
+        provider: 'oidc',
+      });
       throw new Error(`OIDC sign-in failed: ${description}`);
     }
 
@@ -481,6 +500,9 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
 
     if (!config.authOidcTokenUrl || !config.authOidcClientId) {
       sanitizeOidcCallbackParams();
+      reportError('auth.callback.failed', new Error('OIDC callback config missing'), {
+        provider: 'oidc',
+      });
       throw new Error('OIDC callback received, but token exchange config is missing.');
     }
 
@@ -488,6 +510,9 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
     if (!transaction || transaction.state !== state) {
       writeOidcTransaction(null);
       sanitizeOidcCallbackParams();
+      reportError('auth.callback.failed', new Error('OIDC state validation failed'), {
+        provider: 'oidc',
+      });
       throw new Error('OIDC state validation failed.');
     }
 
@@ -510,6 +535,14 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
     if (!response.ok) {
       writeOidcTransaction(null);
       sanitizeOidcCallbackParams();
+      reportError(
+        'auth.callback.failed',
+        new Error(`OIDC token exchange failed (${response.status})`),
+        {
+          provider: 'oidc',
+          httpStatus: response.status,
+        },
+      );
       throw new Error(`OIDC token exchange failed (${response.status}).`);
     }
 
@@ -517,6 +550,9 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
     if (!tokenResponse.access_token) {
       writeOidcTransaction(null);
       sanitizeOidcCallbackParams();
+      reportError('auth.callback.failed', new Error('OIDC token response missing access token'), {
+        provider: 'oidc',
+      });
       throw new Error('OIDC token response did not include an access token.');
     }
 
@@ -525,6 +561,13 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
     writeOidcTransaction(null);
     sanitizeOidcCallbackParams();
     emit(nextSession);
+    emitTelemetry('info', 'auth.signin.succeeded', {
+      provider: 'oidc',
+      userId: nextSession.user.id,
+      roleCount: nextSession.user.roles.length,
+      hasTenant: Boolean(nextSession.user.tenantId),
+      expiresAt: nextSession.expiresAt,
+    });
 
     return nextSession;
   };
