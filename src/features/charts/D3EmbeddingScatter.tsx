@@ -65,12 +65,13 @@ export function D3EmbeddingScatter({
     svg.selectAll('*').remove();
 
     const width = svgRef.current.clientWidth || 640;
+    const plotHeight = svgRef.current.clientHeight || height;
     const innerWidth = Math.max(80, width - MARGIN.left - MARGIN.right);
-    const innerHeight = Math.max(80, height - MARGIN.top - MARGIN.bottom);
+    const innerHeight = Math.max(80, plotHeight - MARGIN.top - MARGIN.bottom);
 
     const root = svg
       .attr('width', width)
-      .attr('height', height)
+      .attr('height', plotHeight)
       .append('g')
       .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
@@ -148,7 +149,7 @@ export function D3EmbeddingScatter({
       .scaleExtent([0.8, 8])
       .translateExtent([
         [0, 0],
-        [width, height],
+        [width, plotHeight],
       ])
       .on('zoom', (event) => {
         const zx = event.transform.rescaleX(xScale);
@@ -181,11 +182,8 @@ export function D3EmbeddingScatter({
   }
 
   return (
-    <div
-      className="relative overflow-hidden rounded-lg border border-slate-200 bg-white"
-      style={{ height }}
-    >
-      <div className="absolute left-2 top-2 z-10 flex flex-wrap items-center gap-1 rounded-md bg-white/95 p-1 shadow-sm">
+    <div className="relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="flex flex-wrap items-center gap-1 border-b border-slate-100 px-2 py-2">
         {labels.map((label) => {
           const active = !hiddenLabels.has(label);
           return (
@@ -227,50 +225,57 @@ export function D3EmbeddingScatter({
         </button>
       </div>
 
-      <div className="absolute bottom-2 left-2 z-10 w-56 rounded-md bg-white/95 p-2 text-[10px] uppercase tracking-wide text-slate-500 shadow-sm">
-        <div className="mb-1 flex items-center justify-between">
-          <span>Point size</span>
-          <span>{pointScale.toFixed(1)}x</span>
-        </div>
-        <input
-          type="range"
-          min={0.6}
-          max={2}
-          step={0.1}
-          value={pointScale}
-          onChange={(event) => setPointScale(Number(event.target.value))}
-          className="w-full"
-        />
-        <div className="mb-1 mt-2 flex items-center justify-between">
-          <span>Opacity</span>
-          <span>{Math.round(pointOpacity * 100)}%</span>
-        </div>
-        <input
-          type="range"
-          min={0.2}
-          max={1}
-          step={0.05}
-          value={pointOpacity}
-          onChange={(event) => setPointOpacity(Number(event.target.value))}
-          className="w-full"
-        />
+      <div className="relative min-h-0 flex-1">
+        <svg ref={svgRef} className="h-full w-full" data-testid="d3-embedding-scatter" />
+        {hovered ? (
+          <div
+            className="pointer-events-none absolute z-20 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 shadow-sm"
+            style={{
+              left: hovered.px + 8,
+              top: Math.max(8, hovered.py - 30),
+            }}
+          >
+            <div className="font-semibold">{hovered.label}</div>
+            <div>x: {hovered.x.toFixed(2)}</div>
+            <div>y: {hovered.y.toFixed(2)}</div>
+            <div>w: {hovered.weight.toFixed(2)}</div>
+          </div>
+        ) : null}
       </div>
 
-      <svg ref={svgRef} className="h-full w-full" data-testid="d3-embedding-scatter" />
-      {hovered ? (
-        <div
-          className="pointer-events-none absolute z-20 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 shadow-sm"
-          style={{
-            left: hovered.px + 8,
-            top: Math.max(8, hovered.py - 30),
-          }}
-        >
-          <div className="font-semibold">{hovered.label}</div>
-          <div>x: {hovered.x.toFixed(2)}</div>
-          <div>y: {hovered.y.toFixed(2)}</div>
-          <div>w: {hovered.weight.toFixed(2)}</div>
-        </div>
-      ) : null}
+      <div className="grid gap-2 border-t border-slate-100 px-2 py-2 text-[10px] uppercase tracking-wide text-slate-500 sm:grid-cols-2">
+        <label className="space-y-1">
+          <div className="flex items-center justify-between">
+            <span>Point size</span>
+            <span>{pointScale.toFixed(1)}x</span>
+          </div>
+          <input
+            type="range"
+            min={0.6}
+            max={2}
+            step={0.1}
+            value={pointScale}
+            onChange={(event) => setPointScale(Number(event.target.value))}
+            className="w-full"
+          />
+        </label>
+        <label className="space-y-1">
+          <div className="flex items-center justify-between">
+            <span>Opacity</span>
+            <span>{Math.round(pointOpacity * 100)}%</span>
+          </div>
+          <input
+            type="range"
+            min={0.2}
+            max={1}
+            step={0.05}
+            value={pointOpacity}
+            onChange={(event) => setPointOpacity(Number(event.target.value))}
+            className="w-full"
+          />
+        </label>
+      </div>
+
       {overlayMessage ? (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-50 text-sm text-slate-400">
           {overlayMessage}
