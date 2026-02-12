@@ -162,6 +162,7 @@ export function DashboardPage() {
           <Card
             title="Summary (Detailed)"
             description="Adjust chart ranges and inspect distribution deeply."
+            subtitle="Tech stack: ECharts + React Query"
           >
             <SummarySection
               datasetSize={datasetSize}
@@ -303,6 +304,7 @@ export function DashboardPage() {
         <Card
           title="Filters"
           description="Global filters for time range, labels, source, and quality."
+          subtitle="Tech stack: React State + URL Params"
           className="hidden lg:block lg:col-span-5"
         >
           {isFetching ? (
@@ -325,6 +327,7 @@ export function DashboardPage() {
         <Card
           title="Summary"
           description="Quick glance of ingestion health and distribution."
+          subtitle="Tech stack: ECharts + React Query"
           className="lg:col-span-7"
           actions={
             <button

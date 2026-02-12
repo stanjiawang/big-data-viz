@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 type CardProps = {
   title: string;
   description?: string;
+  subtitle?: string;
   children?: ReactNode;
   className?: string;
   contentClassName?: string;
@@ -12,6 +13,7 @@ type CardProps = {
 export function Card({
   title,
   description,
+  subtitle,
   children,
   className,
   contentClassName,
@@ -25,6 +27,9 @@ export function Card({
         <div className="space-y-1">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">{title}</h3>
           {description ? <p className="text-sm text-slate-600">{description}</p> : null}
+          {subtitle ? (
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{subtitle}</p>
+          ) : null}
         </div>
         {actions ? <div className="shrink-0">{actions}</div> : null}
       </div>

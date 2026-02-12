@@ -21,6 +21,10 @@ jest.mock('@/features/charts/TimeSeriesChart', () => ({
   TimeSeriesChart: () => <div>TimeSeriesChart</div>,
 }));
 
+jest.mock('@/features/charts/D3EmbeddingScatter', () => ({
+  D3EmbeddingScatter: () => <div>D3EmbeddingScatter</div>,
+}));
+
 jest.mock('@/features/embeddings/EmbeddingCloud', () => ({
   EmbeddingCloud: () => <div>EmbeddingCloud</div>,
 }));
@@ -91,6 +95,7 @@ describe('DashboardSections', () => {
     expect(screen.getByText('TimeSeriesChart')).toBeInTheDocument();
     expect(screen.getByText('EmbeddingCloud')).toBeInTheDocument();
     expect(screen.getByText('RelationshipGraph')).toBeInTheDocument();
+    expect(screen.getByText('D3EmbeddingScatter')).toBeInTheDocument();
   });
 
   it('renders table section', () => {

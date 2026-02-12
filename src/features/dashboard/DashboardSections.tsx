@@ -5,6 +5,7 @@ import type { DataChunk, MockFilters } from '@/lib/types';
 import { BarChart } from '@/features/charts/BarChart';
 import { PieChart } from '@/features/charts/PieChart';
 import { TimeSeriesChart } from '@/features/charts/TimeSeriesChart';
+import { D3EmbeddingScatter } from '@/features/charts/D3EmbeddingScatter';
 import { useGraphSuspense } from '@/features/data/queries/useGraph';
 import { useMockData, useMockDataSuspense } from '@/features/data/queries/useMockData';
 import { useTimeSeriesSuspense } from '@/features/data/queries/useTimeSeries';
@@ -320,7 +321,8 @@ export function ChartsSection({
         <Card
           title="Time Series"
           description="Ingestion and quality trends."
-          className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-4'} flex h-full flex-col`}
+          subtitle="Tech stack: ECharts + React Query"
+          className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
           actions={
             onOpenDetail ? <DetailButton onClick={() => onOpenDetail('timeSeries')} /> : null
@@ -399,7 +401,8 @@ export function ChartsSection({
         <Card
           title="Embedding Cloud"
           description="High-density point cloud view."
-          className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-4'} flex h-full flex-col`}
+          subtitle="Tech stack: deck.gl + WebGL"
+          className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
           actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('embedding')} /> : null}
         >
@@ -410,13 +413,24 @@ export function ChartsSection({
         <Card
           title="Relationship Graph"
           description="Entity linkage and clusters."
-          className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-4'} flex h-full flex-col`}
+          subtitle="Tech stack: Sigma.js + Graphology"
+          className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
           actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('graph')} /> : null}
         >
           <RelationshipGraph data={graph} height={expanded ? 620 : 380} />
         </Card>
       )}
+      {focusView === undefined ? (
+        <Card
+          title="D3 Mock Data Demo"
+          description="Label-aware embedding scatter based on mock records."
+          subtitle="Tech stack: D3.js + SVG"
+          className="lg:col-span-6"
+        >
+          <D3EmbeddingScatter records={chunk?.records} height={expanded ? 420 : 320} />
+        </Card>
+      ) : null}
     </section>
   );
 }
@@ -434,6 +448,7 @@ export function TableSection({
         <Card
           title="Large Table (Primary)"
           description="Virtualized grid for multi-million row browsing."
+          subtitle="Tech stack: TanStack Virtual + React Query"
           actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('table')} /> : null}
         >
           <LargeDataTable total={datasetSize.value} filters={filters} />
@@ -441,6 +456,7 @@ export function TableSection({
         <Card
           title="Large Table (Compare)"
           description="Virtualized grid for multi-million row browsing."
+          subtitle="Tech stack: TanStack Virtual + React Query"
         >
           <LargeDataTable total={compareDatasetSize.value} filters={filters} />
         </Card>
@@ -452,6 +468,7 @@ export function TableSection({
     <Card
       title="Large Table"
       description="Virtualized grid for multi-million row browsing."
+      subtitle="Tech stack: TanStack Virtual + React Query"
       actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('table')} /> : null}
     >
       <LargeDataTable total={datasetSize.value} filters={filters} />

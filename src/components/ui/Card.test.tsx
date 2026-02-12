@@ -4,13 +4,14 @@ import { Card } from '@/components/ui/Card';
 describe('Card', () => {
   it('renders title and description', () => {
     render(
-      <Card title="Summary" description="Quick glance">
+      <Card title="Summary" description="Quick glance" subtitle="Tech stack: Demo">
         <div>Content</div>
       </Card>,
     );
 
     expect(screen.getByText('Summary')).toBeInTheDocument();
     expect(screen.getByText('Quick glance')).toBeInTheDocument();
+    expect(screen.getByText('Tech stack: Demo')).toBeInTheDocument();
     expect(screen.getByText('Content')).toBeInTheDocument();
   });
 
