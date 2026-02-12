@@ -44,6 +44,7 @@ Current auth runtime knobs:
 - `VITE_AUTH_PROVIDER=mock|oidc`
 - OIDC settings: `VITE_AUTH_OIDC_AUTHORIZE_URL`, `VITE_AUTH_OIDC_TOKEN_URL`, `VITE_AUTH_OIDC_CLIENT_ID`
 - Optional OIDC mapping: role claim, tenant claim, redirect URIs, audience, logout URL
+- Session lifecycle: refresh-token renewal is attempted before expiry; failures force re-authentication
 
 ## Performance Gates (Current)
 

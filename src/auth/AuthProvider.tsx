@@ -3,6 +3,7 @@ import { createAuthClient } from '@/auth/authClient';
 import { AuthContext } from '@/auth/AuthContext';
 import type { AuthContextValue, AuthSession } from '@/auth/types';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
+const SESSION_REFRESH_SKEW_MS = 30_000;
 
 export function AuthProvider({
   enabled,
@@ -34,9 +35,13 @@ export function AuthProvider({
         if (active) {
           setSession(nextSession);
         }
-      } catch {
+      } catch (authError) {
         if (active) {
-          setError('Failed to load authentication session.');
+          if (authError instanceof Error && authError.message.includes('expired')) {
+            setError('Session expired. Sign in again to continue.');
+          } else {
+            setError('Failed to load authentication session.');
+          }
         }
       } finally {
         if (active) {
@@ -55,7 +60,34 @@ export function AuthProvider({
       active = false;
       unsubscribe();
     };
-  }, [enabled]);
+  }, [enabled, authClient]);
+
+  useEffect(() => {
+    if (!enabled || !session) {
+      return;
+    }
+
+    const refreshInMs = Math.max(0, session.expiresAt - Date.now() - SESSION_REFRESH_SKEW_MS);
+    const timer = window.setTimeout(() => {
+      void authClient
+        .getSession()
+        .then((nextSession) => {
+          setSession(nextSession);
+        })
+        .catch((authError: unknown) => {
+          if (authError instanceof Error && authError.message.includes('expired')) {
+            setError('Session expired. Sign in again to continue.');
+          } else {
+            setError('Failed to refresh authentication session.');
+          }
+          setSession(null);
+        });
+    }, refreshInMs);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [enabled, session, authClient]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

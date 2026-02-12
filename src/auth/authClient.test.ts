@@ -211,6 +211,135 @@ describe('authClient', () => {
 
     expect(window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY)).toBeNull();
   });
+
+  it('refreshes expiring OIDC sessions with refresh token', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        access_token: createJwt({
+          sub: 'user-1',
+          roles: ['admin'],
+          tenant_id: 'tenant-y',
+          email: 'admin@example.com',
+          name: 'Admin User',
+        }),
+        expires_in: 600,
+      }),
+    });
+    Object.defineProperty(globalThis, 'fetch', {
+      value: fetchMock,
+      writable: true,
+    });
+
+    window.localStorage.setItem(
+      AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'old-token',
+        expiresAt: Date.now() - 1,
+        refreshToken: 'refresh-123',
+        user: {
+          id: 'user-1',
+          name: 'Admin User',
+          roles: ['viewer'],
+        },
+      }),
+    );
+
+    const client = createAuthClient(
+      createRuntimeConfig({
+        authProvider: 'oidc',
+        authOidcTokenUrl: 'https://id.example.com/oauth/token',
+        authOidcClientId: 'client-123',
+      }),
+    );
+
+    const session = await client.getSession();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://id.example.com/oauth/token',
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.any(URLSearchParams),
+      }),
+    );
+    const requestBody = fetchMock.mock.calls[0][1].body as URLSearchParams;
+    expect(requestBody.get('grant_type')).toBe('refresh_token');
+    expect(requestBody.get('refresh_token')).toBe('refresh-123');
+    expect(session).toEqual(
+      expect.objectContaining({
+        refreshToken: 'refresh-123',
+        user: expect.objectContaining({
+          roles: ['admin'],
+          tenantId: 'tenant-y',
+        }),
+      }),
+    );
+  });
+
+  it('returns null when session is expired and no refresh token exists', async () => {
+    window.localStorage.setItem(
+      AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'expired-token',
+        expiresAt: Date.now() - 1,
+        user: {
+          id: 'u1',
+          name: 'User One',
+          roles: ['viewer'],
+        },
+      }),
+    );
+
+    const client = createAuthClient(
+      createRuntimeConfig({
+        authProvider: 'oidc',
+        authOidcTokenUrl: 'https://id.example.com/oauth/token',
+        authOidcClientId: 'client-123',
+      }),
+    );
+
+    await expect(client.getSession()).resolves.toBeNull();
+    expect(window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY)).toBeNull();
+  });
+
+  it('clears session when refresh token exchange fails', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      json: async () => ({}),
+    });
+    Object.defineProperty(globalThis, 'fetch', {
+      value: fetchMock,
+      writable: true,
+    });
+
+    window.localStorage.setItem(
+      AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'old-token',
+        expiresAt: Date.now() - 1,
+        refreshToken: 'refresh-123',
+        user: {
+          id: 'user-1',
+          name: 'Admin User',
+          roles: ['viewer'],
+        },
+      }),
+    );
+
+    const client = createAuthClient(
+      createRuntimeConfig({
+        authProvider: 'oidc',
+        authOidcTokenUrl: 'https://id.example.com/oauth/token',
+        authOidcClientId: 'client-123',
+      }),
+    );
+
+    await expect(client.getSession()).rejects.toThrow(
+      'Authentication session expired. Please sign in again.',
+    );
+    expect(window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY)).toBeNull();
+  });
 });
 
 function createJwt(payload: Record<string, unknown>) {

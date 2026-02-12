@@ -110,6 +110,7 @@
 - B2 completed: RBAC guards now gate privileged compare workflows by role
 - B3 completed: tenant context now propagates via `X-Tenant-Id` request headers
 - B1 completed: OIDC PKCE auth flow is supported via runtime config with mock auth fallback for demo mode
+- B1 hardening completed: OIDC sessions now attempt refresh-token renewal and enforce re-login on refresh failure
 - C3 completed: structured API failure telemetry now includes requestId, errorCode, and httpStatus fields
 - G3 foundation completed: incident template, generator script, and runbook wiring
 - E3 completed: release governance docs and CI validation gate

@@ -43,6 +43,9 @@ The app uses environment-driven runtime config and a resilient API client (timeo
 - `VITE_AUTH_PROVIDER`: `mock` (default) or `oidc`
 - OIDC minimum config: `VITE_AUTH_OIDC_AUTHORIZE_URL`, `VITE_AUTH_OIDC_TOKEN_URL`, `VITE_AUTH_OIDC_CLIENT_ID`
 
+When `VITE_AUTH_PROVIDER=oidc`, the client supports PKCE login callbacks and refresh-token renewal.
+If token renewal fails, the session is cleared and the user is prompted to sign in again.
+
 ## Scripts
 
 ```bash

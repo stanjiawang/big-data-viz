@@ -9,6 +9,8 @@ export type AuthUser = {
 export type AuthSession = {
   accessToken: string;
   expiresAt: number;
+  refreshToken?: string;
+  idToken?: string;
   user: AuthUser;
 };
 

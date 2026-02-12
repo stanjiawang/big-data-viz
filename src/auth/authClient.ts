@@ -13,6 +13,7 @@ export type AuthClient = {
 
 export const AUTH_SESSION_STORAGE_KEY = 'bdv.auth.session';
 const AUTH_OIDC_TRANSACTION_STORAGE_KEY = 'bdv.auth.oidc.transaction';
+const SESSION_REFRESH_SKEW_MS = 30_000;
 
 type OidcTransaction = {
   codeVerifier: string;
@@ -22,6 +23,7 @@ type OidcTransaction = {
 
 type OidcTokenResponse = {
   access_token?: string;
+  refresh_token?: string;
   expires_in?: number;
   id_token?: string;
   token_type?: string;
@@ -220,6 +222,7 @@ async function createCodeChallenge(verifier: string) {
 function buildOidcSessionFromTokens(
   config: RuntimeConfig,
   tokenResponse: OidcTokenResponse,
+  previousSession?: AuthSession | null,
 ): AuthSession {
   const idClaims = parseTokenClaims(tokenResponse.id_token);
   const accessClaims = parseTokenClaims(tokenResponse.access_token);
@@ -240,6 +243,8 @@ function buildOidcSessionFromTokens(
   return {
     accessToken: tokenResponse.access_token ?? '',
     expiresAt,
+    refreshToken: tokenResponse.refresh_token ?? previousSession?.refreshToken,
+    idToken: tokenResponse.id_token ?? previousSession?.idToken,
     user: {
       id: sub,
       name,
@@ -248,6 +253,43 @@ function buildOidcSessionFromTokens(
       tenantId,
     },
   };
+}
+
+function isSessionExpired(session: AuthSession, skewMs = 0) {
+  return session.expiresAt <= Date.now() + Math.max(0, skewMs);
+}
+
+async function exchangeRefreshToken(
+  config: RuntimeConfig,
+  refreshToken: string,
+): Promise<OidcTokenResponse> {
+  if (!config.authOidcTokenUrl || !config.authOidcClientId) {
+    throw new Error('OIDC refresh requires token URL and client ID.');
+  }
+
+  const body = new URLSearchParams();
+  body.set('grant_type', 'refresh_token');
+  body.set('client_id', config.authOidcClientId);
+  body.set('refresh_token', refreshToken);
+
+  const response = await fetch(config.authOidcTokenUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body,
+  });
+
+  if (!response.ok) {
+    throw new Error(`OIDC refresh token exchange failed (${response.status}).`);
+  }
+
+  const payload = (await response.json()) as OidcTokenResponse;
+  if (!payload.access_token) {
+    throw new Error('OIDC refresh response did not include an access token.');
+  }
+
+  return payload;
 }
 
 function createMockSession(): AuthSession {
@@ -394,11 +436,26 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
 
   const getSession = async () => {
     const session = readSession();
-    if (session && session.expiresAt > Date.now()) {
+    if (session && !isSessionExpired(session, SESSION_REFRESH_SKEW_MS)) {
       return session;
     }
 
-    if (session && session.expiresAt <= Date.now()) {
+    if (session?.refreshToken && isSessionExpired(session, SESSION_REFRESH_SKEW_MS)) {
+      try {
+        const tokenResponse = await exchangeRefreshToken(config, session.refreshToken);
+        const refreshedSession = buildOidcSessionFromTokens(config, tokenResponse, session);
+        writeSession(refreshedSession);
+        emit(refreshedSession);
+        return refreshedSession;
+      } catch {
+        writeSession(null);
+        writeOidcTransaction(null);
+        emit(null);
+        throw new Error('Authentication session expired. Please sign in again.');
+      }
+    }
+
+    if (session && isSessionExpired(session)) {
       writeSession(null);
     }
 
