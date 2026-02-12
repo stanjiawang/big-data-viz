@@ -307,7 +307,7 @@ export function RelationshipGraph({
       ) : null}
 
       {clusters.length > 0 ? (
-        <div className="absolute right-3 top-3 z-10 flex max-w-[60%] flex-wrap gap-2 rounded-lg bg-white/90 p-2 backdrop-blur">
+        <div className="absolute right-3 top-3 z-10 flex max-h-[44%] max-w-[65%] flex-wrap gap-2 overflow-y-auto rounded-lg bg-white/90 p-2 backdrop-blur">
           {clusters.map((cluster) => {
             const active = selectedClusters.has(cluster);
             return (
@@ -374,7 +374,7 @@ export function RelationshipGraph({
       ) : null}
 
       {selectedNodeData ? (
-        <div className="absolute left-3 top-3 z-10 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm">
+        <div className="absolute left-3 top-3 z-10 max-w-[50%] rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm">
           <div className="font-semibold">{selectedNodeData.id}</div>
           <div>Cluster: {selectedNodeData.group}</div>
           <div>Weight: {selectedNodeData.weight}</div>

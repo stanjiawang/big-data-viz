@@ -53,7 +53,7 @@ function RangeSummary({
   yMax: string;
 }) {
   return (
-    <div className="text-[11px] text-slate-500">
+    <div className="text-[11px] text-slate-500 sm:text-xs">
       X: {xStart}% - {xEnd}% | Y: {yMin || 'auto'} - {yMax || 'auto'}
     </div>
   );
@@ -215,7 +215,7 @@ export function SummarySection({ datasetSize, filters, expanded = false }: Dashb
     <div className="space-y-4">
       <PieChart title="Label Distribution" data={labelDistribution} height={expanded ? 280 : 200} />
       <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
-        <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <RangeSummary xStart={barXStart} xEnd={barXEnd} yMin={barYMin} yMax={barYMax} />
           <button
             type="button"
@@ -327,7 +327,7 @@ export function ChartsSection({
           }
         >
           <div className="space-y-3">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <RangeSummary xStart={timeXStart} xEnd={timeXEnd} yMin={timeYMin} yMax={timeYMax} />
               <button
                 type="button"

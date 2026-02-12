@@ -34,6 +34,7 @@ const TableRow = memo(function TableRow({
   isCompact,
 }: RowProps) {
   const timestamp = record?.timestamp ? record.timestamp.replace('T', ' ').slice(0, 19) : 'Loading';
+  const featurePreviewSize = isCompact ? 2 : 6;
 
   return (
     <div className="absolute left-0 right-0" style={style}>
@@ -50,7 +51,7 @@ const TableRow = memo(function TableRow({
         <span className="text-xs text-slate-500">
           {record
             ? record.features
-                .slice(0, isCompact ? 3 : 6)
+                .slice(0, featurePreviewSize)
                 .map((value) => value.toFixed(2))
                 .join(', ')
             : '...'}
@@ -193,6 +194,9 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
     <div className="overflow-hidden rounded-lg border border-slate-200">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-white px-4 py-2 text-xs text-slate-500">
         <span className="font-semibold uppercase tracking-wide">Table controls</span>
+        <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          {isCompact ? 'Compact density' : 'Comfortable density'}
+        </span>
         <button
           type="button"
           className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 transition hover:border-slate-300 hover:text-slate-700 focus-visible:border-blue-500 focus-visible:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-200"
@@ -226,7 +230,7 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
               />
             </div>
           ))}
-          <span>Embedding (first 6)</span>
+          <span>{`Embedding (first ${isCompact ? 2 : 6})`}</span>
         </div>
 
         <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>

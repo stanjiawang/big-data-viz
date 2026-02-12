@@ -28,6 +28,12 @@ export function EmbeddingCloud({
 }: EmbeddingCloudProps) {
   const [webglOk] = useState(() => isWebGLAvailable());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [viewState, setViewState] = useState({
+    target: [0, 0, 0] as [number, number, number],
+    zoom: 0.8,
+    minZoom: -2,
+    maxZoom: 4,
+  });
 
   const points = useMemo(() => {
     return records.map((record) => ({
@@ -39,16 +45,6 @@ export function EmbeddingCloud({
   }, [records]);
 
   const view = useMemo(() => new OrthographicView(), []);
-
-  const viewState = useMemo(
-    () => ({
-      target: [0, 0, 0] as [number, number, number],
-      zoom: 0.8,
-      minZoom: -2,
-      maxZoom: 4,
-    }),
-    [],
-  );
 
   const layer = useMemo(
     () =>
@@ -67,7 +63,7 @@ export function EmbeddingCloud({
                 ? [21, 128, 61]
                 : [124, 58, 237],
         opacity: 0.8,
-        pickable: false,
+        pickable: true,
       }),
     [points],
   );
@@ -124,6 +120,20 @@ export function EmbeddingCloud({
       <div className="absolute left-2 top-2 z-10 rounded-md bg-white/90 px-2 py-1 text-[10px] uppercase tracking-wide text-slate-500 shadow-sm backdrop-blur">
         Zoom: scroll | Pan: drag
       </div>
+      <button
+        type="button"
+        className="absolute left-2 top-9 z-10 rounded-md border border-slate-200 bg-white/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500 shadow-sm backdrop-blur transition hover:border-slate-300 hover:text-slate-700"
+        onClick={() =>
+          setViewState({
+            target: [0, 0, 0],
+            zoom: 0.8,
+            minZoom: -2,
+            maxZoom: 4,
+          })
+        }
+      >
+        Reset view
+      </button>
       {hoveredId ? (
         <div className="absolute right-2 top-2 z-10 rounded-md bg-white/90 px-2 py-1 text-xs text-slate-600 shadow-sm backdrop-blur">
           Node: {hoveredId}
@@ -133,6 +143,16 @@ export function EmbeddingCloud({
         views={view}
         viewState={viewState}
         controller={true}
+        onViewStateChange={({ viewState: nextViewState }) =>
+          setViewState((current) => ({
+            ...current,
+            target:
+              Array.isArray(nextViewState.target) && nextViewState.target.length === 3
+                ? (nextViewState.target as [number, number, number])
+                : current.target,
+            zoom: typeof nextViewState.zoom === 'number' ? nextViewState.zoom : current.zoom,
+          }))
+        }
         layers={[layer]}
         getTooltip={({ object }) => {
           if (!object) return null;

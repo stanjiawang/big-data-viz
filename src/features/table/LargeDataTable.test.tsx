@@ -144,5 +144,7 @@ describe('LargeDataTable', () => {
     const toggle = screen.getByRole('button', { name: 'Compact view' });
     await userEvent.click(toggle);
     expect(screen.getByRole('button', { name: 'Comfortable view' })).toBeInTheDocument();
+    expect(screen.getByText('Embedding (first 2)')).toBeInTheDocument();
+    expect(screen.getByText('Compact density')).toBeInTheDocument();
   });
 });
