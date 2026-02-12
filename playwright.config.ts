@@ -17,6 +17,8 @@ export default defineConfig({
     timeout: 120_000,
     env: {
       VITE_ENABLE_MSW: 'true',
+      VITE_ENABLE_AUTH: 'false',
+      VITE_AUTH_PROVIDER: 'mock',
       VITE_API_BASE_URL: '',
     },
   },
