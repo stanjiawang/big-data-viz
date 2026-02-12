@@ -112,6 +112,7 @@
 - B1 completed: OIDC PKCE auth flow is supported via runtime config with mock auth fallback for demo mode
 - B1 hardening completed: OIDC sessions now attempt refresh-token renewal and enforce re-login on refresh failure
 - C1 hardening completed: authentication lifecycle events now emit structured telemetry for signin/callback/refresh/signout
+- E3 hardening completed: release governance now enforces auth rollout checklist and auth incident playbook
 - C3 completed: structured API failure telemetry now includes requestId, errorCode, and httpStatus fields
 - G3 foundation completed: incident template, generator script, and runbook wiring
 - E3 completed: release governance docs and CI validation gate

@@ -4,6 +4,8 @@ import path from 'node:path';
 const changelogPath = path.resolve(process.cwd(), 'CHANGELOG.md');
 const releaseChecklistPath = path.resolve(process.cwd(), 'docs/release-checklist.md');
 const rollbackChecklistPath = path.resolve(process.cwd(), 'docs/rollback-checklist.md');
+const authRolloutChecklistPath = path.resolve(process.cwd(), 'docs/auth-rollout-checklist.md');
+const authIncidentPlaybookPath = path.resolve(process.cwd(), 'docs/auth-incident-playbook.md');
 
 function hasSection(content, heading) {
   return new RegExp(`^##\\s+${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'm').test(content);
@@ -26,10 +28,13 @@ async function readFileOrNull(filePath) {
 async function run() {
   const errors = [];
 
-  const [changelog, releaseChecklist, rollbackChecklist] = await Promise.all([
+  const [changelog, releaseChecklist, rollbackChecklist, authRolloutChecklist, authIncidentPlaybook] =
+    await Promise.all([
     readFileOrNull(changelogPath),
     readFileOrNull(releaseChecklistPath),
     readFileOrNull(rollbackChecklistPath),
+    readFileOrNull(authRolloutChecklistPath),
+    readFileOrNull(authIncidentPlaybookPath),
   ]);
 
   if (!changelog) {
@@ -52,6 +57,7 @@ async function run() {
       'Reliability, performance, and contract gates passed',
       'Rollback plan and owner confirmed',
       'Post-release monitoring window scheduled',
+      'Auth rollout checklist completed for the target environment',
     ];
     for (const item of requiredItems) {
       if (!hasChecklistItem(releaseChecklist, item)) {
@@ -77,6 +83,34 @@ async function run() {
     }
   }
 
+  if (!authRolloutChecklist) {
+    errors.push(`Missing auth rollout checklist: ${authRolloutChecklistPath}`);
+  } else {
+    const requiredItems = [
+      'OIDC client configuration matches environment',
+      'Sign-in callback succeeds and dashboard renders for viewer role',
+      'RBAC validation passed for viewer, analyst, and admin personas',
+      'Session refresh succeeds at least once before token expiry window',
+      'Fallback config (`VITE_ENABLE_AUTH=false`) is prepared and verified',
+    ];
+    for (const item of requiredItems) {
+      if (!hasChecklistItem(authRolloutChecklist, item)) {
+        errors.push(`docs/auth-rollout-checklist.md missing checklist item: "${item}"`);
+      }
+    }
+  }
+
+  if (!authIncidentPlaybook) {
+    errors.push(`Missing auth incident playbook: ${authIncidentPlaybookPath}`);
+  } else {
+    const requiredSectionHeadings = ['Trigger Signals', 'Triage Steps', 'Mitigation', 'Recovery Verification'];
+    for (const heading of requiredSectionHeadings) {
+      if (!hasSection(authIncidentPlaybook, heading)) {
+        errors.push(`docs/auth-incident-playbook.md missing section: "## ${heading}"`);
+      }
+    }
+  }
+
   if (errors.length > 0) {
     console.error('Release governance validation failed:');
     errors.forEach((error) => console.error(`- ${error}`));
@@ -87,6 +121,8 @@ async function run() {
   console.log(`- Changelog: ${changelogPath}`);
   console.log(`- Release checklist: ${releaseChecklistPath}`);
   console.log(`- Rollback checklist: ${rollbackChecklistPath}`);
+  console.log(`- Auth rollout checklist: ${authRolloutChecklistPath}`);
+  console.log(`- Auth incident playbook: ${authIncidentPlaybookPath}`);
 }
 
 run().catch((error) => {
