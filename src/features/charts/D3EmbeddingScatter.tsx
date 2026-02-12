@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import {
-  UI_BUTTON_GHOST_SM,
-  UI_CHIP_ACTIVE,
-  UI_CHIP_INTERACTIVE,
-  UI_LABEL_CLASS,
-} from '@/components/ui/styleTokens';
+import { UI_CHIP_ACTIVE, UI_CHIP_INTERACTIVE, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import type { TrainingRecord } from '@/lib/types';
 
 type D3EmbeddingScatterProps = {
@@ -93,20 +88,9 @@ export function D3EmbeddingScatter({
       .attr('width', innerWidth)
       .attr('height', innerHeight);
 
-    const xExtent = d3.extent(visiblePoints, (point: ScatterPoint) => point.x) as [number, number];
-    const yExtent = d3.extent(visiblePoints, (point: ScatterPoint) => point.y) as [number, number];
+    const xScale = d3.scaleLinear().domain([-1, 1]).clamp(true).range([0, innerWidth]);
 
-    const xScale = d3
-      .scaleLinear()
-      .domain(xExtent[0] === xExtent[1] ? [xExtent[0] - 1, xExtent[1] + 1] : xExtent)
-      .nice()
-      .range([0, innerWidth]);
-
-    const yScale = d3
-      .scaleLinear()
-      .domain(yExtent[0] === yExtent[1] ? [yExtent[0] - 1, yExtent[1] + 1] : yExtent)
-      .nice()
-      .range([innerHeight, 0]);
+    const yScale = d3.scaleLinear().domain([-1, 1]).clamp(true).range([innerHeight, 0]);
 
     const colorScale = d3.scaleOrdinal<string, string>().domain(labels).range(d3.schemeTableau10);
 
@@ -215,7 +199,10 @@ export function D3EmbeddingScatter({
   }
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white">
+    <div
+      className="relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white"
+      style={{ height }}
+    >
       <div className="flex flex-wrap items-center gap-1 border-b border-slate-100 px-2 py-2">
         <span className={`${UI_LABEL_CLASS} mr-1`}>Zoom: {zoomLevel.toFixed(1)}x</span>
         {labels.map((label) => {
@@ -241,19 +228,21 @@ export function D3EmbeddingScatter({
             </button>
           );
         })}
-        <button
-          type="button"
-          className={`${UI_BUTTON_GHOST_SM} h-9 px-2`}
-          onClick={() => {
-            setHiddenLabels(new Set());
-            setPointScale(1);
-            setPointOpacity(0.72);
-            setZoomLevel(1);
-            setResetNonce((current) => current + 1);
-          }}
-        >
-          Reset view
-        </button>
+        <div className="ml-auto">
+          <button
+            type="button"
+            className={UI_CHIP_INTERACTIVE}
+            onClick={() => {
+              setHiddenLabels(new Set());
+              setPointScale(1);
+              setPointOpacity(0.72);
+              setZoomLevel(1);
+              setResetNonce((current) => current + 1);
+            }}
+          >
+            Reset view
+          </button>
+        </div>
       </div>
 
       <div className="relative min-h-0 flex-1">

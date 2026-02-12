@@ -211,76 +211,84 @@ export function SummarySection({ datasetSize, filters, expanded = false }: Dashb
 
   return (
     <div className="space-y-4">
-      <PieChart title="Label Distribution" data={labelDistribution} height={expanded ? 280 : 200} />
-      <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <RangeSummary xStart={barXStart} xEnd={barXEnd} yMin={barYMin} yMax={barYMax} />
-          <button
-            type="button"
-            className={`${UI_BUTTON_GHOST_SM} h-9 px-2`}
-            onClick={() => {
-              setBarXStart(0);
-              setBarXEnd(100);
-              setBarYMin('');
-              setBarYMax('');
-            }}
-          >
-            Reset
-          </button>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="space-y-1 text-xs text-slate-600">
-            <span className={UI_LABEL_CLASS}>X Range Start (%)</span>
-            <input
-              type="range"
-              min={0}
-              max={Math.max(0, barXEnd - 1)}
-              value={barXStart}
-              onChange={(event) => setBarXStart(Number(event.target.value))}
-              className="w-full"
-            />
-          </label>
-          <label className="space-y-1 text-xs text-slate-600">
-            <span className={UI_LABEL_CLASS}>X Range End (%)</span>
-            <input
-              type="range"
-              min={Math.min(100, barXStart + 1)}
-              max={100}
-              value={barXEnd}
-              onChange={(event) => setBarXEnd(Number(event.target.value))}
-              className="w-full"
-            />
-          </label>
-          <label className="space-y-1 text-xs text-slate-600">
-            <span className={UI_LABEL_CLASS}>Y Min</span>
-            <input
-              type="number"
-              value={barYMin}
-              onChange={(event) => setBarYMin(event.target.value)}
-              className="w-full rounded-md border border-slate-300 px-2 py-1"
-            />
-          </label>
-          <label className="space-y-1 text-xs text-slate-600">
-            <span className={UI_LABEL_CLASS}>Y Max</span>
-            <input
-              type="number"
-              value={barYMax}
-              onChange={(event) => setBarYMax(event.target.value)}
-              className="w-full rounded-md border border-slate-300 px-2 py-1"
-            />
-          </label>
+      <div className="rounded-lg border border-slate-200 bg-white p-3">
+        <PieChart
+          title="Label Distribution"
+          data={labelDistribution}
+          height={expanded ? 280 : 200}
+        />
+      </div>
+      <div className="rounded-lg border border-slate-200 bg-white p-3">
+        <BarChart
+          title="Source Volume"
+          categories={sourceDistribution.categories}
+          values={sourceDistribution.values}
+          height={expanded ? 280 : 200}
+          xStartPercent={barXStart}
+          xEndPercent={barXEnd}
+          yMin={barYMinValue}
+          yMax={barYMaxValue}
+        />
+        <div className="mt-3 border-t border-slate-100 pt-3">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <RangeSummary xStart={barXStart} xEnd={barXEnd} yMin={barYMin} yMax={barYMax} />
+            <button
+              type="button"
+              className={`${UI_BUTTON_GHOST_SM} h-9 px-2`}
+              onClick={() => {
+                setBarXStart(0);
+                setBarXEnd(100);
+                setBarYMin('');
+                setBarYMax('');
+              }}
+            >
+              Reset
+            </button>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="space-y-1 text-xs text-slate-600">
+              <span className={UI_LABEL_CLASS}>X Range Start (%)</span>
+              <input
+                type="range"
+                min={0}
+                max={Math.max(0, barXEnd - 1)}
+                value={barXStart}
+                onChange={(event) => setBarXStart(Number(event.target.value))}
+                className="w-full"
+              />
+            </label>
+            <label className="space-y-1 text-xs text-slate-600">
+              <span className={UI_LABEL_CLASS}>X Range End (%)</span>
+              <input
+                type="range"
+                min={Math.min(100, barXStart + 1)}
+                max={100}
+                value={barXEnd}
+                onChange={(event) => setBarXEnd(Number(event.target.value))}
+                className="w-full"
+              />
+            </label>
+            <label className="space-y-1 text-xs text-slate-600">
+              <span className={UI_LABEL_CLASS}>Y Min</span>
+              <input
+                type="number"
+                value={barYMin}
+                onChange={(event) => setBarYMin(event.target.value)}
+                className="w-full rounded-md border border-slate-300 px-2 py-1"
+              />
+            </label>
+            <label className="space-y-1 text-xs text-slate-600">
+              <span className={UI_LABEL_CLASS}>Y Max</span>
+              <input
+                type="number"
+                value={barYMax}
+                onChange={(event) => setBarYMax(event.target.value)}
+                className="w-full rounded-md border border-slate-300 px-2 py-1"
+              />
+            </label>
+          </div>
         </div>
       </div>
-      <BarChart
-        title="Source Volume"
-        categories={sourceDistribution.categories}
-        values={sourceDistribution.values}
-        height={expanded ? 280 : 200}
-        xStartPercent={barXStart}
-        xEndPercent={barXEnd}
-        yMin={barYMinValue}
-        yMax={barYMaxValue}
-      />
     </div>
   );
 }
@@ -326,63 +334,6 @@ export function ChartsSection({
           }
         >
           <div className="space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <RangeSummary xStart={timeXStart} xEnd={timeXEnd} yMin={timeYMin} yMax={timeYMax} />
-              <button
-                type="button"
-                className={`${UI_BUTTON_GHOST_SM} h-9 px-2`}
-                onClick={() => {
-                  setTimeXStart(0);
-                  setTimeXEnd(100);
-                  setTimeYMin('');
-                  setTimeYMax('');
-                }}
-              >
-                Reset
-              </button>
-            </div>
-            <div className="grid gap-2 sm:grid-cols-2">
-              <label className="space-y-1 text-xs text-slate-600">
-                <span className={UI_LABEL_CLASS}>X Start (%)</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={Math.max(0, timeXEnd - 1)}
-                  value={timeXStart}
-                  onChange={(event) => setTimeXStart(Number(event.target.value))}
-                  className="w-full"
-                />
-              </label>
-              <label className="space-y-1 text-xs text-slate-600">
-                <span className={UI_LABEL_CLASS}>X End (%)</span>
-                <input
-                  type="range"
-                  min={Math.min(100, timeXStart + 1)}
-                  max={100}
-                  value={timeXEnd}
-                  onChange={(event) => setTimeXEnd(Number(event.target.value))}
-                  className="w-full"
-                />
-              </label>
-              <label className="space-y-1 text-xs text-slate-600">
-                <span className={UI_LABEL_CLASS}>Y Min</span>
-                <input
-                  type="number"
-                  value={timeYMin}
-                  onChange={(event) => setTimeYMin(event.target.value)}
-                  className="w-full rounded-md border border-slate-300 px-2 py-1"
-                />
-              </label>
-              <label className="space-y-1 text-xs text-slate-600">
-                <span className={UI_LABEL_CLASS}>Y Max</span>
-                <input
-                  type="number"
-                  value={timeYMax}
-                  onChange={(event) => setTimeYMax(event.target.value)}
-                  className="w-full rounded-md border border-slate-300 px-2 py-1"
-                />
-              </label>
-            </div>
             <TimeSeriesChart
               data={timeSeries}
               height={expanded ? 420 : 260}
@@ -391,6 +342,65 @@ export function ChartsSection({
               yMin={timeYMinValue}
               yMax={timeYMaxValue}
             />
+            <div className="border-t border-slate-100 pt-3">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <RangeSummary xStart={timeXStart} xEnd={timeXEnd} yMin={timeYMin} yMax={timeYMax} />
+                <button
+                  type="button"
+                  className={`${UI_BUTTON_GHOST_SM} h-9 px-2`}
+                  onClick={() => {
+                    setTimeXStart(0);
+                    setTimeXEnd(100);
+                    setTimeYMin('');
+                    setTimeYMax('');
+                  }}
+                >
+                  Reset
+                </button>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <label className="space-y-1 text-xs text-slate-600">
+                  <span className={UI_LABEL_CLASS}>X Start (%)</span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={Math.max(0, timeXEnd - 1)}
+                    value={timeXStart}
+                    onChange={(event) => setTimeXStart(Number(event.target.value))}
+                    className="w-full"
+                  />
+                </label>
+                <label className="space-y-1 text-xs text-slate-600">
+                  <span className={UI_LABEL_CLASS}>X End (%)</span>
+                  <input
+                    type="range"
+                    min={Math.min(100, timeXStart + 1)}
+                    max={100}
+                    value={timeXEnd}
+                    onChange={(event) => setTimeXEnd(Number(event.target.value))}
+                    className="w-full"
+                  />
+                </label>
+                <label className="space-y-1 text-xs text-slate-600">
+                  <span className={UI_LABEL_CLASS}>Y Min</span>
+                  <input
+                    type="number"
+                    value={timeYMin}
+                    onChange={(event) => setTimeYMin(event.target.value)}
+                    className="w-full rounded-md border border-slate-300 px-2 py-1"
+                  />
+                </label>
+                <label className="space-y-1 text-xs text-slate-600">
+                  <span className={UI_LABEL_CLASS}>Y Max</span>
+                  <input
+                    type="number"
+                    value={timeYMax}
+                    onChange={(event) => setTimeYMax(event.target.value)}
+                    className="w-full rounded-md border border-slate-300 px-2 py-1"
+                  />
+                </label>
+              </div>
+            </div>
           </div>
         </Card>
       )}
