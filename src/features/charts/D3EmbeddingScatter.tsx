@@ -140,7 +140,9 @@ export function D3EmbeddingScatter({
       })
       .on('mouseleave', () => {
         setHovered(null);
-      })
+      });
+
+    circles
       .append('title')
       .text((point: ScatterPoint) => `${point.label} | weight ${point.weight.toFixed(2)}`);
 
