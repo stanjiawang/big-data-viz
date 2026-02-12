@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
 import { ScatterplotLayer } from '@deck.gl/layers';
+import { UI_BUTTON_GHOST_SM } from '@/components/ui/styleTokens';
 import type { TrainingRecord } from '@/lib/types';
 
 type EmbeddingCloudProps = {
@@ -122,7 +123,7 @@ export function EmbeddingCloud({
       </div>
       <button
         type="button"
-        className="absolute left-2 top-9 z-10 rounded-md border border-slate-200 bg-white/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500 shadow-sm backdrop-blur transition hover:border-slate-300 hover:text-slate-700"
+        className={`absolute left-2 top-9 z-10 ${UI_BUTTON_GHOST_SM} h-7 bg-white/90 px-2 text-[10px] shadow-sm backdrop-blur`}
         onClick={() =>
           setViewState({
             target: [0, 0, 0],

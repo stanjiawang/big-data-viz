@@ -4,6 +4,12 @@ import { useCamera, useRegisterEvents, useSetSettings, useSigma } from '@react-s
 import Graph from 'graphology';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import type { GraphResponse } from '@/lib/types';
+import {
+  UI_BUTTON_GHOST_SM,
+  UI_CHIP_ACTIVE,
+  UI_CHIP_INTERACTIVE,
+  UI_LABEL_CLASS,
+} from '@/components/ui/styleTokens';
 
 const NODE_COLORS = ['#2563eb', '#7c3aed', '#16a34a', '#f97316', '#0ea5e9', '#a855f7'];
 
@@ -275,11 +281,7 @@ export function RelationshipGraph({
                   <button
                     key={cluster}
                     type="button"
-                    className={`rounded-full border px-2 py-1 text-xs font-medium ${
-                      active
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-slate-200 bg-white text-slate-500'
-                    }`}
+                    className={active ? UI_CHIP_ACTIVE : UI_CHIP_INTERACTIVE}
                     onClick={() => {
                       setSelectedClusters((current) => {
                         const next = new Set(current);
@@ -299,7 +301,7 @@ export function RelationshipGraph({
               {selectedClusters.size > 0 ? (
                 <button
                   type="button"
-                  className="rounded-full border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500"
+                  className={`${UI_BUTTON_GHOST_SM} h-7 px-2 text-[11px]`}
                   onClick={() => setSelectedClusters(new Set())}
                 >
                   Clear
@@ -352,7 +354,7 @@ export function RelationshipGraph({
         <div className="flex items-end justify-between gap-2">
           {legendItems.length > 0 ? (
             <div className="max-w-[46%] space-y-1 rounded-lg bg-slate-50 p-2 text-xs text-slate-600">
-              <div className="text-[10px] uppercase tracking-wide text-slate-400">Legend</div>
+              <div className={UI_LABEL_CLASS}>Legend</div>
               {legendItems.map((item) => (
                 <div key={item.label} className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
@@ -367,11 +369,9 @@ export function RelationshipGraph({
           <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-2 py-1 text-xs text-slate-600">
             <button
               type="button"
-              className={`rounded-full border px-2 py-1 ${
-                showEdges
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-slate-200 bg-white text-slate-500'
-              }`}
+              className={
+                showEdges ? `${UI_CHIP_ACTIVE} px-2 py-1` : `${UI_CHIP_INTERACTIVE} px-2 py-1`
+              }
               onClick={() => setShowEdges((current) => !current)}
             >
               {showEdges ? 'Hide edges' : 'Show edges'}

@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import { UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import type { MockFilters } from '@/lib/types';
 import {
   DATASET_SIZES,
@@ -18,7 +19,7 @@ export type FiltersPanelProps = {
   defaultWeightMax: number;
 };
 
-const LABEL_CLASS = 'space-y-2 text-xs font-semibold uppercase tracking-wide text-slate-500';
+const LABEL_CLASS = `space-y-2 ${UI_LABEL_CLASS}`;
 const INPUT_CLASS =
   'w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-200';
 const SELECT_CLASS =

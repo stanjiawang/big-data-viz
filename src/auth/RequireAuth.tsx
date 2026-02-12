@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/auth/useAuth';
 import { MOCK_AUTH_ACCOUNTS } from '@/auth/authClient';
+import { UI_BUTTON_GHOST_SM, UI_BUTTON_PRIMARY_SM } from '@/components/ui/styleTokens';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 
 const PANEL_CLASS =
@@ -85,7 +86,7 @@ export function RequireAuth({
                 </label>
                 <button
                   type="button"
-                  className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                  className={`${UI_BUTTON_PRIMARY_SM} w-full text-sm`}
                   onClick={() =>
                     void signIn({
                       email,
@@ -99,7 +100,7 @@ export function RequireAuth({
             ) : (
               <button
                 type="button"
-                className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                className={`${UI_BUTTON_PRIMARY_SM} w-full text-sm`}
                 onClick={() => void signIn()}
               >
                 Continue with SSO
@@ -121,11 +122,7 @@ export function RequireAuth({
             Signed in as <span className="font-medium">{session?.user.name ?? 'unknown user'}</span>
             , but no tenant is attached to this session.
           </p>
-          <button
-            type="button"
-            className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            onClick={() => void signOut()}
-          >
+          <button type="button" className={UI_BUTTON_GHOST_SM} onClick={() => void signOut()}>
             Sign out
           </button>
         </div>
@@ -142,11 +139,7 @@ export function RequireAuth({
             Signed in as <span className="font-medium">{session?.user.name ?? 'unknown user'}</span>
             , but required roles are missing.
           </p>
-          <button
-            type="button"
-            className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            onClick={() => void signOut()}
-          >
+          <button type="button" className={UI_BUTTON_GHOST_SM} onClick={() => void signOut()}>
             Sign out
           </button>
         </div>

@@ -1,0 +1,16 @@
+export const UI_LABEL_CLASS = 'text-xs font-semibold uppercase tracking-wide text-slate-500';
+
+export const UI_BUTTON_GHOST_SM =
+  'inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold uppercase tracking-wide text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-800 focus-visible:border-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200';
+
+export const UI_BUTTON_PRIMARY_SM =
+  'inline-flex h-9 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-3 text-xs font-semibold uppercase tracking-wide text-blue-700 shadow-sm transition hover:border-blue-300 hover:bg-blue-100 focus-visible:border-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200';
+
+export const UI_CHIP_NEUTRAL =
+  'inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600';
+
+export const UI_CHIP_INTERACTIVE =
+  'inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:border-slate-300 hover:text-slate-800';
+
+export const UI_CHIP_ACTIVE =
+  'inline-flex items-center justify-center rounded-full border border-blue-400 bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700';

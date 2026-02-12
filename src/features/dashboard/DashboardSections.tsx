@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { KpiCard } from '@/components/ui/KpiCard';
+import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import type { DataChunk, MockFilters } from '@/lib/types';
 import { BarChart } from '@/features/charts/BarChart';
 import { PieChart } from '@/features/charts/PieChart';
@@ -32,11 +33,7 @@ export type DetailView = 'summary' | 'timeSeries' | 'embedding' | 'graph' | 'tab
 
 function DetailButton({ onClick }: { onClick: () => void }) {
   return (
-    <button
-      type="button"
-      className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
-      onClick={onClick}
-    >
+    <button type="button" className={UI_BUTTON_GHOST_SM} onClick={onClick}>
       Open detail
     </button>
   );
@@ -220,7 +217,7 @@ export function SummarySection({ datasetSize, filters, expanded = false }: Dashb
           <RangeSummary xStart={barXStart} xEnd={barXEnd} yMin={barYMin} yMax={barYMax} />
           <button
             type="button"
-            className="rounded-full border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500"
+            className={`${UI_BUTTON_GHOST_SM} h-8 px-2 text-[11px]`}
             onClick={() => {
               setBarXStart(0);
               setBarXEnd(100);
@@ -233,7 +230,7 @@ export function SummarySection({ datasetSize, filters, expanded = false }: Dashb
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="space-y-1 text-xs text-slate-600">
-            <span className="font-semibold uppercase tracking-wide">X Range Start (%)</span>
+            <span className={UI_LABEL_CLASS}>X Range Start (%)</span>
             <input
               type="range"
               min={0}
@@ -244,7 +241,7 @@ export function SummarySection({ datasetSize, filters, expanded = false }: Dashb
             />
           </label>
           <label className="space-y-1 text-xs text-slate-600">
-            <span className="font-semibold uppercase tracking-wide">X Range End (%)</span>
+            <span className={UI_LABEL_CLASS}>X Range End (%)</span>
             <input
               type="range"
               min={Math.min(100, barXStart + 1)}
@@ -255,7 +252,7 @@ export function SummarySection({ datasetSize, filters, expanded = false }: Dashb
             />
           </label>
           <label className="space-y-1 text-xs text-slate-600">
-            <span className="font-semibold uppercase tracking-wide">Y Min</span>
+            <span className={UI_LABEL_CLASS}>Y Min</span>
             <input
               type="number"
               value={barYMin}
@@ -264,7 +261,7 @@ export function SummarySection({ datasetSize, filters, expanded = false }: Dashb
             />
           </label>
           <label className="space-y-1 text-xs text-slate-600">
-            <span className="font-semibold uppercase tracking-wide">Y Max</span>
+            <span className={UI_LABEL_CLASS}>Y Max</span>
             <input
               type="number"
               value={barYMax}
@@ -333,7 +330,7 @@ export function ChartsSection({
               <RangeSummary xStart={timeXStart} xEnd={timeXEnd} yMin={timeYMin} yMax={timeYMax} />
               <button
                 type="button"
-                className="rounded-full border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500"
+                className={`${UI_BUTTON_GHOST_SM} h-8 px-2 text-[11px]`}
                 onClick={() => {
                   setTimeXStart(0);
                   setTimeXEnd(100);
@@ -346,7 +343,7 @@ export function ChartsSection({
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
               <label className="space-y-1 text-xs text-slate-600">
-                <span className="font-semibold uppercase tracking-wide">X Start (%)</span>
+                <span className={UI_LABEL_CLASS}>X Start (%)</span>
                 <input
                   type="range"
                   min={0}
@@ -357,7 +354,7 @@ export function ChartsSection({
                 />
               </label>
               <label className="space-y-1 text-xs text-slate-600">
-                <span className="font-semibold uppercase tracking-wide">X End (%)</span>
+                <span className={UI_LABEL_CLASS}>X End (%)</span>
                 <input
                   type="range"
                   min={Math.min(100, timeXStart + 1)}
@@ -368,7 +365,7 @@ export function ChartsSection({
                 />
               </label>
               <label className="space-y-1 text-xs text-slate-600">
-                <span className="font-semibold uppercase tracking-wide">Y Min</span>
+                <span className={UI_LABEL_CLASS}>Y Min</span>
                 <input
                   type="number"
                   value={timeYMin}
@@ -377,7 +374,7 @@ export function ChartsSection({
                 />
               </label>
               <label className="space-y-1 text-xs text-slate-600">
-                <span className="font-semibold uppercase tracking-wide">Y Max</span>
+                <span className={UI_LABEL_CLASS}>Y Max</span>
                 <input
                   type="number"
                   value={timeYMax}

@@ -105,6 +105,10 @@ jest.mock('@/features/charts/BarChart', () => ({
   BarChart: () => <div>BarChart</div>,
 }));
 
+jest.mock('@/features/charts/D3EmbeddingScatter', () => ({
+  D3EmbeddingScatter: () => <div>D3EmbeddingScatter</div>,
+}));
+
 type RenderOptions = {
   enableAuth?: boolean;
   roles?: string[];

@@ -5,6 +5,7 @@ import { canAccessFeature } from '@/auth/useAuth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
+import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import type { MockFilters } from '@/lib/types';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
@@ -35,8 +36,7 @@ const MOCK_CONTROL_PARAMS = [
   'mockTenantId',
 ];
 
-const ACTION_BUTTON_CLASS =
-  'rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-700 focus-visible:border-blue-400 focus-visible:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-200';
+const ACTION_BUTTON_CLASS = UI_BUTTON_GHOST_SM;
 
 function toDetailLabel(view: DetailView) {
   if (view === 'timeSeries') return 'Time Series';
@@ -271,13 +271,13 @@ export function DashboardPage() {
           Compare mode
         </label>
         {!canUseCompareMode ? (
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-600">
+          <span className="text-xs font-semibold uppercase tracking-wide text-amber-600">
             Requires analyst or admin role
           </span>
         ) : null}
         <span className="hidden h-4 w-px bg-slate-200 sm:inline" />
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-semibold uppercase tracking-wide">Compare dataset</span>
+          <span className={UI_LABEL_CLASS}>Compare dataset</span>
           <select
             className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 transition focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-200"
             value={compareDatasetSize.value}
