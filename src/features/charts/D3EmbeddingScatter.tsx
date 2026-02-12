@@ -40,6 +40,7 @@ export function D3EmbeddingScatter({
   const [pointOpacity, setPointOpacity] = useState(0.72);
   const [hovered, setHovered] = useState<HoverState | null>(null);
   const [resetNonce, setResetNonce] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   const points = useMemo(() => {
     return records.slice(0, MAX_POINTS).map((record) => ({
@@ -105,7 +106,9 @@ export function D3EmbeddingScatter({
       .attr('color', '#64748b')
       .attr('font-size', 10);
 
-    const circles = root
+    const plotLayer = root.append('g');
+
+    const circles = plotLayer
       .append('g')
       .selectAll('circle')
       .data<ScatterPoint>(visiblePoints)
@@ -147,13 +150,15 @@ export function D3EmbeddingScatter({
       .text((point: ScatterPoint) => `${point.label} | weight ${point.weight.toFixed(2)}`);
 
     const zoomBehavior = d3
-      .zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.8, 8])
+      .zoom<SVGRectElement, unknown>()
+      .scaleExtent([1, 12])
+      .wheelDelta((event) => -event.deltaY * 0.0035)
       .translateExtent([
         [0, 0],
         [width, plotHeight],
       ])
       .on('zoom', (event) => {
+        setZoomLevel(event.transform.k);
         const zx = event.transform.rescaleX(xScale);
         const zy = event.transform.rescaleY(yScale);
 
@@ -165,10 +170,19 @@ export function D3EmbeddingScatter({
           .attr('cy', (point: ScatterPoint) => zy(point.y));
       });
 
-    svg.call(zoomBehavior);
+    const zoomTarget = root
+      .append('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', innerWidth)
+      .attr('height', innerHeight)
+      .attr('fill', 'transparent')
+      .style('cursor', 'grab');
+
+    zoomTarget.call(zoomBehavior);
 
     return () => {
-      svg.on('.zoom', null);
+      zoomTarget.on('.zoom', null);
     };
   }, [height, visiblePoints, labels, pointOpacity, pointScale, resetNonce]);
 
@@ -186,6 +200,9 @@ export function D3EmbeddingScatter({
   return (
     <div className="relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white">
       <div className="flex flex-wrap items-center gap-1 border-b border-slate-100 px-2 py-2">
+        <span className="mr-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+          Zoom: {zoomLevel.toFixed(1)}x
+        </span>
         {labels.map((label) => {
           const active = !hiddenLabels.has(label);
           return (
@@ -220,6 +237,7 @@ export function D3EmbeddingScatter({
             setHiddenLabels(new Set());
             setPointScale(1);
             setPointOpacity(0.72);
+            setZoomLevel(1);
             setResetNonce((current) => current + 1);
           }}
         >
