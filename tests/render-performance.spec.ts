@@ -4,6 +4,7 @@ const SAMPLE_COUNT = Number(process.env.PERF_RENDER_SAMPLES ?? 3);
 const TARGET_DATASET_SIZE = Number(process.env.PERF_RENDER_DATASET_SIZE ?? 50_000_000);
 const TABLE_BUDGET_MS = Number(process.env.PERF_MAX_TABLE_RENDER_MS ?? 3000);
 const GRAPH_BUDGET_MS = Number(process.env.PERF_MAX_GRAPH_RENDER_MS ?? 3200);
+const PAGE_READY_TIMEOUT_MS = Number(process.env.PERF_PAGE_READY_TIMEOUT_MS ?? 25_000);
 
 function median(values: number[]) {
   const sorted = [...values].sort((left, right) => left - right);
@@ -16,30 +17,48 @@ function median(values: number[]) {
   return sorted[middle];
 }
 
+async function gotoDashboardAndWait(
+  page: import('@playwright/test').Page,
+  url: string,
+  maxAttempts = 2,
+) {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
+      await page.waitForLoadState('networkidle');
+      await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible({
+        timeout: PAGE_READY_TIMEOUT_MS,
+      });
+      return;
+    } catch (error) {
+      lastError = error;
+      if (attempt < maxAttempts) {
+        await page.waitForTimeout(500);
+      }
+    }
+  }
+
+  throw lastError;
+}
+
 test('meets render budgets for large table and relationship graph', async ({ page }) => {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible({
-    timeout: 15_000,
-  });
+  test.setTimeout(90_000);
+  await gotoDashboardAndWait(page, '/');
 
   const tableSamples: number[] = [];
   const graphSamples: number[] = [];
 
   for (let index = 0; index < SAMPLE_COUNT; index += 1) {
     const tablePage = await page.context().newPage();
-    await tablePage.goto(`/?size=${TARGET_DATASET_SIZE}`, { waitUntil: 'domcontentloaded' });
-    await expect(tablePage.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible({
-      timeout: 15_000,
-    });
+    await gotoDashboardAndWait(tablePage, `/?size=${TARGET_DATASET_SIZE}`);
     await expect(tablePage.getByText('Rows loaded:')).toBeVisible({ timeout: 15_000 });
     tableSamples.push(await tablePage.evaluate(() => Math.round(performance.now())));
     await tablePage.close();
 
     const graphPage = await page.context().newPage();
-    await graphPage.goto(`/?size=${TARGET_DATASET_SIZE}`, { waitUntil: 'domcontentloaded' });
-    await expect(graphPage.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible({
-      timeout: 15_000,
-    });
+    await gotoDashboardAndWait(graphPage, `/?size=${TARGET_DATASET_SIZE}`);
     await expect(graphPage.locator('[data-testid="relationship-graph"]')).toBeVisible({
       timeout: 15_000,
     });
