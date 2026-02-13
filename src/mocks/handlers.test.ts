@@ -14,7 +14,26 @@ jest.mock('msw', () => {
 
 import { handlers, parseFilters, parseMockControls, parseNumber } from '@/mocks/handlers';
 
-function mockRequest(url: string, headers?: Record<string, string>) {
+type MockRequest = {
+  url: string;
+  headers: {
+    get: (_name: string) => string | null;
+  };
+};
+
+type MockHandler = {
+  info: {
+    method: string;
+    path: string;
+  };
+  resolver: (_context: { request: MockRequest }) => Promise<any>;
+};
+
+function asMockHandler(handler: unknown): MockHandler {
+  return handler as MockHandler;
+}
+
+function mockRequest(url: string, headers?: Record<string, string>): MockRequest {
   return {
     url,
     headers: {
@@ -90,7 +109,7 @@ describe('msw handlers', () => {
   });
 
   it('returns auth/tenant errors for mock-data endpoint', async () => {
-    const mockDataHandler = handlers[0];
+    const mockDataHandler = asMockHandler(handlers[0]);
 
     const authResult = await mockDataHandler.resolver({
       request: mockRequest('http://localhost/api/mock-data?mockRequireAuth=true'),
@@ -108,7 +127,7 @@ describe('msw handlers', () => {
   });
 
   it('returns failure and malformed payload modes for mock-data endpoint', async () => {
-    const mockDataHandler = handlers[0];
+    const mockDataHandler = asMockHandler(handlers[0]);
 
     const rateLimited = await mockDataHandler.resolver({
       request: mockRequest('http://localhost/api/mock-data?mockFailure=rate-limit'),
@@ -123,7 +142,7 @@ describe('msw handlers', () => {
   });
 
   it('returns generated data for mock-data endpoint', async () => {
-    const mockDataHandler = handlers[0];
+    const mockDataHandler = asMockHandler(handlers[0]);
     const success = await mockDataHandler.resolver({
       request: mockRequest(
         'http://localhost/api/mock-data?total=100&offset=5&limit=20&vectorSize=8&labels=class-A,class-B',
@@ -140,8 +159,8 @@ describe('msw handlers', () => {
   });
 
   it('covers failure branches for timeseries and graph endpoints', async () => {
-    const timeseriesHandler = handlers[1];
-    const graphHandler = handlers[2];
+    const timeseriesHandler = asMockHandler(handlers[1]);
+    const graphHandler = asMockHandler(handlers[2]);
 
     const forbidden = await timeseriesHandler.resolver({
       request: mockRequest('http://localhost/api/timeseries?mockFailure=forbidden'),

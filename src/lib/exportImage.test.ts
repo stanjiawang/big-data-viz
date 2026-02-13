@@ -8,18 +8,16 @@ jest.mock('html-to-image', () => ({
 describe('exportImage', () => {
   it('exports an element as png with sanitized filename', async () => {
     const element = document.createElement('div');
-    const click = jest.fn();
-    let anchor: HTMLAnchorElement | null = null;
+    const linkMock = {
+      download: '',
+      href: '',
+      click: jest.fn(),
+    };
     const originalCreateElement = document.createElement.bind(document);
     const createElementSpy = jest.spyOn(document, 'createElement');
     createElementSpy.mockImplementation((tagName: string) => {
       if (tagName === 'a') {
-        anchor = {
-          download: '',
-          href: '',
-          click,
-        } as unknown as HTMLAnchorElement;
-        return anchor;
+        return linkMock as unknown as HTMLAnchorElement;
       }
       return originalCreateElement(tagName);
     });
@@ -34,9 +32,9 @@ describe('exportImage', () => {
         backgroundColor: '#ffffff',
       }),
     );
-    expect(anchor?.download).toBe('summary-card-2026.png');
-    expect(anchor?.href).toBe('data:image/png;base64,mock');
-    expect(click).toHaveBeenCalledTimes(1);
+    expect(linkMock.download).toBe('summary-card-2026.png');
+    expect(linkMock.href).toBe('data:image/png;base64,mock');
+    expect(linkMock.click).toHaveBeenCalledTimes(1);
 
     createElementSpy.mockRestore();
   });

@@ -4,18 +4,39 @@ import { D3EmbeddingScatter } from '@/features/charts/D3EmbeddingScatter';
 import type { TrainingRecord } from '@/lib/types';
 
 jest.mock('d3', () => {
-  const chain = {
-    selectAll: jest.fn(() => chain),
-    remove: jest.fn(() => chain),
-    attr: jest.fn(() => chain),
-    append: jest.fn(() => chain),
-    call: jest.fn(() => chain),
-    style: jest.fn(() => chain),
-    text: jest.fn(() => chain),
-    on: jest.fn(() => chain),
-    data: jest.fn(() => chain),
-    enter: jest.fn(() => chain),
+  const chain: {
+    selectAll: jest.Mock;
+    remove: jest.Mock;
+    attr: jest.Mock;
+    append: jest.Mock;
+    call: jest.Mock;
+    style: jest.Mock;
+    text: jest.Mock;
+    on: jest.Mock;
+    data: jest.Mock;
+    enter: jest.Mock;
+  } = {
+    selectAll: jest.fn(),
+    remove: jest.fn(),
+    attr: jest.fn(),
+    append: jest.fn(),
+    call: jest.fn(),
+    style: jest.fn(),
+    text: jest.fn(),
+    on: jest.fn(),
+    data: jest.fn(),
+    enter: jest.fn(),
   };
+  chain.selectAll.mockImplementation(() => chain);
+  chain.remove.mockImplementation(() => chain);
+  chain.attr.mockImplementation(() => chain);
+  chain.append.mockImplementation(() => chain);
+  chain.call.mockImplementation(() => chain);
+  chain.style.mockImplementation(() => chain);
+  chain.text.mockImplementation(() => chain);
+  chain.on.mockImplementation(() => chain);
+  chain.data.mockImplementation(() => chain);
+  chain.enter.mockImplementation(() => chain);
 
   const scaleLinear = () => {
     const fn = ((value: number) => value) as unknown as {
@@ -41,7 +62,7 @@ jest.mock('d3', () => {
     return fn;
   };
 
-  const zoom = () => ({
+  const zoom: () => any = () => ({
     scaleExtent: () => zoom(),
     wheelDelta: () => zoom(),
     translateExtent: () => zoom(),
