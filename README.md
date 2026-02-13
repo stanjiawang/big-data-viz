@@ -66,10 +66,12 @@ pnpm run format
 pnpm run stylelint
 pnpm test
 pnpm test:e2e
+pnpm run test:e2e:auth
 pnpm run test:e2e:a11y
 ```
 
-`test:e2e` now includes the core functional suite plus accessibility coverage.
+`test:e2e` runs the non-auth functional suite.
+`test:e2e:auth` runs auth-enabled end-to-end sign-in/sign-out flows.
 `test:e2e:a11y` runs only the axe-core accessibility specs.
 
 ## Mock Data

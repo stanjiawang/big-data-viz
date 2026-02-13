@@ -18,7 +18,8 @@
 8. `pnpm run test:release-governance`
 9. `pnpm test`
 10. `pnpm test:e2e`
-11. `pnpm run test:e2e:a11y`
+11. `pnpm run test:e2e:auth`
+12. `pnpm run test:e2e:a11y`
 
 ## Common Failures
 

@@ -20,6 +20,7 @@ pnpm run format
 pnpm run stylelint
 pnpm test
 pnpm test:e2e
+pnpm run test:e2e:auth
 pnpm run test:e2e:a11y
 pnpm run test:perf
 pnpm run test:render-perf

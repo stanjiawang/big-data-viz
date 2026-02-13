@@ -2,6 +2,11 @@ import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 4173;
 const skipRenderPerf = process.env.SKIP_RENDER_PERF === '1';
+const authSuite = process.env.PW_AUTH_SUITE === '1';
+const defaultProjectIgnore = [
+  '**/auth-enabled.spec.ts',
+  ...(skipRenderPerf ? ['**/render-performance.spec.ts'] : []),
+];
 
 export default defineConfig({
   testDir: './tests',
@@ -20,15 +25,24 @@ export default defineConfig({
     timeout: 120_000,
     env: {
       VITE_ENABLE_MSW: 'true',
-      VITE_ENABLE_AUTH: 'false',
+      VITE_ENABLE_AUTH: authSuite ? 'true' : 'false',
       VITE_AUTH_PROVIDER: 'mock',
       VITE_API_BASE_URL: '',
     },
   },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
+  projects: authSuite
+    ? [
+        {
+          name: 'chromium-auth',
+          testMatch: ['**/auth-enabled.spec.ts'],
+          use: { ...devices['Desktop Chrome'] },
+        },
+      ]
+    : [
+        {
+          name: 'chromium',
+          testIgnore: defaultProjectIgnore,
+          use: { ...devices['Desktop Chrome'] },
+        },
+      ],
 });
