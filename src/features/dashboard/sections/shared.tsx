@@ -13,6 +13,32 @@ export function DetailButton({ onClick }: { onClick: () => void }) {
   );
 }
 
+async function waitForExportTarget(targetRef: RefObject<HTMLElement | null>, timeoutMs = 2_000) {
+  if (targetRef.current) {
+    return targetRef.current;
+  }
+
+  return new Promise<HTMLElement | null>((resolve) => {
+    const startedAt = performance.now();
+
+    const tick = () => {
+      if (targetRef.current) {
+        resolve(targetRef.current);
+        return;
+      }
+
+      if (performance.now() - startedAt >= timeoutMs) {
+        resolve(null);
+        return;
+      }
+
+      window.requestAnimationFrame(tick);
+    };
+
+    window.requestAnimationFrame(tick);
+  });
+}
+
 function ExportImageButton({
   targetRef,
   fileName,
@@ -29,10 +55,13 @@ function ExportImageButton({
       className={UI_BUTTON_GHOST_SM}
       disabled={isExporting}
       onClick={async () => {
-        if (!targetRef.current) return;
         try {
           setIsExporting(true);
-          await downloadElementAsImage(targetRef.current, fileName);
+          const targetElement = await waitForExportTarget(targetRef);
+          if (!targetElement) {
+            return;
+          }
+          await downloadElementAsImage(targetElement, fileName);
         } finally {
           setIsExporting(false);
         }

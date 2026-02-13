@@ -102,11 +102,11 @@ http://localhost:5173/?size=1000000&mockFailure=rate-limit
 
 ```
 src/
-  app/            App entry, bootstrap, query client
+  app/            Bootstrap, provider composition, query client
   i18n/           Locale catalogs + react-intl provider/hook
-  components/     Reusable UI and layout components
-  config/         Runtime config resolution
-  features/       Domain features (charts, graph, embeddings, table)
+  components/     Reusable UI and layout primitives
+  config/         Runtime config + feature access policy
+  features/       Domain modules (dashboard, charts, graph, embeddings, table)
   lib/            Core utilities, API transport, data generators
   mocks/          MSW handlers
   styles/         Tailwind entry

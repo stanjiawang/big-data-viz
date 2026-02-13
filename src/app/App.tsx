@@ -1,10 +1,8 @@
-import { QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { RequireAuth } from '@/auth/RequireAuth';
-import { queryClient } from '@/app/queryClient';
+import { AppProviders } from '@/app/providers/AppProviders';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
-import { I18nProvider } from '@/i18n/I18nProvider';
 import { useI18n } from '@/i18n/useI18n';
 
 function AppContent() {
@@ -34,10 +32,8 @@ function AppContent() {
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <I18nProvider>
-        <AppContent />
-      </I18nProvider>
-    </QueryClientProvider>
+    <AppProviders>
+      <AppContent />
+    </AppProviders>
   );
 }
