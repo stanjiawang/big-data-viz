@@ -38,6 +38,9 @@ importers:
       graphology-layout-forceatlas2:
         specifier: ^0.10.1
         version: 0.10.1(graphology-types@0.24.8)
+      html-to-image:
+        specifier: ^1.11.13
+        version: 1.11.13
       msw:
         specifier: ^2.12.7
         version: 2.12.7(@types/node@25.2.0)(typescript@5.9.3)
@@ -2599,6 +2602,9 @@ packages:
   html-tags@5.1.0:
     resolution: {integrity: sha512-n6l5uca7/y5joxZ3LUePhzmBFUJ+U2YWzhMa8XUTecSeSlQiZdF5XAd/Q3/WUl0VsXgUwWi8I7CNIwdI5WN1SQ==}
     engines: {node: '>=20.10'}
+
+  html-to-image@1.11.13:
+    resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
 
   http-proxy-agent@5.0.0:
     resolution: {integrity: sha512-n2hY8YdoRE1i7r6M0w9DIw5GgZN0G25P8zLCRQ8rjXtTU3vsNFBI/vWK/UIeE6g5MUUz6avwAPXmL6Fy9D/90w==}
@@ -6888,6 +6894,8 @@ snapshots:
   html-escaper@2.0.2: {}
 
   html-tags@5.1.0: {}
+
+  html-to-image@1.11.13: {}
 
   http-proxy-agent@5.0.0:
     dependencies:

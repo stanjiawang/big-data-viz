@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { RefObject } from 'react';
 import * as d3 from 'd3';
 import { UI_CHIP_ACTIVE, UI_CHIP_INTERACTIVE, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import type { TrainingRecord } from '@/lib/types';
@@ -8,6 +9,7 @@ type D3EmbeddingScatterProps = {
   height?: number;
   isLoading?: boolean;
   isError?: boolean;
+  exportTargetRef?: RefObject<HTMLDivElement | null>;
 };
 
 type ScatterPoint = {
@@ -34,6 +36,7 @@ export function D3EmbeddingScatter({
   height = 280,
   isLoading,
   isError,
+  exportTargetRef,
 }: D3EmbeddingScatterProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [hiddenLabels, setHiddenLabels] = useState<Set<string>>(new Set());
@@ -245,7 +248,7 @@ export function D3EmbeddingScatter({
         </div>
       </div>
 
-      <div className="relative min-h-0 flex-1">
+      <div ref={exportTargetRef} className="relative min-h-0 flex-1">
         <svg ref={svgRef} className="h-full w-full" data-testid="d3-embedding-scatter" />
         {hovered ? (
           <div

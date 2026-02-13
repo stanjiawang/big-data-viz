@@ -1,6 +1,7 @@
+import { useRef } from 'react';
 import { Card } from '@/components/ui/Card';
 import { LargeDataTable } from '@/features/table/LargeDataTable';
-import { DetailButton } from '@/features/dashboard/sections/shared';
+import { SectionCardActions } from '@/features/dashboard/sections/shared';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
 
 export function TableSection({
@@ -10,6 +11,9 @@ export function TableSection({
   filters,
   onOpenDetail,
 }: DashboardSectionProps) {
+  const primaryTableRef = useRef<HTMLDivElement | null>(null);
+  const compareTableRef = useRef<HTMLDivElement | null>(null);
+
   if (compareEnabled) {
     return (
       <section className="grid gap-6 lg:grid-cols-2">
@@ -17,16 +21,36 @@ export function TableSection({
           title="Large Table (Primary)"
           description="Virtualized grid for multi-million row browsing."
           subtitle="Tech stack: TanStack Virtual + React Query"
-          actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('table')} /> : null}
+          actions={
+            <SectionCardActions
+              onOpenDetail={onOpenDetail ? () => onOpenDetail('table') : undefined}
+              exportTargetRef={primaryTableRef}
+              exportFileName="large-table-primary"
+            />
+          }
         >
-          <LargeDataTable total={datasetSize.value} filters={filters} />
+          <LargeDataTable
+            total={datasetSize.value}
+            filters={filters}
+            exportTargetRef={primaryTableRef}
+          />
         </Card>
         <Card
           title="Large Table (Compare)"
           description="Virtualized grid for multi-million row browsing."
           subtitle="Tech stack: TanStack Virtual + React Query"
+          actions={
+            <SectionCardActions
+              exportTargetRef={compareTableRef}
+              exportFileName="large-table-compare"
+            />
+          }
         >
-          <LargeDataTable total={compareDatasetSize.value} filters={filters} />
+          <LargeDataTable
+            total={compareDatasetSize.value}
+            filters={filters}
+            exportTargetRef={compareTableRef}
+          />
         </Card>
       </section>
     );
@@ -37,9 +61,19 @@ export function TableSection({
       title="Large Table"
       description="Virtualized grid for multi-million row browsing."
       subtitle="Tech stack: TanStack Virtual + React Query"
-      actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('table')} /> : null}
+      actions={
+        <SectionCardActions
+          onOpenDetail={onOpenDetail ? () => onOpenDetail('table') : undefined}
+          exportTargetRef={primaryTableRef}
+          exportFileName="large-table"
+        />
+      }
     >
-      <LargeDataTable total={datasetSize.value} filters={filters} />
+      <LargeDataTable
+        total={datasetSize.value}
+        filters={filters}
+        exportTargetRef={primaryTableRef}
+      />
     </Card>
   );
 }

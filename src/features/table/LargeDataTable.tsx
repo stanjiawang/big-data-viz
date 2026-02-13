@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
+import type { RefObject } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { getMockData } from '@/lib/apiClient';
@@ -19,6 +20,7 @@ const MAX_COL_WIDTH = 360;
 type LargeDataTableProps = {
   total: number;
   filters: MockFilters;
+  exportTargetRef?: RefObject<HTMLDivElement | null>;
 };
 
 type RowProps = {
@@ -62,7 +64,7 @@ const TableRow = memo(function TableRow({
   );
 });
 
-export function LargeDataTable({ total, filters }: LargeDataTableProps) {
+export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTableProps) {
   const queryClient = useQueryClient();
   const parentRef = useRef<HTMLDivElement | null>(null);
   const resizeState = useRef<{
@@ -209,49 +211,51 @@ export function LargeDataTable({ total, filters }: LargeDataTableProps) {
         </button>
       </div>
 
-      <div ref={parentRef} className="h-80 overflow-auto">
-        <div
-          className="sticky top-0 z-10 grid h-11 items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 text-xs font-semibold uppercase tracking-wide text-slate-500 shadow-sm"
-          style={{ gridTemplateColumns }}
-        >
-          {['ID', 'Timestamp', 'Source', 'Label'].map((label, index) => (
-            <div key={label} className="relative flex items-center">
-              <span>{label}</span>
-              <span
-                role="presentation"
-                className="absolute -right-1 top-0 h-full w-2 cursor-col-resize"
-                onMouseDown={(event) => {
-                  resizeState.current = {
-                    index,
-                    startX: event.clientX,
-                    startWidth: columnWidths[index],
-                  };
-                }}
-              />
-            </div>
-          ))}
-          <span>Embedding preview</span>
-        </div>
+      <div ref={exportTargetRef} className="h-80 overflow-hidden">
+        <div ref={parentRef} className="h-full overflow-auto">
+          <div
+            className="sticky top-0 z-10 grid h-11 items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 text-xs font-semibold uppercase tracking-wide text-slate-500 shadow-sm"
+            style={{ gridTemplateColumns }}
+          >
+            {['ID', 'Timestamp', 'Source', 'Label'].map((label, index) => (
+              <div key={label} className="relative flex items-center">
+                <span>{label}</span>
+                <span
+                  role="presentation"
+                  className="absolute -right-1 top-0 h-full w-2 cursor-col-resize"
+                  onMouseDown={(event) => {
+                    resizeState.current = {
+                      index,
+                      startX: event.clientX,
+                      startWidth: columnWidths[index],
+                    };
+                  }}
+                />
+              </div>
+            ))}
+            <span>Embedding preview</span>
+          </div>
 
-        <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
-          {isLoading && (
-            <div className="absolute left-4 top-4 text-sm text-slate-400">Loading records...</div>
-          )}
-          {virtualizer.getVirtualItems().map((virtualRow) => {
-            const record = recordsByIndex(virtualRow.index);
-            return (
-              <TableRow
-                key={virtualRow.key}
-                record={record}
-                gridTemplateColumns={gridTemplateColumns}
-                isCompact={isCompact}
-                style={{
-                  transform: `translateY(${virtualRow.start}px)`,
-                  height: `${virtualRow.size}px`,
-                }}
-              />
-            );
-          })}
+          <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
+            {isLoading && (
+              <div className="absolute left-4 top-4 text-sm text-slate-400">Loading records...</div>
+            )}
+            {virtualizer.getVirtualItems().map((virtualRow) => {
+              const record = recordsByIndex(virtualRow.index);
+              return (
+                <TableRow
+                  key={virtualRow.key}
+                  record={record}
+                  gridTemplateColumns={gridTemplateColumns}
+                  isCompact={isCompact}
+                  style={{
+                    transform: `translateY(${virtualRow.start}px)`,
+                    height: `${virtualRow.size}px`,
+                  }}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 

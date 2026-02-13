@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { RefObject } from 'react';
 import { SigmaContainer } from '@react-sigma/core';
 import { useCamera, useRegisterEvents, useSetSettings, useSigma } from '@react-sigma/core';
 import Graph from 'graphology';
@@ -32,6 +33,7 @@ type RelationshipGraphProps = {
   isLoading?: boolean;
   isError?: boolean;
   height?: number;
+  exportTargetRef?: RefObject<HTMLDivElement | null>;
 };
 
 type SigmaNodeEvent = {
@@ -175,6 +177,7 @@ export function RelationshipGraph({
   isLoading,
   isError,
   height = 220,
+  exportTargetRef,
 }: RelationshipGraphProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
@@ -273,7 +276,10 @@ export function RelationshipGraph({
       data-testid="relationship-graph"
     >
       <div className="grid min-h-0 flex-1 gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_220px]">
-        <div className="relative min-h-0 overflow-hidden rounded-lg bg-slate-50/60">
+        <div
+          ref={exportTargetRef}
+          className="relative min-h-0 overflow-hidden rounded-lg bg-slate-50/60"
+        >
           <div className="h-full">
             <SigmaContainer
               key={sigmaKey}

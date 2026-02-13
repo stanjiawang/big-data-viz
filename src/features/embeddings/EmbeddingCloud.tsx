@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { RefObject } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
 import { ScatterplotLayer } from '@deck.gl/layers';
@@ -10,6 +11,7 @@ type EmbeddingCloudProps = {
   isLoading?: boolean;
   isError?: boolean;
   height?: number;
+  exportTargetRef?: RefObject<HTMLDivElement | null>;
 };
 
 function isWebGLAvailable() {
@@ -26,6 +28,7 @@ export function EmbeddingCloud({
   isLoading,
   isError,
   height = 224,
+  exportTargetRef,
 }: EmbeddingCloudProps) {
   const [webglOk] = useState(() => isWebGLAvailable());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -140,35 +143,37 @@ export function EmbeddingCloud({
           Node: {hoveredId}
         </div>
       ) : null}
-      <DeckGL
-        views={view}
-        viewState={viewState}
-        controller={true}
-        onViewStateChange={({ viewState: nextViewState }) =>
-          setViewState((current) => ({
-            ...current,
-            target:
-              Array.isArray(nextViewState.target) && nextViewState.target.length === 3
-                ? (nextViewState.target as [number, number, number])
-                : current.target,
-            zoom: typeof nextViewState.zoom === 'number' ? nextViewState.zoom : current.zoom,
-          }))
-        }
-        layers={[layer]}
-        getTooltip={({ object }) => {
-          if (!object) return null;
-          const point = object as { id: string; label: string; weight: number };
-          return {
-            text: `${point.id}\n${point.label}\nweight: ${point.weight.toFixed(2)}`,
-          };
-        }}
-        onHover={({ object }) => {
-          if (!object) return setHoveredId(null);
-          const point = object as { id: string };
-          setHoveredId(point.id);
-        }}
-        style={{ position: 'absolute', inset: '0' }}
-      />
+      <div ref={exportTargetRef} className="absolute inset-0">
+        <DeckGL
+          views={view}
+          viewState={viewState}
+          controller={true}
+          onViewStateChange={({ viewState: nextViewState }) =>
+            setViewState((current) => ({
+              ...current,
+              target:
+                Array.isArray(nextViewState.target) && nextViewState.target.length === 3
+                  ? (nextViewState.target as [number, number, number])
+                  : current.target,
+              zoom: typeof nextViewState.zoom === 'number' ? nextViewState.zoom : current.zoom,
+            }))
+          }
+          layers={[layer]}
+          getTooltip={({ object }) => {
+            if (!object) return null;
+            const point = object as { id: string; label: string; weight: number };
+            return {
+              text: `${point.id}\n${point.label}\nweight: ${point.weight.toFixed(2)}`,
+            };
+          }}
+          onHover={({ object }) => {
+            if (!object) return setHoveredId(null);
+            const point = object as { id: string };
+            setHoveredId(point.id);
+          }}
+          style={{ position: 'absolute', inset: '0' }}
+        />
+      </div>
     </div>
   );
 }

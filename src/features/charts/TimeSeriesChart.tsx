@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import type { RefObject } from 'react';
 import * as echarts from 'echarts/core';
 import { LineChart } from 'echarts/charts';
 import {
@@ -29,6 +30,7 @@ type TimeSeriesChartProps = {
   xEndPercent?: number;
   yMin?: number;
   yMax?: number;
+  exportTargetRef?: RefObject<HTMLDivElement | null>;
 };
 
 export function TimeSeriesChart({
@@ -40,6 +42,7 @@ export function TimeSeriesChart({
   xEndPercent = 100,
   yMin,
   yMax,
+  exportTargetRef,
 }: TimeSeriesChartProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
@@ -132,7 +135,7 @@ export function TimeSeriesChart({
         : null;
 
   return (
-    <div className="relative" style={{ height }}>
+    <div ref={exportTargetRef} className="relative" style={{ height }}>
       <div ref={chartRef} className="h-full w-full" />
       {overlayMessage ? (
         <div className="absolute inset-0 flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import type { RefObject } from 'react';
 import * as echarts from 'echarts/core';
 import { BarChart as BarChartImpl } from 'echarts/charts';
 import { GridComponent, TooltipComponent } from 'echarts/components';
@@ -18,6 +19,7 @@ type BarChartProps = {
   xEndPercent?: number;
   yMin?: number;
   yMax?: number;
+  exportTargetRef?: RefObject<HTMLDivElement | null>;
 };
 
 export function BarChart({
@@ -31,6 +33,7 @@ export function BarChart({
   xEndPercent = 100,
   yMin,
   yMax,
+  exportTargetRef,
 }: BarChartProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
@@ -120,7 +123,7 @@ export function BarChart({
         : null;
 
   return (
-    <div className="relative" style={{ height }}>
+    <div ref={exportTargetRef} className="relative" style={{ height }}>
       <div ref={chartRef} className="h-full w-full" />
       {overlayMessage ? (
         <div className="absolute inset-0 flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">

@@ -1,6 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DetailButton, RangeSummary } from '@/features/dashboard/sections/shared';
+import {
+  DetailButton,
+  RangeSummary,
+  SectionCardActions,
+} from '@/features/dashboard/sections/shared';
+import { downloadElementAsImage } from '@/lib/exportImage';
+
+jest.mock('@/lib/exportImage', () => ({
+  downloadElementAsImage: jest.fn(() => Promise.resolve()),
+}));
 
 describe('dashboard/sections/shared', () => {
   it('renders detail button and invokes callback', async () => {
@@ -19,5 +28,24 @@ describe('dashboard/sections/shared', () => {
   it('renders auto placeholders when y bounds are empty', () => {
     render(<RangeSummary xStart={0} xEnd={100} yMin="" yMax="" />);
     expect(screen.getByText('X: 0% - 100% | Y: auto - auto')).toBeInTheDocument();
+  });
+
+  it('renders export action and triggers image export', async () => {
+    const target = document.createElement('section');
+    document.body.appendChild(target);
+    const targetRef = { current: target };
+
+    render(
+      <SectionCardActions
+        onOpenDetail={jest.fn()}
+        exportTargetRef={targetRef}
+        exportFileName="time-series"
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Download image' }));
+    expect(downloadElementAsImage).toHaveBeenCalledWith(target, 'time-series');
+
+    target.remove();
   });
 });

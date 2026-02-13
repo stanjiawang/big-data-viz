@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { RefObject } from 'react';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { BarChart } from '@/features/charts/BarChart';
 import { PieChart } from '@/features/charts/PieChart';
@@ -7,7 +8,16 @@ import { LABEL_OPTIONS, SOURCE_OPTIONS } from '@/features/dashboard/constants/fi
 import { RangeSummary } from '@/features/dashboard/sections/shared';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
 
-export function SummarySection({ datasetSize, filters, expanded = false }: DashboardSectionProps) {
+type SummarySectionProps = DashboardSectionProps & {
+  visualizationRef?: RefObject<HTMLDivElement | null>;
+};
+
+export function SummarySection({
+  datasetSize,
+  filters,
+  expanded = false,
+  visualizationRef,
+}: SummarySectionProps) {
   const { data: chunk } = useMockDataSuspense({
     total: datasetSize.value,
     offset: 0,
@@ -50,24 +60,28 @@ export function SummarySection({ datasetSize, filters, expanded = false }: Dashb
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-slate-200 bg-white p-3">
-        <PieChart
-          title="Label Distribution"
-          data={labelDistribution}
-          height={expanded ? 280 : 200}
-        />
+      <div ref={visualizationRef} className="space-y-4">
+        <div className="rounded-lg border border-slate-200 bg-white p-3">
+          <PieChart
+            title="Label Distribution"
+            data={labelDistribution}
+            height={expanded ? 280 : 200}
+          />
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white p-3">
+          <BarChart
+            title="Source Volume"
+            categories={sourceDistribution.categories}
+            values={sourceDistribution.values}
+            height={expanded ? 280 : 200}
+            xStartPercent={barXStart}
+            xEndPercent={barXEnd}
+            yMin={barYMinValue}
+            yMax={barYMaxValue}
+          />
+        </div>
       </div>
       <div className="rounded-lg border border-slate-200 bg-white p-3">
-        <BarChart
-          title="Source Volume"
-          categories={sourceDistribution.categories}
-          values={sourceDistribution.values}
-          height={expanded ? 280 : 200}
-          xStartPercent={barXStart}
-          xEndPercent={barXEnd}
-          yMin={barYMinValue}
-          yMax={barYMaxValue}
-        />
         <div className="mt-3 border-t border-slate-100 pt-3">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <RangeSummary xStart={barXStart} xEnd={barXEnd} yMin={barYMin} yMax={barYMax} />

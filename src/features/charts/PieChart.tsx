@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import type { RefObject } from 'react';
 import * as echarts from 'echarts/core';
 import { PieChart as PieChartImpl } from 'echarts/charts';
 import { LegendComponent, TooltipComponent } from 'echarts/components';
@@ -13,9 +14,17 @@ type PieChartProps = {
   height?: number;
   isLoading?: boolean;
   isError?: boolean;
+  exportTargetRef?: RefObject<HTMLDivElement | null>;
 };
 
-export function PieChart({ title, data, height = 220, isLoading, isError }: PieChartProps) {
+export function PieChart({
+  title,
+  data,
+  height = 220,
+  isLoading,
+  isError,
+  exportTargetRef,
+}: PieChartProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
 
@@ -80,7 +89,7 @@ export function PieChart({ title, data, height = 220, isLoading, isError }: PieC
         : null;
 
   return (
-    <div className="relative" style={{ height }}>
+    <div ref={exportTargetRef} className="relative" style={{ height }}>
       <div ref={chartRef} className="h-full w-full" />
       {overlayMessage ? (
         <div className="absolute inset-0 flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">

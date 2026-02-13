@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { D3EmbeddingScatter } from '@/features/charts/D3EmbeddingScatter';
@@ -8,7 +8,7 @@ import { useMockDataSuspense } from '@/features/data/queries/useMockData';
 import { useTimeSeriesSuspense } from '@/features/data/queries/useTimeSeries';
 import { EmbeddingCloud } from '@/features/embeddings/EmbeddingCloud';
 import { RelationshipGraph } from '@/features/graph/RelationshipGraph';
-import { DetailButton, RangeSummary } from '@/features/dashboard/sections/shared';
+import { RangeSummary, SectionCardActions } from '@/features/dashboard/sections/shared';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
 
 export function ChartsSection({
@@ -32,6 +32,10 @@ export function ChartsSection({
   const [timeXEnd, setTimeXEnd] = useState(100);
   const [timeYMin, setTimeYMin] = useState<string>('');
   const [timeYMax, setTimeYMax] = useState<string>('');
+  const timeSeriesImageRef = useRef<HTMLDivElement | null>(null);
+  const embeddingImageRef = useRef<HTMLDivElement | null>(null);
+  const graphImageRef = useRef<HTMLDivElement | null>(null);
+  const d3ImageRef = useRef<HTMLDivElement | null>(null);
 
   const timeYMinValue = timeYMin === '' ? undefined : Number(timeYMin);
   const timeYMaxValue = timeYMax === '' ? undefined : Number(timeYMax);
@@ -48,7 +52,11 @@ export function ChartsSection({
           className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
           actions={
-            onOpenDetail ? <DetailButton onClick={() => onOpenDetail('timeSeries')} /> : null
+            <SectionCardActions
+              onOpenDetail={onOpenDetail ? () => onOpenDetail('timeSeries') : undefined}
+              exportTargetRef={timeSeriesImageRef}
+              exportFileName="time-series"
+            />
           }
         >
           <div className="space-y-3">
@@ -59,6 +67,7 @@ export function ChartsSection({
               xEndPercent={timeXEnd}
               yMin={timeYMinValue}
               yMax={timeYMaxValue}
+              exportTargetRef={timeSeriesImageRef}
             />
             <div className="border-t border-slate-100 pt-3">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
@@ -129,9 +138,19 @@ export function ChartsSection({
           subtitle="Tech stack: deck.gl + WebGL"
           className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
-          actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('embedding')} /> : null}
+          actions={
+            <SectionCardActions
+              onOpenDetail={onOpenDetail ? () => onOpenDetail('embedding') : undefined}
+              exportTargetRef={embeddingImageRef}
+              exportFileName="embedding-cloud"
+            />
+          }
         >
-          <EmbeddingCloud records={chunk?.records} height={expanded ? 620 : 360} />
+          <EmbeddingCloud
+            records={chunk?.records}
+            height={expanded ? 620 : 360}
+            exportTargetRef={embeddingImageRef}
+          />
         </Card>
       )}
       {(focusView === undefined || focusView === 'graph') && (
@@ -141,9 +160,19 @@ export function ChartsSection({
           subtitle="Tech stack: Sigma.js + Graphology"
           className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
-          actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('graph')} /> : null}
+          actions={
+            <SectionCardActions
+              onOpenDetail={onOpenDetail ? () => onOpenDetail('graph') : undefined}
+              exportTargetRef={graphImageRef}
+              exportFileName="relationship-graph"
+            />
+          }
         >
-          <RelationshipGraph data={graph} height={expanded ? 620 : 380} />
+          <RelationshipGraph
+            data={graph}
+            height={expanded ? 620 : 380}
+            exportTargetRef={graphImageRef}
+          />
         </Card>
       )}
       {(focusView === undefined || focusView === 'd3') && (
@@ -153,9 +182,19 @@ export function ChartsSection({
           subtitle="Tech stack: D3.js + SVG"
           className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
-          actions={onOpenDetail ? <DetailButton onClick={() => onOpenDetail('d3')} /> : null}
+          actions={
+            <SectionCardActions
+              onOpenDetail={onOpenDetail ? () => onOpenDetail('d3') : undefined}
+              exportTargetRef={d3ImageRef}
+              exportFileName="d3-mock-data-demo"
+            />
+          }
         >
-          <D3EmbeddingScatter records={chunk?.records} height={expanded ? 620 : 380} />
+          <D3EmbeddingScatter
+            records={chunk?.records}
+            height={expanded ? 620 : 380}
+            exportTargetRef={d3ImageRef}
+          />
         </Card>
       )}
     </section>

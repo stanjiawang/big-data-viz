@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useIsFetching, useQueryClient } from '@tanstack/react-query';
 import { AuthContext } from '@/auth/AuthContext';
 import { canAccessFeature } from '@/auth/useAuth';
@@ -17,6 +17,7 @@ import {
   SummarySection,
   TableSection,
 } from '@/features/dashboard/sections';
+import { SectionCardActions } from '@/features/dashboard/sections/shared';
 import {
   ChartsRowSkeleton,
   FiltersSkeleton,
@@ -87,6 +88,8 @@ export function DashboardPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [compareEnabled, setCompareEnabled] = useState(false);
   const [compareDatasetSize, setCompareDatasetSize] = useState(DATASET_SIZES[2]);
+  const summaryCardRef = useRef<HTMLElement | null>(null);
+  const summaryVisualizationRef = useRef<HTMLDivElement | null>(null);
 
   const runtimeConfig = getRuntimeConfig();
   const authContext = useContext(AuthContext);
@@ -159,9 +162,16 @@ export function DashboardPage() {
 
         {detailView === 'summary' ? (
           <Card
+            sectionRef={summaryCardRef}
             title="Summary (Detailed)"
             description="Adjust chart ranges and inspect distribution deeply."
             subtitle="Tech stack: ECharts + React Query"
+            actions={
+              <SectionCardActions
+                exportTargetRef={summaryVisualizationRef}
+                exportFileName="summary-detailed"
+              />
+            }
           >
             <SummarySection
               datasetSize={datasetSize}
@@ -169,6 +179,7 @@ export function DashboardPage() {
               compareEnabled={effectiveCompareEnabled}
               filters={filters}
               expanded
+              visualizationRef={summaryVisualizationRef}
             />
           </Card>
         ) : null}
@@ -335,18 +346,17 @@ export function DashboardPage() {
         </Card>
 
         <Card
+          sectionRef={summaryCardRef}
           title="Summary"
           description="Quick glance of ingestion health and distribution."
           subtitle="Tech stack: ECharts + React Query"
           className="lg:col-span-7"
           actions={
-            <button
-              type="button"
-              className={ACTION_BUTTON_CLASS}
-              onClick={() => setDetailView('summary')}
-            >
-              Open detail
-            </button>
+            <SectionCardActions
+              onOpenDetail={() => setDetailView('summary')}
+              exportTargetRef={summaryVisualizationRef}
+              exportFileName="summary"
+            />
           }
         >
           <AsyncBoundary
@@ -359,6 +369,7 @@ export function DashboardPage() {
               compareDatasetSize={compareDatasetSize}
               compareEnabled={effectiveCompareEnabled}
               filters={filters}
+              visualizationRef={summaryVisualizationRef}
             />
           </AsyncBoundary>
         </Card>

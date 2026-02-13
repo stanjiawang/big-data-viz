@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { UI_LABEL_CLASS, UI_TEXT_MUTED_SM, UI_TEXT_SUBTITLE } from '@/components/ui/styleTokens';
 
 type CardProps = {
@@ -9,6 +9,7 @@ type CardProps = {
   className?: string;
   contentClassName?: string;
   actions?: ReactNode;
+  sectionRef?: RefObject<HTMLElement | null>;
 };
 
 export function Card({
@@ -19,9 +20,11 @@ export function Card({
   className,
   contentClassName,
   actions,
+  sectionRef,
 }: CardProps) {
   return (
     <section
+      ref={sectionRef}
       className={`rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md ${className ?? ''}`}
     >
       <div className="flex items-start justify-between gap-3">
