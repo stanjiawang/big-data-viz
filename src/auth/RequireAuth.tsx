@@ -59,8 +59,8 @@ export function RequireAuth({
       <div className={PANEL_CLASS}>
         <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
           <div className="bg-gradient-to-r from-slate-900 to-blue-900 px-6 py-5 text-white">
-            <h1 className={UI_TEXT_TITLE_MD}>Sign in required</h1>
-            <p className={`${UI_TEXT_SUBTITLE} mt-1 text-blue-100`}>
+            <h1 className="text-lg font-semibold text-white">Sign in required</h1>
+            <p className="mt-1 text-sm text-blue-100">
               Authentication is enabled for this environment. Sign in to access the dashboard.
             </p>
           </div>
