@@ -8,6 +8,8 @@ Enterprise-ready workspace for large-scale AI training data analytics, built wit
 - Mocked big-data APIs via MSW for local development
 - Interactive visualizations (time series, embedding cloud, relationship graph)
 - Virtualized large table for multi-million row browsing
+- Runtime language switcher with `react-intl` (`en`, `zh-CN`)
+- Accessibility baseline enforced with Playwright + axe-core
 - Strict linting, formatting, and type-checking
 - Unit tests (Jest) and E2E tests (Playwright)
 
@@ -18,8 +20,9 @@ Enterprise-ready workspace for large-scale AI training data analytics, built wit
 - React Query
 - MSW (Mock Service Worker)
 - Deck.gl + Sigma.js
+- react-intl
 - Jest + React Testing Library
-- Playwright
+- Playwright + @axe-core/playwright
 
 ## Getting Started
 
@@ -63,7 +66,11 @@ pnpm run format
 pnpm run stylelint
 pnpm test
 pnpm test:e2e
+pnpm run test:e2e:a11y
 ```
+
+`test:e2e` now includes the core functional suite plus accessibility coverage.
+`test:e2e:a11y` runs only the axe-core accessibility specs.
 
 ## Mock Data
 
@@ -96,6 +103,7 @@ http://localhost:5173/?size=1000000&mockFailure=rate-limit
 ```
 src/
   app/            App entry, bootstrap, query client
+  i18n/           Locale catalogs + react-intl provider/hook
   components/     Reusable UI and layout components
   config/         Runtime config resolution
   features/       Domain features (charts, graph, embeddings, table)

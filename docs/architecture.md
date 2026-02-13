@@ -8,6 +8,7 @@ Big Data Viz Lab is a frontend analytics console for large-scale AI training dat
 
 - Client: React + Vite + TypeScript
 - Auth: runtime-selectable `mock` or OIDC Authorization Code + PKCE SPA flow
+- Localization: `react-intl` with runtime locale switcher (`en`, `zh-CN`)
 - Server state: TanStack Query
 - API transport: `src/lib/httpClient.ts` and `src/lib/apiClient.ts`
 - Mock backend: MSW handlers in `src/mocks/handlers.ts`
@@ -70,6 +71,12 @@ Current auth runtime knobs:
   - `CHANGELOG.md` contains `Unreleased` and `Release Procedure` sections
   - `docs/release-checklist.md` contains mandatory pre-release controls
   - `docs/rollback-checklist.md` contains mandatory rollback controls
+
+## Accessibility Gates (Current)
+
+- CI runs `pnpm run test:e2e` for end-to-end critical flows and accessibility checks.
+- Focused accessibility validation is available via `pnpm run test:e2e:a11y`.
+- Accessibility tests use axe-core (`@axe-core/playwright`) and fail on serious/critical issues.
 
 ## Non-Functional Targets
 

@@ -90,6 +90,18 @@
   - Estimate: 1d
   - Acceptance: documented runbook exercised once
 
+## Epic H: Accessibility and Localization (P1)
+
+- H1. Add runtime localization framework
+  - Estimate: 2d
+  - Acceptance: locale provider, translation catalogs, and language switcher
+- H2. Add automated accessibility gate for serious/critical issues
+  - Estimate: 1.5d
+  - Acceptance: Playwright + axe-core checks in CI
+- H3. Remediate baseline accessibility violations
+  - Estimate: 2d
+  - Acceptance: keyboard focusability, semantic landmarks/labels, and contrast fixes in key flows
+
 ## Completed Foundation Items
 
 - F1 completed: Playwright critical-flow suite expanded to 10 scenarios in CI
@@ -116,6 +128,9 @@
 - C3 completed: structured API failure telemetry now includes requestId, errorCode, and httpStatus fields
 - G3 foundation completed: incident template, generator script, and runbook wiring
 - E3 completed: release governance docs and CI validation gate
+- H1 completed: i18n foundation implemented with `react-intl` and runtime language switcher (`en`, `zh-CN`)
+- H2 completed: Playwright accessibility gate added via `@axe-core/playwright` (`test:e2e:a11y`)
+- H3 completed: baseline accessibility issues remediated across dashboard/table/graph/auth surfaces
 
 ## Suggested Delivery Sequence
 

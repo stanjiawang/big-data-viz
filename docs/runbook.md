@@ -17,6 +17,7 @@
 7. `pnpm run test:release-governance`
 8. `pnpm test`
 9. `pnpm test:e2e`
+10. `pnpm run test:e2e:a11y`
 
 ## Common Failures
 
@@ -33,6 +34,7 @@
 
 - Re-run with traces: `pnpm exec playwright test --trace on`
 - Inspect artifacts under `test-results/`
+- Run accessibility-only suite for fast iteration: `pnpm run test:e2e:a11y`
 
 ## Incident Triage (Frontend)
 
