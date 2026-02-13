@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
 import { Card } from '@/components/ui/Card';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { UI_BUTTON_GHOST_SM, UI_INPUT_MD, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
 import {
@@ -89,18 +90,22 @@ export function DashboardOverviewView({
   return (
     <main
       id="app-main"
-      className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+      className="mx-auto grid w-full max-w-[1480px] gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
     >
-      <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="grid gap-3 lg:grid-cols-12 lg:items-start">
+      <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="grid gap-4 lg:grid-cols-12 lg:items-start">
           <div className="lg:col-span-7">
             <PageHeader title={t('dashboardTitle')} subtitle={t('dashboardSubtitle')} />
           </div>
           <div className="flex flex-wrap items-center justify-start gap-2 lg:col-span-5 lg:justify-end">
-            <LanguageSwitcher />
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <LanguageSwitcher />
+              <ThemeToggle />
+            </div>
+            <span className="hidden h-7 w-px bg-slate-200 lg:inline-flex" />
             <button
               type="button"
-              className={ACTION_BUTTON_CLASS}
+              className={`${ACTION_BUTTON_CLASS} w-32`}
               onClick={() => void queryClient.invalidateQueries()}
             >
               {t('dashboardRefreshData')}
@@ -108,7 +113,7 @@ export function DashboardOverviewView({
             {runtimeEnableAuth && isAuthenticated ? (
               <button
                 type="button"
-                className={ACTION_BUTTON_CLASS}
+                className={`${ACTION_BUTTON_CLASS} w-32`}
                 onClick={() => void onSignOut()}
               >
                 {t('authSignOut')}
@@ -117,18 +122,18 @@ export function DashboardOverviewView({
             <button
               type="button"
               onClick={onOpenFilters}
-              className={`${ACTION_BUTTON_CLASS} lg:hidden`}
+              className={`${ACTION_BUTTON_CLASS} w-32 lg:hidden`}
             >
               {t('dashboardFilters')}
             </button>
           </div>
         </div>
-        <div className="border-t border-slate-100 pt-3">
+        <div className="min-h-10 border-t border-slate-100 pt-3">
           <DashboardHeaderBadges items={badgeItems} isLoading={isFetching} />
         </div>
       </section>
 
-      <section className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs text-slate-500 shadow-sm">
+      <section className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs text-slate-500 shadow-sm">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"

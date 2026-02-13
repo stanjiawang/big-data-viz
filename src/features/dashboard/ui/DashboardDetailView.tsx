@@ -1,5 +1,7 @@
 import type { RefObject } from 'react';
 import { Card } from '@/components/ui/Card';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import type { DetailView } from '@/features/dashboard/sections';
@@ -46,15 +48,25 @@ export function DashboardDetailView({
   return (
     <main
       id="app-main"
-      className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+      className="mx-auto grid w-full max-w-[1480px] gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
     >
-      <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-        <h2 className={UI_LABEL_CLASS}>
-          {t('dashboardDetailedView')}: {detailLabelByView[detailView]}
-        </h2>
-        <button type="button" className={ACTION_BUTTON_CLASS} onClick={onBackToDashboard}>
-          {t('dashboardBackToDashboard')}
-        </button>
+      <section className="space-y-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className={UI_LABEL_CLASS}>
+            {t('dashboardDetailedView')}: {detailLabelByView[detailView]}
+          </h2>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <LanguageSwitcher />
+            <ThemeToggle />
+            <button
+              type="button"
+              className={`${ACTION_BUTTON_CLASS} w-40`}
+              onClick={onBackToDashboard}
+            >
+              {t('dashboardBackToDashboard')}
+            </button>
+          </div>
+        </div>
       </section>
 
       {detailView === 'summary' ? (

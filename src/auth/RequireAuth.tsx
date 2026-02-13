@@ -11,11 +11,12 @@ import {
   UI_TEXT_TITLE_MD,
 } from '@/components/ui/styleTokens';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { useI18n } from '@/i18n/useI18n';
 
 const PANEL_CLASS =
-  'mx-auto flex min-h-[50vh] w-full max-w-7xl items-center justify-center px-4 py-10 sm:px-6 lg:px-8';
+  'mx-auto flex min-h-[50vh] w-full max-w-[1480px] items-center justify-center px-4 py-10 sm:px-6 lg:px-8';
 
 export function RequireAuth({
   enabled,
@@ -62,8 +63,9 @@ export function RequireAuth({
       <main id="app-main" className={PANEL_CLASS}>
         <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
           <div className="bg-gradient-to-r from-slate-900 to-blue-900 px-6 py-5 text-white">
-            <div className="mb-3 flex justify-end">
+            <div className="mb-3 flex flex-wrap justify-end gap-2">
               <LanguageSwitcher />
+              <ThemeToggle />
             </div>
             <h1 className="text-lg font-semibold text-white">{t('authSignInRequired')}</h1>
             <p className="mt-1 text-sm text-blue-100">{t('authSignInDescription')}</p>

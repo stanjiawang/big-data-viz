@@ -10,6 +10,10 @@ export const messages = {
     language: 'Language',
     languageEnglish: 'English',
     languageChinese: 'Chinese (Simplified)',
+    theme: 'Theme',
+    themeLight: 'Light',
+    themeDark: 'Dark',
+    themeSwitchAria: 'Switch color theme',
 
     authLoading: 'Loading authentication...',
     authSignInRequired: 'Sign in required',
@@ -144,6 +148,10 @@ export const messages = {
     language: '语言',
     languageEnglish: '英语',
     languageChinese: '简体中文',
+    theme: '主题',
+    themeLight: '浅色',
+    themeDark: '深色',
+    themeSwitchAria: '切换页面主题',
 
     authLoading: '正在加载身份验证...',
     authSignInRequired: '需要登录',
