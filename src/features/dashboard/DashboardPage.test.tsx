@@ -109,6 +109,12 @@ jest.mock('@/features/charts/D3EmbeddingScatter', () => ({
   D3EmbeddingScatter: () => <div>D3EmbeddingScatter</div>,
 }));
 
+jest.mock('@/features/dashboard/ui/lazySections', () => ({
+  SummarySection: () => <div>SummarySection</div>,
+  ChartsSection: () => <div>ChartsSection</div>,
+  TableSection: () => <div>TableSection</div>,
+}));
+
 type RenderOptions = {
   enableAuth?: boolean;
   roles?: string[];
