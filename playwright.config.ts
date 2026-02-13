@@ -1,9 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 4173;
+const skipRenderPerf = process.env.SKIP_RENDER_PERF === '1';
 
 export default defineConfig({
   testDir: './tests',
+  testIgnore: skipRenderPerf ? ['**/render-performance.spec.ts'] : undefined,
   timeout: 30_000,
   fullyParallel: true,
   use: {

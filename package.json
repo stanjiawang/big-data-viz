@@ -22,7 +22,7 @@
     "test:reliability": "node scripts/check-reliability.mjs",
     "test:coverage": "jest --coverage --runInBand",
     "test:watch": "jest --watch",
-    "test:e2e": "playwright test",
+    "test:e2e": "SKIP_RENDER_PERF=1 playwright test",
     "prepare": "husky",
     "check:env": "node scripts/check-env.mjs",
     "test:render-perf": "playwright test tests/render-performance.spec.ts --workers=1"
