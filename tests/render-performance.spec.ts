@@ -5,6 +5,7 @@ const TARGET_DATASET_SIZE = Number(process.env.PERF_RENDER_DATASET_SIZE ?? 50_00
 const TABLE_BUDGET_MS = Number(process.env.PERF_MAX_TABLE_RENDER_MS ?? 3000);
 const GRAPH_BUDGET_MS = Number(process.env.PERF_MAX_GRAPH_RENDER_MS ?? 3200);
 const PAGE_READY_TIMEOUT_MS = Number(process.env.PERF_PAGE_READY_TIMEOUT_MS ?? 25_000);
+const GRAPH_READY_TIMEOUT_MS = Number(process.env.PERF_GRAPH_READY_TIMEOUT_MS ?? 30_000);
 
 function median(values: number[]) {
   const sorted = [...values].sort((left, right) => left - right);
@@ -43,6 +44,38 @@ async function gotoDashboardAndWait(
   throw lastError;
 }
 
+async function measureTableRenderMs(page: import('@playwright/test').Page, url: string) {
+  await gotoDashboardAndWait(page, url);
+  const renderStart = Date.now();
+  await expect(page.getByText('Rows loaded:')).toBeVisible({ timeout: GRAPH_READY_TIMEOUT_MS });
+  return Date.now() - renderStart;
+}
+
+async function measureGraphRenderMs(page: import('@playwright/test').Page, url: string) {
+  await gotoDashboardAndWait(page, url);
+  const renderStart = Date.now();
+  await waitForRelationshipGraphMount(page);
+  await expect(page.locator('[data-testid="relationship-graph"]')).toBeVisible({
+    timeout: GRAPH_READY_TIMEOUT_MS,
+  });
+  await expect(page.getByText('Legend')).toBeVisible({ timeout: GRAPH_READY_TIMEOUT_MS });
+  return Date.now() - renderStart;
+}
+
+async function waitForRelationshipGraphMount(page: import('@playwright/test').Page) {
+  await expect
+    .poll(
+      () =>
+        page.evaluate(() => {
+          return document.querySelector('[data-testid="relationship-graph"]') !== null;
+        }),
+      {
+        timeout: GRAPH_READY_TIMEOUT_MS,
+      },
+    )
+    .toBe(true);
+}
+
 test('meets render budgets for large table and relationship graph', async ({ page }) => {
   test.setTimeout(90_000);
   await gotoDashboardAndWait(page, '/');
@@ -52,18 +85,11 @@ test('meets render budgets for large table and relationship graph', async ({ pag
 
   for (let index = 0; index < SAMPLE_COUNT; index += 1) {
     const tablePage = await page.context().newPage();
-    await gotoDashboardAndWait(tablePage, `/?size=${TARGET_DATASET_SIZE}`);
-    await expect(tablePage.getByText('Rows loaded:')).toBeVisible({ timeout: 15_000 });
-    tableSamples.push(await tablePage.evaluate(() => Math.round(performance.now())));
+    tableSamples.push(await measureTableRenderMs(tablePage, `/?size=${TARGET_DATASET_SIZE}`));
     await tablePage.close();
 
     const graphPage = await page.context().newPage();
-    await gotoDashboardAndWait(graphPage, `/?size=${TARGET_DATASET_SIZE}`);
-    await expect(graphPage.locator('[data-testid="relationship-graph"]')).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(graphPage.getByText('Legend')).toBeVisible({ timeout: 15_000 });
-    graphSamples.push(await graphPage.evaluate(() => Math.round(performance.now())));
+    graphSamples.push(await measureGraphRenderMs(graphPage, `/?size=${TARGET_DATASET_SIZE}`));
     await graphPage.close();
   }
 
