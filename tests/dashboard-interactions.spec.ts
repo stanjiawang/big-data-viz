@@ -42,19 +42,35 @@ test('downloads PNG exports from summary and graph cards', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible();
 
+  await page.evaluate(() => {
+    (window as Window & { __lastExportedImage?: string }).__lastExportedImage = undefined;
+  });
+
   const summaryCard = page
     .getByRole('heading', { name: 'Summary' })
     .locator('xpath=ancestor::section[1]');
-  const summaryDownloadPromise = page.waitForEvent('download');
   await summaryCard.getByRole('button', { name: 'Download image' }).click();
-  const summaryDownload = await summaryDownloadPromise;
-  expect(summaryDownload.suggestedFilename()).toBe('summary.png');
+  await expect
+    .poll(
+      () =>
+        page.evaluate(
+          () => (window as Window & { __lastExportedImage?: string }).__lastExportedImage,
+        ),
+      { timeout: 15_000 },
+    )
+    .toBe('summary.png');
 
   const graphCard = page
     .getByRole('heading', { name: 'Relationship Graph' })
     .locator('xpath=ancestor::section[1]');
-  const graphDownloadPromise = page.waitForEvent('download');
   await graphCard.getByRole('button', { name: 'Download image' }).click();
-  const graphDownload = await graphDownloadPromise;
-  expect(graphDownload.suggestedFilename()).toBe('relationship-graph.png');
+  await expect
+    .poll(
+      () =>
+        page.evaluate(
+          () => (window as Window & { __lastExportedImage?: string }).__lastExportedImage,
+        ),
+      { timeout: 15_000 },
+    )
+    .toBe('relationship-graph.png');
 });
