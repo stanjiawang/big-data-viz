@@ -3,6 +3,7 @@ import { KpiCard } from '@/components/ui/KpiCard';
 import type { DataChunk } from '@/lib/types';
 import { useMockData, useMockDataSuspense } from '@/features/data/queries/useMockData';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
+import { useI18n } from '@/i18n/useI18n';
 
 export function KpiSection({
   datasetSize,
@@ -10,6 +11,7 @@ export function KpiSection({
   compareEnabled,
   filters,
 }: DashboardSectionProps) {
+  const { t } = useI18n();
   const { data: chunk, isLoading } = useMockDataSuspense({
     total: datasetSize.value,
     offset: 0,
@@ -40,27 +42,31 @@ export function KpiSection({
   const kpiGrid = (data: DataChunk | undefined, loading: boolean, activeLabels: number) => (
     <div className="grid gap-4 sm:grid-cols-2">
       <KpiCard
-        label="Total Records"
-        value={loading ? 'Loading...' : `${(data?.total ?? datasetSize.value).toLocaleString()}`}
+        label={t('kpiTotalRecords')}
+        value={
+          loading
+            ? t('tableTimestampLoading')
+            : `${(data?.total ?? datasetSize.value).toLocaleString()}`
+        }
         trend="+8.2%"
-        helper="Across all sources"
+        helper={t('kpiAcrossAllSources')}
       />
       <KpiCard
-        label="Active Labels"
-        value={loading ? '—' : `${activeLabels}`}
-        trend="+4 new"
-        helper="Top 3: A, B, C"
+        label={t('kpiActiveLabels')}
+        value={loading ? t('dashboardBadgeEmpty') : `${activeLabels}`}
+        trend={t('kpiActiveLabelsTrend')}
+        helper={t('kpiTopLabels')}
       />
       <KpiCard
-        label="Avg. Feature Length"
-        value={loading ? '—' : `${data?.records[0]?.features.length ?? 0}`}
-        helper="Embedding vector size"
+        label={t('kpiAvgFeatureLength')}
+        value={loading ? t('dashboardBadgeEmpty') : `${data?.records[0]?.features.length ?? 0}`}
+        helper={t('kpiEmbeddingVectorSize')}
       />
       <KpiCard
-        label="Anomaly Rate"
-        value={loading ? '—' : '0.34%'}
+        label={t('kpiAnomalyRate')}
+        value={loading ? t('dashboardBadgeEmpty') : '0.34%'}
         trend="-0.08%"
-        helper="Outliers flagged"
+        helper={t('kpiOutliersFlagged')}
       />
     </div>
   );
@@ -70,14 +76,14 @@ export function KpiSection({
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
-            <span>Primary dataset</span>
+            <span>{t('kpiPrimaryDataset')}</span>
             <span>{datasetSize.label}</span>
           </div>
           {kpiGrid(chunk, isLoading, labelCount)}
         </div>
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
-            <span>Compare dataset</span>
+            <span>{t('kpiCompareDataset')}</span>
             <span>{compareDatasetSize.label}</span>
           </div>
           {kpiGrid(compareChunk, isCompareLoading, compareLabelCount)}
@@ -89,27 +95,31 @@ export function KpiSection({
   return (
     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <KpiCard
-        label="Total Records"
-        value={isLoading ? 'Loading...' : `${(chunk?.total ?? datasetSize.value).toLocaleString()}`}
+        label={t('kpiTotalRecords')}
+        value={
+          isLoading
+            ? t('tableTimestampLoading')
+            : `${(chunk?.total ?? datasetSize.value).toLocaleString()}`
+        }
         trend="+8.2%"
-        helper="Across all sources"
+        helper={t('kpiAcrossAllSources')}
       />
       <KpiCard
-        label="Active Labels"
-        value={isLoading ? '—' : `${labelCount}`}
-        trend="+4 new"
-        helper="Top 3: A, B, C"
+        label={t('kpiActiveLabels')}
+        value={isLoading ? t('dashboardBadgeEmpty') : `${labelCount}`}
+        trend={t('kpiActiveLabelsTrend')}
+        helper={t('kpiTopLabels')}
       />
       <KpiCard
-        label="Avg. Feature Length"
-        value={isLoading ? '—' : `${chunk?.records[0]?.features.length ?? 0}`}
-        helper="Embedding vector size"
+        label={t('kpiAvgFeatureLength')}
+        value={isLoading ? t('dashboardBadgeEmpty') : `${chunk?.records[0]?.features.length ?? 0}`}
+        helper={t('kpiEmbeddingVectorSize')}
       />
       <KpiCard
-        label="Anomaly Rate"
-        value={isLoading ? '—' : '0.34%'}
+        label={t('kpiAnomalyRate')}
+        value={isLoading ? t('dashboardBadgeEmpty') : '0.34%'}
         trend="-0.08%"
-        helper="Outliers flagged"
+        helper={t('kpiOutliersFlagged')}
       />
     </section>
   );

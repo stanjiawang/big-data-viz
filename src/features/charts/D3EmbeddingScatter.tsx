@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import * as d3 from 'd3';
 import { UI_CHIP_ACTIVE, UI_CHIP_INTERACTIVE, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
+import { useI18n } from '@/i18n/useI18n';
 import type { TrainingRecord } from '@/lib/types';
 
 type D3EmbeddingScatterProps = {
@@ -38,6 +39,7 @@ export function D3EmbeddingScatter({
   isError,
   exportTargetRef,
 }: D3EmbeddingScatterProps) {
+  const { t } = useI18n();
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [hiddenLabels, setHiddenLabels] = useState<Set<string>>(new Set());
   const [pointScale, setPointScale] = useState(1);
@@ -192,13 +194,13 @@ export function D3EmbeddingScatter({
 
   let overlayMessage: string | null = null;
   if (isError) {
-    overlayMessage = 'Failed to load D3 chart.';
+    overlayMessage = t('d3FailedToLoad');
   } else if (isLoading) {
-    overlayMessage = 'Loading D3 chart...';
+    overlayMessage = t('d3Loading');
   } else if (points.length === 0) {
-    overlayMessage = 'No points for D3 chart.';
+    overlayMessage = t('d3NoPoints');
   } else if (visiblePoints.length === 0) {
-    overlayMessage = 'No points for selected labels.';
+    overlayMessage = t('d3NoPointsForLabels');
   }
 
   return (
@@ -207,7 +209,9 @@ export function D3EmbeddingScatter({
       style={{ height }}
     >
       <div className="flex flex-wrap items-center gap-1 border-b border-slate-100 px-2 py-2">
-        <span className={`${UI_LABEL_CLASS} mr-1`}>Zoom: {zoomLevel.toFixed(1)}x</span>
+        <span className={`${UI_LABEL_CLASS} mr-1`}>
+          {t('d3ZoomLabel')}: {zoomLevel.toFixed(1)}x
+        </span>
         {labels.map((label) => {
           const active = !hiddenLabels.has(label);
           return (
@@ -243,7 +247,7 @@ export function D3EmbeddingScatter({
               setResetNonce((current) => current + 1);
             }}
           >
-            Reset view
+            {t('d3ResetView')}
           </button>
         </div>
       </div>
@@ -269,7 +273,7 @@ export function D3EmbeddingScatter({
       <div className="grid gap-2 border-t border-slate-100 px-2 py-2 text-xs uppercase tracking-wide text-slate-500 sm:grid-cols-2">
         <label className="space-y-1">
           <div className="flex items-center justify-between">
-            <span className={UI_LABEL_CLASS}>Point size</span>
+            <span className={UI_LABEL_CLASS}>{t('d3PointSize')}</span>
             <span>{pointScale.toFixed(1)}x</span>
           </div>
           <input
@@ -284,7 +288,7 @@ export function D3EmbeddingScatter({
         </label>
         <label className="space-y-1">
           <div className="flex items-center justify-between">
-            <span className={UI_LABEL_CLASS}>Opacity</span>
+            <span className={UI_LABEL_CLASS}>{t('d3Opacity')}</span>
             <span>{Math.round(pointOpacity * 100)}%</span>
           </div>
           <input
