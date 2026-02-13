@@ -3,6 +3,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   testMatch: ['<rootDir>/src/**/*.test.{ts,tsx}'],
   testPathIgnorePatterns: ['/node_modules/', '/tests/'],
+  transformIgnorePatterns: ['/node_modules/(?!(react-intl|@formatjs)/)'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',

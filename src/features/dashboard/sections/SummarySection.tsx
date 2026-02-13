@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { RefObject } from 'react';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
+import { useI18n } from '@/i18n/useI18n';
 import { BarChart } from '@/features/charts/BarChart';
 import { PieChart } from '@/features/charts/PieChart';
 import { useMockDataSuspense } from '@/features/data/queries/useMockData';
@@ -18,6 +19,7 @@ export function SummarySection({
   expanded = false,
   visualizationRef,
 }: SummarySectionProps) {
+  const { t } = useI18n();
   const { data: chunk } = useMockDataSuspense({
     total: datasetSize.value,
     offset: 0,
@@ -63,14 +65,14 @@ export function SummarySection({
       <div ref={visualizationRef} className="space-y-4">
         <div className="rounded-lg border border-slate-200 bg-white p-3">
           <PieChart
-            title="Label Distribution"
+            title={t('chartLabelDistribution')}
             data={labelDistribution}
             height={expanded ? 280 : 200}
           />
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-3">
           <BarChart
-            title="Source Volume"
+            title={t('chartSourceVolume')}
             categories={sourceDistribution.categories}
             values={sourceDistribution.values}
             height={expanded ? 280 : 200}
@@ -95,12 +97,12 @@ export function SummarySection({
                 setBarYMax('');
               }}
             >
-              Reset
+              {t('reset')}
             </button>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="space-y-1 text-xs text-slate-600">
-              <span className={UI_LABEL_CLASS}>X Range Start (%)</span>
+              <span className={UI_LABEL_CLASS}>{t('xRangeStart')}</span>
               <input
                 type="range"
                 min={0}
@@ -111,7 +113,7 @@ export function SummarySection({
               />
             </label>
             <label className="space-y-1 text-xs text-slate-600">
-              <span className={UI_LABEL_CLASS}>X Range End (%)</span>
+              <span className={UI_LABEL_CLASS}>{t('xRangeEnd')}</span>
               <input
                 type="range"
                 min={Math.min(100, barXStart + 1)}
@@ -122,7 +124,7 @@ export function SummarySection({
               />
             </label>
             <label className="space-y-1 text-xs text-slate-600">
-              <span className={UI_LABEL_CLASS}>Y Min</span>
+              <span className={UI_LABEL_CLASS}>{t('yMin')}</span>
               <input
                 type="number"
                 value={barYMin}
@@ -131,7 +133,7 @@ export function SummarySection({
               />
             </label>
             <label className="space-y-1 text-xs text-slate-600">
-              <span className={UI_LABEL_CLASS}>Y Max</span>
+              <span className={UI_LABEL_CLASS}>{t('yMax')}</span>
               <input
                 type="number"
                 value={barYMax}

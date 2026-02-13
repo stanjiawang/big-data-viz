@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
+import { useI18n } from '@/i18n/useI18n';
 import { D3EmbeddingScatter } from '@/features/charts/D3EmbeddingScatter';
 import { TimeSeriesChart } from '@/features/charts/TimeSeriesChart';
 import { useGraphSuspense } from '@/features/data/queries/useGraph';
@@ -18,6 +19,7 @@ export function ChartsSection({
   onOpenDetail,
   focusView,
 }: DashboardSectionProps) {
+  const { t } = useI18n();
   const { data: timeSeries } = useTimeSeriesSuspense('ingestion');
   const { data: graph } = useGraphSuspense();
   const { data: chunk } = useMockDataSuspense({
@@ -46,9 +48,9 @@ export function ChartsSection({
     >
       {(focusView === undefined || focusView === 'timeSeries') && (
         <Card
-          title="Time Series"
-          description="Ingestion and quality trends."
-          subtitle="Tech stack: ECharts + React Query"
+          title={t('sectionTimeSeriesTitle')}
+          description={t('sectionTimeSeriesDescription')}
+          subtitle={t('techEchartsQuery')}
           className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
           actions={
@@ -82,12 +84,12 @@ export function ChartsSection({
                     setTimeYMax('');
                   }}
                 >
-                  Reset
+                  {t('reset')}
                 </button>
               </div>
               <div className="grid gap-2 sm:grid-cols-2">
                 <label className="space-y-1 text-xs text-slate-600">
-                  <span className={UI_LABEL_CLASS}>X Start (%)</span>
+                  <span className={UI_LABEL_CLASS}>{t('xStart')}</span>
                   <input
                     type="range"
                     min={0}
@@ -98,7 +100,7 @@ export function ChartsSection({
                   />
                 </label>
                 <label className="space-y-1 text-xs text-slate-600">
-                  <span className={UI_LABEL_CLASS}>X End (%)</span>
+                  <span className={UI_LABEL_CLASS}>{t('xEnd')}</span>
                   <input
                     type="range"
                     min={Math.min(100, timeXStart + 1)}
@@ -109,7 +111,7 @@ export function ChartsSection({
                   />
                 </label>
                 <label className="space-y-1 text-xs text-slate-600">
-                  <span className={UI_LABEL_CLASS}>Y Min</span>
+                  <span className={UI_LABEL_CLASS}>{t('yMin')}</span>
                   <input
                     type="number"
                     value={timeYMin}
@@ -118,7 +120,7 @@ export function ChartsSection({
                   />
                 </label>
                 <label className="space-y-1 text-xs text-slate-600">
-                  <span className={UI_LABEL_CLASS}>Y Max</span>
+                  <span className={UI_LABEL_CLASS}>{t('yMax')}</span>
                   <input
                     type="number"
                     value={timeYMax}
@@ -133,9 +135,9 @@ export function ChartsSection({
       )}
       {(focusView === undefined || focusView === 'embedding') && (
         <Card
-          title="Embedding Cloud"
-          description="High-density point cloud view."
-          subtitle="Tech stack: deck.gl + WebGL"
+          title={t('sectionEmbeddingTitle')}
+          description={t('sectionEmbeddingDescription')}
+          subtitle={t('techDeckGl')}
           className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
           actions={
@@ -155,9 +157,9 @@ export function ChartsSection({
       )}
       {(focusView === undefined || focusView === 'graph') && (
         <Card
-          title="Relationship Graph"
-          description="Entity linkage and clusters."
-          subtitle="Tech stack: Sigma.js + Graphology"
+          title={t('sectionGraphTitle')}
+          description={t('sectionGraphDescription')}
+          subtitle={t('techSigma')}
           className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
           actions={
@@ -177,9 +179,9 @@ export function ChartsSection({
       )}
       {(focusView === undefined || focusView === 'd3') && (
         <Card
-          title="D3 Mock Data Demo"
-          description="Label-aware embedding scatter based on mock records."
-          subtitle="Tech stack: D3.js + SVG"
+          title={t('sectionD3Title')}
+          description={t('sectionD3Description')}
+          subtitle={t('techD3')}
           className={`${focusView ? 'lg:col-span-12' : 'lg:col-span-6'} flex h-full flex-col`}
           contentClassName="flex-1"
           actions={

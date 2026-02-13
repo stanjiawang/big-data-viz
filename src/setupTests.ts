@@ -1,5 +1,22 @@
 import '@testing-library/jest-dom';
 
+jest.mock('react-intl', () => ({
+  IntlProvider: ({ children }: { children: unknown }) => children,
+  useIntl: () => ({
+    formatMessage: (
+      descriptor: {
+        id?: string;
+        defaultMessage?: string;
+      },
+      values?: Record<string, unknown>,
+    ) => {
+      const template = descriptor.defaultMessage ?? descriptor.id ?? '';
+      if (!values) return template;
+      return template.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? `{${key}}`));
+    },
+  }),
+}));
+
 type ResizeObserverConstructor = new () => {
   observe: () => void;
   unobserve: () => void;

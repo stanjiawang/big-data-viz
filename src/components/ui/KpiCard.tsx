@@ -13,7 +13,7 @@ export function KpiCard({ label, value, trend, helper }: KpiCardProps) {
       <p className={UI_LABEL_CLASS}>{label}</p>
       <div className="mt-3 flex items-end justify-between">
         <span className="text-2xl font-semibold text-slate-900">{value}</span>
-        {trend ? <span className="text-xs font-medium text-emerald-600">{trend}</span> : null}
+        {trend ? <span className="text-xs font-medium text-emerald-700">{trend}</span> : null}
       </div>
       {helper ? <p className={`${UI_TEXT_MUTED_SM} mt-2 text-xs`}>{helper}</p> : null}
     </div>

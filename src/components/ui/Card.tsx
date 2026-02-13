@@ -1,4 +1,4 @@
-import type { ReactNode, RefObject } from 'react';
+import { useId, type ReactNode, type RefObject } from 'react';
 import { UI_LABEL_CLASS, UI_TEXT_MUTED_SM, UI_TEXT_SUBTITLE } from '@/components/ui/styleTokens';
 
 type CardProps = {
@@ -22,14 +22,19 @@ export function Card({
   actions,
   sectionRef,
 }: CardProps) {
+  const headingId = useId();
+
   return (
     <section
       ref={sectionRef}
+      aria-labelledby={headingId}
       className={`rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md ${className ?? ''}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
-          <h3 className={UI_LABEL_CLASS}>{title}</h3>
+          <h3 id={headingId} className={UI_LABEL_CLASS}>
+            {title}
+          </h3>
           {description ? <p className={UI_TEXT_SUBTITLE}>{description}</p> : null}
           {subtitle ? (
             <p className={`${UI_TEXT_MUTED_SM} text-xs uppercase tracking-wide`}>{subtitle}</p>

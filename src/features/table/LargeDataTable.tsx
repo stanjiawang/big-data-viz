@@ -3,9 +3,10 @@ import type { CSSProperties } from 'react';
 import type { RefObject } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { UI_BUTTON_PRIMARY_SM, UI_LABEL_CLASS, UI_STATUS_PILL } from '@/components/ui/styleTokens';
+import { useI18n } from '@/i18n/useI18n';
 import { getMockData } from '@/lib/apiClient';
 import type { DataChunk, MockFilters, TrainingRecord } from '@/lib/types';
-import { UI_BUTTON_PRIMARY_SM, UI_LABEL_CLASS, UI_STATUS_PILL } from '@/components/ui/styleTokens';
 import { queryKeys } from '@/features/data/queries/queryKeys';
 import { useMockData } from '@/features/data/queries/useMockData';
 
@@ -28,6 +29,7 @@ type RowProps = {
   style: CSSProperties;
   gridTemplateColumns: string;
   isCompact: boolean;
+  loadingText: string;
 };
 
 const TableRow = memo(function TableRow({
@@ -35,8 +37,11 @@ const TableRow = memo(function TableRow({
   style,
   gridTemplateColumns,
   isCompact,
+  loadingText,
 }: RowProps) {
-  const timestamp = record?.timestamp ? record.timestamp.replace('T', ' ').slice(0, 19) : 'Loading';
+  const timestamp = record?.timestamp
+    ? record.timestamp.replace('T', ' ').slice(0, 19)
+    : loadingText;
   const featurePreviewSize = isCompact ? 2 : 6;
 
   return (
@@ -66,6 +71,7 @@ const TableRow = memo(function TableRow({
 
 export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTableProps) {
   const queryClient = useQueryClient();
+  const { t } = useI18n();
   const parentRef = useRef<HTMLDivElement | null>(null);
   const resizeState = useRef<{
     index: number;
@@ -180,7 +186,7 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
   if (isError) {
     return (
       <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
-        Failed to load table data.
+        {t('tableLoadFailed')}
       </div>
     );
   }
@@ -188,33 +194,37 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
   if (rowCount === 0 && !isLoading) {
     return (
       <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
-        No records match the current filters.
+        {t('tableNoRecords')}
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200">
+    <div
+      className="overflow-hidden rounded-lg border border-slate-200"
+      role="region"
+      aria-label={t('sectionTableTitle')}
+    >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-white px-4 py-2 text-xs text-slate-500">
-        <span className={UI_LABEL_CLASS}>Table controls</span>
+        <span className={UI_LABEL_CLASS}>{t('tableControls')}</span>
         <span className={UI_STATUS_PILL}>
-          {isCompact ? 'Compact density' : 'Comfortable density'}
+          {isCompact ? t('tableCompactDensity') : t('tableComfortableDensity')}
         </span>
         <button
           type="button"
           className={`${UI_BUTTON_PRIMARY_SM} w-40`}
           aria-pressed={isCompact}
-          aria-label={isCompact ? 'Switch to comfortable view' : 'Switch to compact view'}
+          aria-label={isCompact ? t('tableSwitchToComfortable') : t('tableSwitchToCompact')}
           onClick={() => setIsCompact((current) => !current)}
         >
-          Toggle Density
+          {t('tableToggleDensity')}
         </button>
       </div>
 
       <div ref={exportTargetRef} className="h-80 overflow-hidden">
-        <div ref={parentRef} className="h-full overflow-auto">
+        <div ref={parentRef} className="h-full overflow-auto" tabIndex={0}>
           <div
-            className="sticky top-0 z-10 grid h-11 items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 text-xs font-semibold uppercase tracking-wide text-slate-500 shadow-sm"
+            className="sticky top-0 z-10 grid h-11 items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 text-xs font-semibold uppercase tracking-wide text-slate-600 shadow-sm"
             style={{ gridTemplateColumns }}
           >
             {['ID', 'Timestamp', 'Source', 'Label'].map((label, index) => (
@@ -233,12 +243,14 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
                 />
               </div>
             ))}
-            <span>Embedding preview</span>
+            <span>{t('tableEmbeddingPreview')}</span>
           </div>
 
           <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
             {isLoading && (
-              <div className="absolute left-4 top-4 text-sm text-slate-400">Loading records...</div>
+              <div className="absolute left-4 top-4 text-sm text-slate-400">
+                {t('tableLoadingRecords')}
+              </div>
             )}
             {virtualizer.getVirtualItems().map((virtualRow) => {
               const record = recordsByIndex(virtualRow.index);
@@ -248,6 +260,7 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
                   record={record}
                   gridTemplateColumns={gridTemplateColumns}
                   isCompact={isCompact}
+                  loadingText={t('tableTimestampLoading')}
                   style={{
                     transform: `translateY(${virtualRow.start}px)`,
                     height: `${virtualRow.size}px`,
@@ -260,8 +273,12 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
       </div>
 
       <div className="flex items-center justify-between bg-slate-50 px-4 py-2 text-xs text-slate-500">
-        <span>Rows loaded: {Math.min(rowCount, PAGE_SIZE * 5).toLocaleString()}</span>
-        <span>Total rows: {rowCount.toLocaleString()}</span>
+        <span>
+          {t('tableRowsLoaded')}: {Math.min(rowCount, PAGE_SIZE * 5).toLocaleString()}
+        </span>
+        <span>
+          {t('tableTotalRows')}: {rowCount.toLocaleString()}
+        </span>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { Card } from '@/components/ui/Card';
+import { useI18n } from '@/i18n/useI18n';
 import { LargeDataTable } from '@/features/table/LargeDataTable';
 import { SectionCardActions } from '@/features/dashboard/sections/shared';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
@@ -11,6 +12,7 @@ export function TableSection({
   filters,
   onOpenDetail,
 }: DashboardSectionProps) {
+  const { t } = useI18n();
   const primaryTableRef = useRef<HTMLDivElement | null>(null);
   const compareTableRef = useRef<HTMLDivElement | null>(null);
 
@@ -18,9 +20,9 @@ export function TableSection({
     return (
       <section className="grid gap-6 lg:grid-cols-2">
         <Card
-          title="Large Table (Primary)"
-          description="Virtualized grid for multi-million row browsing."
-          subtitle="Tech stack: TanStack Virtual + React Query"
+          title={t('sectionTablePrimaryTitle')}
+          description={t('sectionTableDescription')}
+          subtitle={t('techVirtual')}
           actions={
             <SectionCardActions
               onOpenDetail={onOpenDetail ? () => onOpenDetail('table') : undefined}
@@ -36,9 +38,9 @@ export function TableSection({
           />
         </Card>
         <Card
-          title="Large Table (Compare)"
-          description="Virtualized grid for multi-million row browsing."
-          subtitle="Tech stack: TanStack Virtual + React Query"
+          title={t('sectionTableCompareTitle')}
+          description={t('sectionTableDescription')}
+          subtitle={t('techVirtual')}
           actions={
             <SectionCardActions
               exportTargetRef={compareTableRef}
@@ -58,9 +60,9 @@ export function TableSection({
 
   return (
     <Card
-      title="Large Table"
-      description="Virtualized grid for multi-million row browsing."
-      subtitle="Tech stack: TanStack Virtual + React Query"
+      title={t('sectionTableTitle')}
+      description={t('sectionTableDescription')}
+      subtitle={t('techVirtual')}
       actions={
         <SectionCardActions
           onOpenDetail={onOpenDetail ? () => onOpenDetail('table') : undefined}

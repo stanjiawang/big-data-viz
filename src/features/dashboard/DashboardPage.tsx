@@ -5,6 +5,7 @@ import { canAccessFeature } from '@/auth/useAuth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { UI_BUTTON_GHOST_SM, UI_INPUT_MD, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import type { MockFilters } from '@/lib/types';
@@ -26,6 +27,7 @@ import {
   TableSkeleton,
 } from '@/features/dashboard/SectionSkeletons';
 import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadges';
+import { useI18n } from '@/i18n/useI18n';
 
 const DEFAULT_WEIGHT_MIN = 0.5;
 const DEFAULT_WEIGHT_MAX = 2.5;
@@ -38,15 +40,6 @@ const MOCK_CONTROL_PARAMS = [
 ];
 
 const ACTION_BUTTON_CLASS = UI_BUTTON_GHOST_SM;
-
-function toDetailLabel(view: DetailView) {
-  if (view === 'timeSeries') return 'Time Series';
-  if (view === 'embedding') return 'Embedding Cloud';
-  if (view === 'graph') return 'Relationship Graph';
-  if (view === 'd3') return 'D3 Mock Data Demo';
-  if (view === 'table') return 'Large Table';
-  return 'Summary';
-}
 
 function parseSearchParams() {
   const params = new URLSearchParams(window.location.search);
@@ -93,6 +86,7 @@ export function DashboardPage() {
 
   const runtimeConfig = getRuntimeConfig();
   const authContext = useContext(AuthContext);
+  const { t } = useI18n();
   const canUseCompareMode = canAccessFeature(
     authContext?.session ?? null,
     'compare_mode',
@@ -150,22 +144,36 @@ export function DashboardPage() {
     `Search: ${filters.search || '—'}`,
   ];
 
+  const detailLabelByView: Record<DetailView, string> = {
+    summary: t('sectionSummaryTitle'),
+    timeSeries: t('sectionTimeSeriesTitle'),
+    embedding: t('sectionEmbeddingTitle'),
+    graph: t('sectionGraphTitle'),
+    d3: t('sectionD3Title'),
+    table: t('sectionTableTitle'),
+  };
+
   if (detailView) {
     return (
-      <main className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <main
+        id="app-main"
+        className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+      >
         <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-          <h2 className={UI_LABEL_CLASS}>Detailed View: {toDetailLabel(detailView)}</h2>
+          <h2 className={UI_LABEL_CLASS}>
+            {t('dashboardDetailedView')}: {detailLabelByView[detailView]}
+          </h2>
           <button type="button" className={ACTION_BUTTON_CLASS} onClick={() => setDetailView(null)}>
-            Back to dashboard
+            {t('dashboardBackToDashboard')}
           </button>
         </section>
 
         {detailView === 'summary' ? (
           <Card
             sectionRef={summaryCardRef}
-            title="Summary (Detailed)"
-            description="Adjust chart ranges and inspect distribution deeply."
-            subtitle="Tech stack: ECharts + React Query"
+            title={t('sectionSummaryDetailedTitle')}
+            description={t('sectionSummaryDetailedDescription')}
+            subtitle={t('techEchartsQuery')}
             actions={
               <SectionCardActions
                 exportTargetRef={summaryVisualizationRef}
@@ -241,22 +249,23 @@ export function DashboardPage() {
   }
 
   return (
-    <main className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+    <main
+      id="app-main"
+      className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+    >
       <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="grid gap-3 lg:grid-cols-12 lg:items-start">
           <div className="lg:col-span-7">
-            <PageHeader
-              title="Big Data Viz Lab"
-              subtitle="Enterprise-ready workspace for large-scale AI training data analytics."
-            />
+            <PageHeader title={t('dashboardTitle')} subtitle={t('dashboardSubtitle')} />
           </div>
           <div className="flex flex-wrap items-center justify-start gap-2 lg:col-span-5 lg:justify-end">
+            <LanguageSwitcher />
             <button
               type="button"
               className={ACTION_BUTTON_CLASS}
               onClick={() => void queryClient.invalidateQueries()}
             >
-              Refresh data
+              {t('dashboardRefreshData')}
             </button>
             {runtimeConfig.enableAuth && authContext?.isAuthenticated ? (
               <button
@@ -264,7 +273,7 @@ export function DashboardPage() {
                 className={ACTION_BUTTON_CLASS}
                 onClick={() => void authContext.signOut()}
               >
-                Sign out
+                {t('authSignOut')}
               </button>
             ) : null}
             <button
@@ -272,7 +281,7 @@ export function DashboardPage() {
               onClick={() => setIsFilterOpen(true)}
               className={`${ACTION_BUTTON_CLASS} lg:hidden`}
             >
-              Filters
+              {t('dashboardFilters')}
             </button>
           </div>
         </div>
@@ -288,18 +297,23 @@ export function DashboardPage() {
             checked={effectiveCompareEnabled}
             onChange={(event) => setCompareEnabled(event.target.checked)}
             disabled={!canUseCompareMode}
+            aria-describedby={!canUseCompareMode ? 'compare-mode-note' : undefined}
           />
-          Compare mode
+          {t('dashboardCompareMode')}
         </label>
         {!canUseCompareMode ? (
-          <span className="text-xs font-semibold uppercase tracking-wide text-amber-600">
-            Requires analyst or admin role
+          <span
+            id="compare-mode-note"
+            className="text-xs font-semibold uppercase tracking-wide text-amber-600"
+          >
+            {t('dashboardCompareRoleRequired')}
           </span>
         ) : null}
         <span className="hidden h-4 w-px bg-slate-200 sm:inline" />
         <div className="flex flex-wrap items-center gap-2">
-          <span className={UI_LABEL_CLASS}>Compare dataset</span>
+          <span className={UI_LABEL_CLASS}>{t('dashboardCompareDataset')}</span>
           <select
+            aria-label={t('dashboardCompareDataset')}
             className={`${UI_INPUT_MD} h-9 w-28 px-2 text-xs`}
             value={compareDatasetSize.value}
             onChange={(event) => {
@@ -323,9 +337,9 @@ export function DashboardPage() {
 
       <section className="grid gap-6 lg:grid-cols-12">
         <Card
-          title="Filters"
-          description="Global filters for time range, labels, source, and quality."
-          subtitle="Tech stack: React State + URL Params"
+          title={t('dashboardFilters')}
+          description={t('sectionFiltersDescription')}
+          subtitle={t('techReactStateUrl')}
           className="hidden lg:block lg:col-span-5"
         >
           {isFetching ? (
@@ -347,9 +361,9 @@ export function DashboardPage() {
 
         <Card
           sectionRef={summaryCardRef}
-          title="Summary"
-          description="Quick glance of ingestion health and distribution."
-          subtitle="Tech stack: ECharts + React Query"
+          title={t('sectionSummaryTitle')}
+          description={t('sectionSummaryDescription')}
+          subtitle={t('techEchartsQuery')}
           className="lg:col-span-7"
           actions={
             <SectionCardActions
@@ -420,24 +434,29 @@ export function DashboardPage() {
         <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 p-4 lg:hidden">
           <button
             type="button"
-            aria-label="Close filters"
+            aria-label={t('dashboardCloseFilters')}
             className="absolute inset-0"
             onClick={() => setIsFilterOpen(false)}
           />
-          <div className="relative z-10 w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="filters-dialog-title"
+            className="relative z-10 w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl"
+          >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className={UI_LABEL_CLASS}>Filters</h3>
-                <p className="text-sm text-slate-600">
-                  Global filters for time range, labels, source, and quality.
-                </p>
+                <h3 id="filters-dialog-title" className={UI_LABEL_CLASS}>
+                  {t('dashboardFilters')}
+                </h3>
+                <p className="text-sm text-slate-600">{t('sectionFiltersDescription')}</p>
               </div>
               <button
                 type="button"
                 className={ACTION_BUTTON_CLASS}
                 onClick={() => setIsFilterOpen(false)}
               >
-                Close
+                {t('dashboardClose')}
               </button>
             </div>
             <div className="mt-4 max-h-[70vh] overflow-y-auto pr-1">

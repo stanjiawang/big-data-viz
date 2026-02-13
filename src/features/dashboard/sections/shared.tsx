@@ -1,11 +1,14 @@
 import { useState, type RefObject } from 'react';
 import { UI_BUTTON_GHOST_SM } from '@/components/ui/styleTokens';
+import { useI18n } from '@/i18n/useI18n';
 import { downloadElementAsImage } from '@/lib/exportImage';
 
 export function DetailButton({ onClick }: { onClick: () => void }) {
+  const { t } = useI18n();
+
   return (
     <button type="button" className={UI_BUTTON_GHOST_SM} onClick={onClick}>
-      Open detail
+      {t('detailOpen')}
     </button>
   );
 }
@@ -18,6 +21,7 @@ function ExportImageButton({
   fileName: string;
 }) {
   const [isExporting, setIsExporting] = useState(false);
+  const { t } = useI18n();
 
   return (
     <button
@@ -34,7 +38,7 @@ function ExportImageButton({
         }
       }}
     >
-      {isExporting ? 'Exporting...' : 'Download image'}
+      {isExporting ? t('detailExporting') : t('detailDownloadImage')}
     </button>
   );
 }
@@ -67,9 +71,12 @@ export function RangeSummary({
   yMin: string;
   yMax: string;
 }) {
+  const { t } = useI18n();
+
   return (
     <div className="text-[11px] text-slate-500 sm:text-xs">
-      X: {xStart}% - {xEnd}% | Y: {yMin || 'auto'} - {yMax || 'auto'}
+      {t('axisXRange')}: {xStart}% - {xEnd}% | {t('axisYRange')}: {yMin || t('axisAuto')} -{' '}
+      {yMax || t('axisAuto')}
     </div>
   );
 }

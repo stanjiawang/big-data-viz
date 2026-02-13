@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { UI_INPUT_MD, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
+import { useI18n } from '@/i18n/useI18n';
 import type { MockFilters } from '@/lib/types';
 import {
   DATASET_SIZES,
@@ -34,10 +35,12 @@ export function FiltersPanel({
   defaultWeightMin,
   defaultWeightMax,
 }: FiltersPanelProps) {
+  const { t } = useI18n();
+
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <label className={LABEL_CLASS}>
-        Dataset size
+        {t('filtersDatasetSize')}
         <select
           className={SELECT_CLASS}
           value={datasetSize.value}
@@ -58,9 +61,9 @@ export function FiltersPanel({
         </select>
       </label>
 
-      <div className={LABEL_CLASS}>
-        Labels (multi-select)
-        <div className="grid grid-cols-2 gap-2 rounded-lg border border-slate-200 bg-white p-2">
+      <fieldset className={LABEL_CLASS}>
+        <legend>{t('filtersLabelsMultiSelect')}</legend>
+        <div className="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-slate-200 bg-white p-2">
           {LABEL_OPTIONS.map((label) => {
             const checked = selectedLabels.includes(label);
             return (
@@ -88,10 +91,10 @@ export function FiltersPanel({
             );
           })}
         </div>
-      </div>
+      </fieldset>
 
       <label className={LABEL_CLASS}>
-        Source
+        {t('filtersSource')}
         <select
           className={SELECT_CLASS}
           value={filters.source ?? 'all'}
@@ -111,10 +114,10 @@ export function FiltersPanel({
       </label>
 
       <label className={LABEL_CLASS}>
-        Search ID prefix
+        {t('filtersSearchPrefix')}
         <input
           className={INPUT_CLASS}
-          placeholder="e.g. batch-2025"
+          placeholder={t('filtersSearchPlaceholder')}
           value={filters.search ?? ''}
           onChange={(event) =>
             setFilters((current) => ({
@@ -126,7 +129,7 @@ export function FiltersPanel({
       </label>
 
       <label className={LABEL_CLASS}>
-        Weight min
+        {t('filtersWeightMin')}
         <input
           type="number"
           step="0.1"
@@ -145,7 +148,7 @@ export function FiltersPanel({
       </label>
 
       <label className={LABEL_CLASS}>
-        Weight max
+        {t('filtersWeightMax')}
         <input
           type="number"
           step="0.1"
