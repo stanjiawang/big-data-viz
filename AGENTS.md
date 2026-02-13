@@ -1,89 +1,119 @@
-# Engineering Rules (Vite + React + TypeScript)
+# Engineering Rules (Enterprise Baseline)
 
-## Tech Stack (must follow)
+## Stack Contract (must remain consistent)
 
-- Build: Vite
-- UI: React + TypeScript
-- Styling: Tailwind CSS v4 via PostCSS + @tailwindcss/postcss
-- Data: TanStack React Query
-- Mock: MSW
-- Visualization: ECharts, deck.gl
-- Perf: TanStack React Virtual for large lists/tables
-- Quality: ESLint (flat config), Prettier, Stylelint, Husky + lint-staged
-- Test: Jest + Testing Library
-- E2E: Playwright
+- Build/runtime: Vite + React + TypeScript
+- Styling: Tailwind CSS v4 (+ PostCSS)
+- Data/state: TanStack Query for server state
+- Mock backend: MSW
+- Visualization: ECharts, deck.gl, Sigma.js, D3
+- Virtualization: TanStack Virtual
+- i18n: `react-intl` with typed message keys
+- Quality: ESLint, Prettier, Stylelint, Husky, lint-staged
+- Testing: Jest + Testing Library, Playwright, axe-core Playwright
 
-## General Principles
+## Core Engineering Principles
 
-- Prefer small, incremental diffs. Do not reformat unrelated code.
-- Keep changes scoped; if refactor is needed, propose a plan first.
-- Ensure type-safety: no `any` unless justified and localized.
-- Avoid introducing new dependencies unless explicitly requested.
+- Ship small, reviewable, low-risk diffs.
+- Do not reformat or refactor unrelated code.
+- Keep strict type safety; avoid `any` unless justified and localized.
+- Prefer determinism over convenience in test and mock behavior.
+- All user-facing copy must be localization-ready.
+- Accessibility is a release requirement, not an optional enhancement.
 
-## TypeScript & React
+## Architecture Boundaries
 
-- Use function components + hooks only.
-- Prefer `type` for props, `interface` only when extending.
-- Avoid inline complex types in JSX; extract to named types.
-- Keep components pure; side effects go in hooks.
-- For performance-sensitive components: memoize callbacks (`useCallback`) only when needed and measurable.
+- `src/app`: bootstrap, top-level providers, runtime wiring
+- `src/config`: env/runtime config parsing and validation
+- `src/lib`: API transport, schemas, contracts, telemetry helpers
+- `src/features`: domain modules and feature UIs
+- `src/components`: reusable UI primitives only
+- `src/i18n`: locale catalogs, i18n provider/hook
+- `src/mocks`: MSW handlers only
 
-## Styling (Tailwind v4)
+Do not move logic across boundaries without a clear architectural reason.
 
-- Use Tailwind utility classes as default.
-- Prefer semantic composition: extract repetitive class strings into small components or helper (`cn`).
-- Do NOT add new CSS files unless absolutely necessary.
-- If custom CSS is needed, use a dedicated layer and keep it minimal.
-- Ensure responsive + dark mode patterns (if project uses them) stay consistent.
+## React + TypeScript Rules
 
-## Data Layer (TanStack React Query)
+- Function components and hooks only.
+- Prefer `type` aliases for props and local model types.
+- Extract complex inline JSX types into named types.
+- Keep side effects in hooks; keep render functions pure.
+- Memoize only when profiling or known hotspots justify it.
+- Lazy-load heavy feature modules where it improves bundle composition.
 
-- Use `useQuery`/`useInfiniteQuery` with stable `queryKey` patterns.
-- All network calls must go through a single `api` module (or existing convention).
-- Prefer server state in React Query; local UI state in component state.
-- On mutations: use `useMutation` + invalidate or update cache correctly.
-- Handle loading/error/empty states explicitly.
+## Data and API Rules
 
-## MSW (Mock Service Worker)
+- All HTTP calls go through `src/lib/httpClient.ts` and `src/lib/apiClient.ts`.
+- Maintain schema validation for API payloads (`zod` contracts).
+- Preserve error taxonomy (`ApiError` codes) and telemetry context.
+- Query keys must be stable and colocated with query hooks.
+- Handle loading, empty, and error states explicitly in UI.
 
-- For new endpoints, add MSW handlers that mirror real API shape.
-- Keep mock data deterministic and reusable.
-- Tests should use MSW for networked components when appropriate.
+## i18n Rules
 
-## Visualization (ECharts / deck.gl)
+- New UI strings must use `useI18n().t(...)`.
+- Do not hardcode user-facing English strings in feature components.
+- Add keys to `src/i18n/messages.ts` for all supported locales.
+- Preserve fallback behavior (`defaultMessage`) for resilience.
 
-- Encapsulate charts in dedicated components.
-- Avoid rerendering entire chart on every prop change:
-  - Keep option object stable (memoize) and update only changed pieces.
-- For deck.gl, keep layers memoized and avoid recreating heavy objects.
+## Accessibility Rules
 
-## Performance (TanStack React Virtual)
+- Require semantic landmarks (`main`, labeled `section`, dialog semantics).
+- All interactive controls need accessible names.
+- Scrollable custom regions must be keyboard-focusable when required.
+- Maintain color contrast at WCAG AA minimum for default text sizes.
+- Keep axe serious/critical violations at zero for covered flows.
 
-- Use virtualization for lists/tables that can exceed ~200 rows or heavy row rendering.
-- Keep row components lightweight and memoized where it matters.
-- Measure before/after with React Profiler or simple timing when asked.
+## Visualization and Table Rules
 
-## Lint / Format / Style
+- Keep chart rendering encapsulated in feature-level components.
+- Avoid unnecessary full re-renders of heavy chart layers.
+- Virtualized table interactions must remain keyboard and screen-reader aware.
+- Export/download features must capture visualization content only.
 
-- ESLint: adhere to flat config. Do not disable rules globally; prefer local, minimal disables with reason.
-- Prettier: formatting is enforced; do not fight it.
-- Stylelint: run on style changes; follow existing rules.
-- Husky/lint-staged: ensure changes pass pre-commit checks.
+## Performance Rules
 
-## Testing Standards
+- Keep production bundle budgets green (`test:perf`).
+- Keep render budgets green (`test:render-perf`).
+- Prefer code-splitting for large vendor/features over budget inflation.
+- Avoid increasing main entry chunk unless justified and approved.
 
-- Unit/integration: Jest + Testing Library
-  - Test behavior, not implementation.
-  - Prefer `screen.*` queries, role-based queries, and user flows (`userEvent`).
-  - Use MSW for API-dependent components.
-- E2E: Playwright
-  - Focus on critical flows; keep selectors resilient (role/text/testid).
-- When you change behavior, update/add tests.
+## Security and Auth Rules
 
-## Acceptance Checklist (before finishing)
+- Auth behavior must remain feature-flagged and runtime-configurable.
+- Do not log secrets, tokens, or PII in client logs/tests.
+- Preserve RBAC and tenant-context checks for privileged workflows.
+- Keep auth lifecycle telemetry and failure handling intact.
 
-- `pnpm lint` / `npm run lint` / `yarn lint` (use project’s script)
-- `pnpm test` (or equivalent) passes
-- Typecheck passes
-- No new eslint/stylelint/prettier violations
-- Update MSW handlers/tests if API shape changed
+## Testing and CI Rules
+
+- Update or add tests whenever behavior changes.
+- Unit/integration tests:
+  - Test user-observable behavior.
+  - Prefer role-based queries and `userEvent`.
+- E2E tests:
+  - Use resilient selectors (`role`, `text`, `data-testid`).
+  - Keep i18n-safe checks where possible.
+- Required local pass before handoff:
+  - `pnpm run lint`
+  - `pnpm run typecheck`
+  - `pnpm test`
+  - `pnpm run test:e2e`
+  - `pnpm run test:e2e:a11y`
+  - `pnpm run test:perf`
+  - `pnpm run test:render-perf`
+
+## Dependency and Tooling Policy
+
+- No new dependencies without clear benefit and validation impact analysis.
+- Keep lockfile updates intentional and scoped.
+- If a dependency affects Jest/Playwright runtime semantics, add coverage.
+
+## Documentation Policy
+
+- When behavior, scripts, or gates change, update:
+  - `README.md`
+  - `CONTRIBUTING.md`
+  - `docs/runbook.md`
+  - relevant checklists/changelog entries

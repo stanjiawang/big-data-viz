@@ -13,11 +13,12 @@
 3. `pnpm run stylelint`
 4. `pnpm run test:contracts`
 5. `pnpm run test:perf`
-6. `pnpm run test:reliability`
-7. `pnpm run test:release-governance`
-8. `pnpm test`
-9. `pnpm test:e2e`
-10. `pnpm run test:e2e:a11y`
+6. `pnpm run test:render-perf`
+7. `pnpm run test:reliability`
+8. `pnpm run test:release-governance`
+9. `pnpm test`
+10. `pnpm test:e2e`
+11. `pnpm run test:e2e:a11y`
 
 ## Common Failures
 
@@ -35,6 +36,12 @@
 - Re-run with traces: `pnpm exec playwright test --trace on`
 - Inspect artifacts under `test-results/`
 - Run accessibility-only suite for fast iteration: `pnpm run test:e2e:a11y`
+
+### Render performance failures
+
+- Run `pnpm run test:render-perf` locally to reproduce.
+- If failure is mount/readiness related, check detail-mode and lazy-load timing in `tests/render-performance.spec.ts`.
+- If failure is budget related, inspect latest `test:perf` output before changing thresholds.
 
 ## Incident Triage (Frontend)
 

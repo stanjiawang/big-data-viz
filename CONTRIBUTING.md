@@ -21,7 +21,21 @@ pnpm run stylelint
 pnpm test
 pnpm test:e2e
 pnpm run test:e2e:a11y
+pnpm run test:perf
+pnpm run test:render-perf
 ```
+
+## i18n and Accessibility Requirements
+
+- All new user-facing copy must be localized via `useI18n().t(...)`.
+- Do not merge changes with unresolved serious/critical axe violations.
+- Ensure interactive controls have accessible names and keyboard support.
+
+## Performance Requirements
+
+- Keep bundle budgets green (`pnpm run test:perf`).
+- Keep render budgets green (`pnpm run test:render-perf`).
+- Prefer code-splitting for heavy features over relaxing budgets.
 
 ## Branching
 
