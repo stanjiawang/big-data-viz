@@ -55,5 +55,32 @@ export default defineConfig(({ mode }) => {
       ),
       __APP_AUTH_OIDC_LOGOUT_URL__: defineLiteral(env.VITE_AUTH_OIDC_LOGOUT_URL),
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/react-intl') || id.includes('node_modules/@formatjs/')) {
+              return 'intl';
+            }
+            if (id.includes('node_modules/echarts')) {
+              return 'charts-echarts';
+            }
+            if (id.includes('node_modules/d3')) {
+              return 'charts-d3';
+            }
+            if (id.includes('node_modules/@deck.gl/') || id.includes('node_modules/@loaders.gl/')) {
+              return 'viz-deckgl';
+            }
+            if (
+              id.includes('node_modules/@react-sigma/') ||
+              id.includes('node_modules/graphology')
+            ) {
+              return 'viz-graph';
+            }
+            return undefined;
+          },
+        },
+      },
+    },
   };
 });

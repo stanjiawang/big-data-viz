@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { lazy, useContext, useEffect, useRef, useState } from 'react';
 import { useIsFetching, useQueryClient } from '@tanstack/react-query';
 import { AuthContext } from '@/auth/AuthContext';
 import { canAccessFeature } from '@/auth/useAuth';
@@ -11,13 +11,7 @@ import { getRuntimeConfig } from '@/config/runtimeConfig';
 import type { MockFilters } from '@/lib/types';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
-import {
-  ChartsSection,
-  type DetailView,
-  KpiSection,
-  SummarySection,
-  TableSection,
-} from '@/features/dashboard/sections';
+import { type DetailView } from '@/features/dashboard/sections';
 import { SectionCardActions } from '@/features/dashboard/sections/shared';
 import {
   ChartsRowSkeleton,
@@ -27,7 +21,23 @@ import {
   TableSkeleton,
 } from '@/features/dashboard/SectionSkeletons';
 import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadges';
+import { KpiSection } from '@/features/dashboard/sections/KpiSection';
 import { useI18n } from '@/i18n/useI18n';
+
+const SummarySection = lazy(async () => {
+  const module = await import('@/features/dashboard/sections/SummarySection');
+  return { default: module.SummarySection };
+});
+
+const ChartsSection = lazy(async () => {
+  const module = await import('@/features/dashboard/sections/ChartsSection');
+  return { default: module.ChartsSection };
+});
+
+const TableSection = lazy(async () => {
+  const module = await import('@/features/dashboard/sections/TableSection');
+  return { default: module.TableSection };
+});
 
 const DEFAULT_WEIGHT_MIN = 0.5;
 const DEFAULT_WEIGHT_MAX = 2.5;
