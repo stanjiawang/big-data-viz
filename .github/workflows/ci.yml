@@ -48,6 +48,10 @@ jobs:
       - name: Performance budgets
         run: pnpm run test:perf
       - name: Render performance benchmarks
+        env:
+          PERF_MAX_TABLE_RENDER_MS: 6000
+          PERF_MAX_GRAPH_RENDER_MS: 6500
+          PERF_PAGE_READY_TIMEOUT_MS: 30000
         run: pnpm run test:render-perf
       - name: Reliability policy
         run: pnpm run test:reliability
