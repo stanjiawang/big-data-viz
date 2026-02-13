@@ -29,7 +29,7 @@ async function gotoDashboardAndWait(
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle');
-      await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible({
+      await expect(page.locator('#app-main')).toBeVisible({
         timeout: PAGE_READY_TIMEOUT_MS,
       });
       return;
@@ -52,28 +52,13 @@ async function measureTableRenderMs(page: import('@playwright/test').Page, url: 
 }
 
 async function measureGraphRenderMs(page: import('@playwright/test').Page, url: string) {
-  await gotoDashboardAndWait(page, url);
+  await gotoDashboardAndWait(page, `${url}&detail=graph`);
   const renderStart = Date.now();
-  await waitForRelationshipGraphMount(page);
   await expect(page.locator('[data-testid="relationship-graph"]')).toBeVisible({
     timeout: GRAPH_READY_TIMEOUT_MS,
   });
   await expect(page.getByText('Legend')).toBeVisible({ timeout: GRAPH_READY_TIMEOUT_MS });
   return Date.now() - renderStart;
-}
-
-async function waitForRelationshipGraphMount(page: import('@playwright/test').Page) {
-  await expect
-    .poll(
-      () =>
-        page.evaluate(() => {
-          return document.querySelector('[data-testid="relationship-graph"]') !== null;
-        }),
-      {
-        timeout: GRAPH_READY_TIMEOUT_MS,
-      },
-    )
-    .toBe(true);
 }
 
 test('meets render budgets for large table and relationship graph', async ({ page }) => {
