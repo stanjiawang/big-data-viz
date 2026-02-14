@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 import type { RefObject } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { UI_BUTTON_PRIMARY_SM, UI_LABEL_CLASS, UI_STATUS_PILL } from '@/components/ui/styleTokens';
+import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS, UI_STATUS_PILL } from '@/components/ui/styleTokens';
 import { useI18n } from '@/i18n/useI18n';
 import { getMockData } from '@/lib/apiClient';
 import type { DataChunk, MockFilters, TrainingRecord } from '@/lib/types';
@@ -71,7 +71,7 @@ const TableRow = memo(function TableRow({
 
 export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTableProps) {
   const queryClient = useQueryClient();
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const parentRef = useRef<HTMLDivElement | null>(null);
   const resizeState = useRef<{
     index: number;
@@ -84,6 +84,10 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
 
   const rowHeight = isCompact ? COMPACT_ROW_HEIGHT : DEFAULT_ROW_HEIGHT;
   const gridTemplateColumns = `${columnWidths[0]}px ${columnWidths[1]}px ${columnWidths[2]}px ${columnWidths[3]}px minmax(220px, 1fr)`;
+  const tableHeaders =
+    locale === 'zh-CN'
+      ? (['ID', '时间戳', '来源', '标签'] as const)
+      : (['ID', 'Timestamp', 'Source', 'Label'] as const);
 
   const {
     data: firstChunk,
@@ -212,7 +216,7 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
         </span>
         <button
           type="button"
-          className={`${UI_BUTTON_PRIMARY_SM} w-40`}
+          className={`${UI_BUTTON_GHOST_SM} w-40`}
           aria-pressed={isCompact}
           aria-label={isCompact ? t('tableSwitchToComfortable') : t('tableSwitchToCompact')}
           onClick={() => setIsCompact((current) => !current)}
@@ -227,7 +231,7 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
             className="sticky top-0 z-10 grid h-11 items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 text-xs font-semibold uppercase tracking-wide text-slate-600 shadow-sm"
             style={{ gridTemplateColumns }}
           >
-            {['ID', 'Timestamp', 'Source', 'Label'].map((label, index) => (
+            {tableHeaders.map((label, index) => (
               <div key={label} className="relative flex items-center">
                 <span>{label}</span>
                 <span

@@ -9,7 +9,7 @@ type DashboardHeaderBadgesProps = {
 export function DashboardHeaderBadges({ items, isLoading }: DashboardHeaderBadgesProps) {
   if (isLoading) {
     return (
-      <div className="flex flex-wrap gap-2">
+      <div className="flex min-h-7 flex-nowrap gap-2 overflow-x-auto">
         {items.map((_, index) => (
           <Skeleton key={index} className="h-7 w-28 rounded-full" />
         ))}
@@ -18,7 +18,7 @@ export function DashboardHeaderBadges({ items, isLoading }: DashboardHeaderBadge
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex min-h-7 flex-nowrap gap-2 overflow-x-auto">
       {items.map((label) => (
         <Badge key={label} label={label} />
       ))}

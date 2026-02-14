@@ -9,7 +9,7 @@ type KpiCardProps = {
 
 export function KpiCard({ label, value, trend, helper }: KpiCardProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+    <div className="min-h-36 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
       <p className={UI_LABEL_CLASS}>{label}</p>
       <div className="mt-3 flex items-end justify-between">
         <span className="text-2xl font-semibold text-slate-900">{value}</span>

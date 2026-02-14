@@ -97,12 +97,72 @@ export function DashboardOverviewView({
           <div className="lg:col-span-7">
             <PageHeader title={t('dashboardTitle')} subtitle={t('dashboardSubtitle')} />
           </div>
-          <div className="flex flex-wrap items-center justify-start gap-2 lg:col-span-5 lg:justify-end">
-            <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex flex-col gap-2 lg:col-span-5 lg:items-end">
+            <div className="flex flex-wrap items-center justify-start gap-2 lg:flex-nowrap lg:justify-end">
               <LanguageSwitcher />
               <ThemeToggle />
+              {runtimeEnableAuth && isAuthenticated ? (
+                <button
+                  type="button"
+                  className={`${ACTION_BUTTON_CLASS} w-32`}
+                  onClick={() => void onSignOut()}
+                >
+                  {t('authSignOut')}
+                </button>
+              ) : null}
             </div>
-            <span className="hidden h-7 w-px bg-slate-200 lg:inline-flex" />
+          </div>
+        </div>
+        <div className="min-h-10 border-t border-slate-100 pt-3">
+          <DashboardHeaderBadges items={badgeItems} isLoading={isFetching} />
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs text-slate-500 shadow-sm">
+        <div className="flex min-h-10 flex-wrap items-center gap-3 lg:flex-nowrap">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={effectiveCompareEnabled}
+              onChange={(event) => setCompareEnabled(event.target.checked)}
+              disabled={!canUseCompareMode}
+              aria-describedby={!canUseCompareMode ? 'compare-mode-note' : undefined}
+            />
+            {t('dashboardCompareMode')}
+          </label>
+          {!canUseCompareMode ? (
+            <span
+              id="compare-mode-note"
+              className="text-xs font-semibold uppercase tracking-wide text-amber-600"
+            >
+              {t('dashboardCompareRoleRequired')}
+            </span>
+          ) : null}
+          <span className="hidden h-4 w-px bg-slate-200 sm:inline" />
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={UI_LABEL_CLASS}>{t('dashboardCompareDataset')}</span>
+            <select
+              aria-label={t('dashboardCompareDataset')}
+              className={`${UI_INPUT_MD} h-9 w-28 px-2 text-xs`}
+              value={compareDatasetSize.value}
+              onChange={(event) => {
+                const nextSize = DATASET_SIZES.find(
+                  (option) => option.value === Number(event.target.value),
+                );
+                if (nextSize) {
+                  setCompareDatasetSize(nextSize);
+                }
+              }}
+              disabled={!effectiveCompareEnabled}
+            >
+              {DATASET_SIZES.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="ml-auto flex flex-wrap items-center gap-2 lg:flex-nowrap">
             <button
               type="button"
               className={`${ACTION_BUTTON_CLASS} w-32`}
@@ -110,15 +170,6 @@ export function DashboardOverviewView({
             >
               {t('dashboardRefreshData')}
             </button>
-            {runtimeEnableAuth && isAuthenticated ? (
-              <button
-                type="button"
-                className={`${ACTION_BUTTON_CLASS} w-32`}
-                onClick={() => void onSignOut()}
-              >
-                {t('authSignOut')}
-              </button>
-            ) : null}
             <button
               type="button"
               onClick={onOpenFilters}
@@ -127,54 +178,6 @@ export function DashboardOverviewView({
               {t('dashboardFilters')}
             </button>
           </div>
-        </div>
-        <div className="min-h-10 border-t border-slate-100 pt-3">
-          <DashboardHeaderBadges items={badgeItems} isLoading={isFetching} />
-        </div>
-      </section>
-
-      <section className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs text-slate-500 shadow-sm">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={effectiveCompareEnabled}
-            onChange={(event) => setCompareEnabled(event.target.checked)}
-            disabled={!canUseCompareMode}
-            aria-describedby={!canUseCompareMode ? 'compare-mode-note' : undefined}
-          />
-          {t('dashboardCompareMode')}
-        </label>
-        {!canUseCompareMode ? (
-          <span
-            id="compare-mode-note"
-            className="text-xs font-semibold uppercase tracking-wide text-amber-600"
-          >
-            {t('dashboardCompareRoleRequired')}
-          </span>
-        ) : null}
-        <span className="hidden h-4 w-px bg-slate-200 sm:inline" />
-        <div className="flex flex-wrap items-center gap-2">
-          <span className={UI_LABEL_CLASS}>{t('dashboardCompareDataset')}</span>
-          <select
-            aria-label={t('dashboardCompareDataset')}
-            className={`${UI_INPUT_MD} h-9 w-28 px-2 text-xs`}
-            value={compareDatasetSize.value}
-            onChange={(event) => {
-              const nextSize = DATASET_SIZES.find(
-                (option) => option.value === Number(event.target.value),
-              );
-              if (nextSize) {
-                setCompareDatasetSize(nextSize);
-              }
-            }}
-            disabled={!effectiveCompareEnabled}
-          >
-            {DATASET_SIZES.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
         </div>
       </section>
 

@@ -30,17 +30,19 @@ export function Card({
       aria-labelledby={headingId}
       className={`rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md ${className ?? ''}`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
+      <div className="flex min-h-24 items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
           <h3 id={headingId} className={UI_LABEL_CLASS}>
             {title}
           </h3>
-          {description ? <p className={UI_TEXT_SUBTITLE}>{description}</p> : null}
+          {description ? <p className={`${UI_TEXT_SUBTITLE} min-h-6`}>{description}</p> : null}
           {subtitle ? (
-            <p className={`${UI_TEXT_MUTED_SM} text-xs uppercase tracking-wide`}>{subtitle}</p>
+            <p className={`${UI_TEXT_MUTED_SM} min-h-5 text-xs uppercase tracking-wide`}>
+              {subtitle}
+            </p>
           ) : null}
         </div>
-        {actions ? <div className="shrink-0">{actions}</div> : null}
+        {actions ? <div className="shrink-0 pt-1">{actions}</div> : null}
       </div>
       {children ? <div className={`mt-4 ${contentClassName ?? ''}`}>{children}</div> : null}
     </section>

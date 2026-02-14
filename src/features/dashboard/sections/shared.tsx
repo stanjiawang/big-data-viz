@@ -7,7 +7,7 @@ export function DetailButton({ onClick }: { onClick: () => void }) {
   const { t } = useI18n();
 
   return (
-    <button type="button" className={UI_BUTTON_GHOST_SM} onClick={onClick}>
+    <button type="button" className={`${UI_BUTTON_GHOST_SM} w-36`} onClick={onClick}>
       {t('detailOpen')}
     </button>
   );
@@ -52,7 +52,7 @@ function ExportImageButton({
   return (
     <button
       type="button"
-      className={UI_BUTTON_GHOST_SM}
+      className={`${UI_BUTTON_GHOST_SM} w-44`}
       disabled={isExporting}
       onClick={async () => {
         try {
@@ -82,7 +82,7 @@ export function SectionCardActions({
   exportFileName: string;
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-end gap-2">
+    <div className="flex items-center justify-end gap-2 whitespace-nowrap">
       {onOpenDetail ? <DetailButton onClick={onOpenDetail} /> : null}
       <ExportImageButton targetRef={exportTargetRef} fileName={exportFileName} />
     </div>
@@ -103,7 +103,7 @@ export function RangeSummary({
   const { t } = useI18n();
 
   return (
-    <div className="text-[11px] text-slate-500 sm:text-xs">
+    <div className="min-h-5 text-[11px] text-slate-500 sm:text-xs">
       {t('axisXRange')}: {xStart}% - {xEnd}% | {t('axisYRange')}: {yMin || t('axisAuto')} -{' '}
       {yMax || t('axisAuto')}
     </div>

@@ -7,7 +7,7 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, subtitle }: PageHeaderProps) {
   return (
-    <header className="space-y-2">
+    <header className="min-h-24 space-y-2">
       <h1 className={UI_TEXT_TITLE_XL}>{title}</h1>
       {subtitle ? <p className={UI_TEXT_SUBTITLE}>{subtitle}</p> : null}
     </header>

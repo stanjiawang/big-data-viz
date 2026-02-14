@@ -7,7 +7,6 @@ import forceAtlas2 from 'graphology-layout-forceatlas2';
 import type { GraphResponse } from '@/lib/types';
 import {
   UI_BUTTON_GHOST_SM,
-  UI_BUTTON_PRIMARY_SM,
   UI_CHIP_ACTIVE,
   UI_CHIP_INTERACTIVE,
   UI_LABEL_CLASS,
@@ -372,7 +371,7 @@ export function RelationshipGraph({
 
           <button
             type="button"
-            className={showEdges ? UI_BUTTON_PRIMARY_SM : UI_BUTTON_GHOST_SM}
+            className={`${UI_BUTTON_GHOST_SM} h-8 w-auto self-start px-3 text-xs`}
             onClick={() => setShowEdges((current) => !current)}
           >
             {showEdges ? 'Hide edges' : 'Show edges'}

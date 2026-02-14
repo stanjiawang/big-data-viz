@@ -41,7 +41,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      className={`${UI_BUTTON_GHOST_SM} w-32`}
+      className={`${UI_BUTTON_GHOST_SM} w-32 overflow-hidden text-ellipsis`}
       aria-label={t('themeSwitchAria')}
       onClick={() => setTheme(nextTheme)}
     >

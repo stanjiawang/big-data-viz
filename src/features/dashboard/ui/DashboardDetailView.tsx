@@ -51,11 +51,11 @@ export function DashboardDetailView({
       className="mx-auto grid w-full max-w-[1480px] gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
     >
       <section className="space-y-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-h-10 flex-wrap items-center justify-between gap-3">
           <h2 className={UI_LABEL_CLASS}>
             {t('dashboardDetailedView')}: {detailLabelByView[detailView]}
           </h2>
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2 lg:flex-nowrap">
             <LanguageSwitcher />
             <ThemeToggle />
             <button
