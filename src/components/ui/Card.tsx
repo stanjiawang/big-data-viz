@@ -58,7 +58,7 @@ export function Card({
           dragHandle?.onDragEnd();
         }}
       >
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
           <div className="min-w-0 space-y-1.5">
             <h3
               id={headingId}
@@ -77,7 +77,9 @@ export function Card({
               </p>
             ) : null}
           </div>
-          <div className="flex shrink-0 items-center gap-2 self-start pt-0.5">{actions}</div>
+          <div className="flex w-full shrink-0 items-center justify-end gap-2 self-start pt-0.5 sm:w-auto">
+            {actions}
+          </div>
         </div>
       </div>
       {children ? <div className={`mt-4 ${contentClassName ?? ''}`}>{children}</div> : null}

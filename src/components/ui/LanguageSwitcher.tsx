@@ -6,7 +6,7 @@ export function LanguageSwitcher() {
 
   return (
     <label
-      className={`${UI_BUTTON_GHOST_SM} h-9 w-36 justify-start gap-1.5 px-2 text-left normal-case`}
+      className={`${UI_BUTTON_GHOST_SM} h-9 w-full max-w-[12.5rem] justify-start gap-1.5 px-2 text-left normal-case sm:w-36`}
     >
       <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-slate-500">
         <path

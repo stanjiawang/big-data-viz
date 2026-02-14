@@ -218,12 +218,12 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-white px-4 py-2 text-xs text-slate-500">
         <span className={UI_LABEL_CLASS}>{t('tableControls')}</span>
-        <span className={UI_STATUS_PILL}>
+        <span className={`${UI_STATUS_PILL} order-3 w-full sm:order-none sm:w-auto`}>
           {isCompact ? t('tableCompactDensity') : t('tableComfortableDensity')}
         </span>
         <button
           type="button"
-          className={`${UI_BUTTON_GHOST_SM} w-40`}
+          className={`${UI_BUTTON_GHOST_SM} w-full min-w-0 sm:w-40`}
           aria-pressed={isCompact}
           aria-label={isCompact ? t('tableSwitchToComfortable') : t('tableSwitchToCompact')}
           onClick={() => setIsCompact((current) => !current)}

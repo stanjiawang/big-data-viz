@@ -31,11 +31,11 @@ export function SummarySkeleton() {
 
 export function ChartsRowSkeleton() {
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-12">
+    <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-12">
       {Array.from({ length: 3 }).map((_, index) => (
         <div
           key={index}
-          className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-4"
+          className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-4"
         >
           <SkeletonText className="w-24" />
           <SkeletonText className="mt-2 w-40" />

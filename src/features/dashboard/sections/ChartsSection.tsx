@@ -243,11 +243,11 @@ export function ChartsSection({
   } as const;
 
   return (
-    <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-12">
+    <section className="grid gap-6 lg:grid-cols-2 xl:grid-cols-12">
       {chartCardReorder.order.map((cardId) => (
         <div
           key={cardId}
-          className={`lg:col-span-6 ${chartCardReorder.overId === cardId && chartCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
+          className={`xl:col-span-6 ${chartCardReorder.overId === cardId && chartCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
           onDragOver={(event) => chartCardReorder.onDragOver(event, cardId)}
           onDrop={() => chartCardReorder.onDrop(cardId)}
         >

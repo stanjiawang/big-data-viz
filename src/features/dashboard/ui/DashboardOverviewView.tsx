@@ -118,13 +118,13 @@ export function DashboardOverviewView({
             <PageHeader title={t('dashboardTitle')} subtitle={t('dashboardSubtitle')} />
           </div>
           <div className="flex flex-col gap-2 lg:col-span-5 lg:items-end">
-            <div className="flex flex-wrap items-center justify-start gap-2 lg:flex-nowrap lg:justify-end">
+            <div className="flex w-full flex-wrap items-center justify-start gap-2 sm:justify-end lg:flex-nowrap lg:justify-end">
               <LanguageSwitcher />
               <ThemeToggle />
               {runtimeEnableAuth && isAuthenticated ? (
                 <button
                   type="button"
-                  className={`${ACTION_BUTTON_CLASS} w-32`}
+                  className={`${ACTION_BUTTON_CLASS} w-full min-w-0 sm:w-auto sm:min-w-32`}
                   onClick={() => void onSignOut()}
                 >
                   {t('authSignOut')}
@@ -144,7 +144,7 @@ export function DashboardOverviewView({
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs text-slate-500 shadow-sm">
-        <div className="flex min-h-10 flex-wrap items-center gap-3 lg:flex-nowrap">
+        <div className="flex min-h-10 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:flex-nowrap">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -166,10 +166,10 @@ export function DashboardOverviewView({
           <span className="hidden h-4 w-px bg-slate-200 sm:inline" />
           <div className="flex flex-wrap items-center gap-2">
             <span className={UI_LABEL_CLASS}>{t('dashboardCompareDataset')}</span>
-            <span className="relative block">
+            <span className="relative block w-28">
               <select
                 aria-label={t('dashboardCompareDataset')}
-                className={`${UI_SELECT_MD} h-9 w-28 px-2 pr-7 text-xs`}
+                className={`${UI_SELECT_MD} h-9 w-full px-2 pr-7 text-xs`}
                 value={compareDatasetSize.value}
                 onChange={(event) => {
                   const nextSize = DATASET_SIZES.find(
@@ -203,10 +203,10 @@ export function DashboardOverviewView({
               </svg>
             </span>
           </div>
-          <div className="ml-auto flex flex-wrap items-center gap-2 lg:flex-nowrap">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto lg:flex-nowrap">
             <button
               type="button"
-              className={`${ACTION_BUTTON_CLASS} w-32`}
+              className={`${ACTION_BUTTON_CLASS} w-full min-w-0 sm:w-auto sm:min-w-32`}
               onClick={() => void queryClient.invalidateQueries()}
             >
               {t('dashboardRefreshData')}
@@ -214,7 +214,7 @@ export function DashboardOverviewView({
             <button
               type="button"
               onClick={onOpenFilters}
-              className={`${ACTION_BUTTON_CLASS} w-32 lg:hidden`}
+              className={`${ACTION_BUTTON_CLASS} w-full min-w-0 sm:w-auto sm:min-w-32 lg:hidden`}
             >
               {t('dashboardFilters')}
             </button>

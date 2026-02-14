@@ -208,7 +208,7 @@ export function D3EmbeddingScatter({
       className="relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white"
       style={{ height }}
     >
-      <div className="flex flex-wrap items-center gap-1 border-b border-slate-100 px-2 py-2">
+      <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-100 px-2 py-2">
         <span className={`${UI_LABEL_CLASS} mr-1`}>
           {t('d3ZoomLabel')}: {zoomLevel.toFixed(1)}x
         </span>
@@ -235,10 +235,10 @@ export function D3EmbeddingScatter({
             </button>
           );
         })}
-        <div className="ml-auto">
+        <div className="w-full sm:ml-auto sm:w-auto">
           <button
             type="button"
-            className={UI_CHIP_INTERACTIVE}
+            className={`${UI_CHIP_INTERACTIVE} w-full sm:w-auto`}
             onClick={() => {
               setHiddenLabels(new Set());
               setPointScale(1);

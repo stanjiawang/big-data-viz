@@ -7,7 +7,7 @@ export function DetailButton({ onClick }: { onClick: () => void }) {
   const { t } = useI18n();
 
   return (
-    <button type="button" className={`${UI_BUTTON_GHOST_SM} w-36`} onClick={onClick}>
+    <button type="button" className={`${UI_BUTTON_GHOST_SM} w-full sm:w-36`} onClick={onClick}>
       {t('detailOpen')}
     </button>
   );
@@ -52,7 +52,7 @@ function ExportImageButton({
   return (
     <button
       type="button"
-      className={`${UI_BUTTON_GHOST_SM} w-44`}
+      className={`${UI_BUTTON_GHOST_SM} w-full sm:w-44`}
       disabled={isExporting}
       onClick={async () => {
         try {
@@ -82,7 +82,7 @@ export function SectionCardActions({
   exportFileName: string;
 }) {
   return (
-    <div className="flex items-center justify-end gap-2 whitespace-nowrap">
+    <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-nowrap">
       <ExportImageButton targetRef={exportTargetRef} fileName={exportFileName} />
       {onOpenDetail ? <DetailButton onClick={onOpenDetail} /> : null}
     </div>
