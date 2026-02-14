@@ -254,6 +254,11 @@ export function D3EmbeddingScatter({
 
       <div ref={exportTargetRef} className="relative min-h-0 flex-1">
         <svg ref={svgRef} className="h-full w-full" data-testid="d3-embedding-scatter" />
+        {overlayMessage ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-50 text-sm text-slate-400">
+            {overlayMessage}
+          </div>
+        ) : null}
         {hovered ? (
           <div
             className="pointer-events-none absolute z-20 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 shadow-sm"
@@ -302,12 +307,6 @@ export function D3EmbeddingScatter({
           />
         </label>
       </div>
-
-      {overlayMessage ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-50 text-sm text-slate-400">
-          {overlayMessage}
-        </div>
-      ) : null}
     </div>
   );
 }
