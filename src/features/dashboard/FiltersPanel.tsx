@@ -116,6 +116,7 @@ export function FiltersPanel({
       <label className={LABEL_CLASS}>
         {t('filtersSearchPrefix')}
         <input
+          id="filters-search-input"
           className={INPUT_CLASS}
           placeholder={t('filtersSearchPlaceholder')}
           value={filters.search ?? ''}

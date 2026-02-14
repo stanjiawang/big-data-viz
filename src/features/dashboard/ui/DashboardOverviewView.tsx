@@ -89,6 +89,23 @@ export function DashboardOverviewView({
     `${t('dashboardBadgeSource')}: ${filters.source ?? t('dashboardBadgeAll')}`,
     `${t('dashboardBadgeSearch')}: ${filters.search || t('dashboardBadgeEmpty')}`,
   ];
+  const searchBadgePrefix = `${t('dashboardBadgeSearch')}:`;
+
+  const focusSearchFilter = () => {
+    const searchInput = document.getElementById('filters-search-input') as HTMLInputElement | null;
+    if (!searchInput) return;
+    searchInput.focus();
+    searchInput.select();
+  };
+
+  const handleSearchBadgeClick = () => {
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      onOpenFilters();
+      window.setTimeout(focusSearchFilter, 0);
+      return;
+    }
+    focusSearchFilter();
+  };
 
   return (
     <main
@@ -117,7 +134,12 @@ export function DashboardOverviewView({
           </div>
         </div>
         <div className="min-h-10 border-t border-slate-100 pt-3">
-          <DashboardHeaderBadges items={badgeItems} isLoading={isFetching} />
+          <DashboardHeaderBadges
+            items={badgeItems}
+            isLoading={isFetching}
+            searchBadgePrefix={searchBadgePrefix}
+            onSearchBadgeClick={handleSearchBadgeClick}
+          />
         </div>
       </section>
 
@@ -200,6 +222,19 @@ export function DashboardOverviewView({
         </div>
       </section>
 
+      <AsyncBoundary
+        fallback={<KpiSkeletonGrid />}
+        errorTitle={t('dashboardMetricsFailedTitle')}
+        errorMessage={t('dashboardMetricsFailedMessage')}
+      >
+        <KpiSection
+          datasetSize={datasetSize}
+          compareDatasetSize={compareDatasetSize}
+          compareEnabled={effectiveCompareEnabled}
+          filters={filters}
+        />
+      </AsyncBoundary>
+
       <section className="grid gap-6 lg:grid-cols-12">
         {topCardReorder.order.map((cardId) => {
           if (cardId === 'filters') {
@@ -207,16 +242,22 @@ export function DashboardOverviewView({
               <div
                 key={cardId}
                 className={`hidden lg:col-span-5 lg:block ${topCardReorder.overId === cardId && topCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
-                draggable
-                onDragStart={() => topCardReorder.onDragStart(cardId)}
                 onDragOver={(event) => topCardReorder.onDragOver(event, cardId)}
                 onDrop={() => topCardReorder.onDrop(cardId)}
-                onDragEnd={topCardReorder.onDragEnd}
               >
                 <Card
                   title={t('dashboardFilters')}
                   description={t('sectionFiltersDescription')}
                   subtitle={t('techReactStateUrl')}
+                  dragHandle={{
+                    isDragging: topCardReorder.draggingId === cardId,
+                    onDragStart: (event) => {
+                      event.dataTransfer.effectAllowed = 'move';
+                      event.dataTransfer.setData('text/plain', cardId);
+                      topCardReorder.onDragStart(cardId);
+                    },
+                    onDragEnd: topCardReorder.onDragEnd,
+                  }}
                 >
                   {isFetching ? (
                     <FiltersSkeleton />
@@ -242,17 +283,23 @@ export function DashboardOverviewView({
             <div
               key={cardId}
               className={`lg:col-span-7 ${topCardReorder.overId === cardId && topCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
-              draggable
-              onDragStart={() => topCardReorder.onDragStart(cardId)}
               onDragOver={(event) => topCardReorder.onDragOver(event, cardId)}
               onDrop={() => topCardReorder.onDrop(cardId)}
-              onDragEnd={topCardReorder.onDragEnd}
             >
               <Card
                 sectionRef={summaryCardRef}
                 title={t('sectionSummaryTitle')}
                 description={t('sectionSummaryDescription')}
                 subtitle={t('techEchartsQuery')}
+                dragHandle={{
+                  isDragging: topCardReorder.draggingId === cardId,
+                  onDragStart: (event) => {
+                    event.dataTransfer.effectAllowed = 'move';
+                    event.dataTransfer.setData('text/plain', cardId);
+                    topCardReorder.onDragStart(cardId);
+                  },
+                  onDragEnd: topCardReorder.onDragEnd,
+                }}
                 actions={
                   <SectionCardActions
                     onOpenDetail={() => onOpenDetail('summary')}
@@ -279,19 +326,6 @@ export function DashboardOverviewView({
           );
         })}
       </section>
-
-      <AsyncBoundary
-        fallback={<KpiSkeletonGrid />}
-        errorTitle={t('dashboardMetricsFailedTitle')}
-        errorMessage={t('dashboardMetricsFailedMessage')}
-      >
-        <KpiSection
-          datasetSize={datasetSize}
-          compareDatasetSize={compareDatasetSize}
-          compareEnabled={effectiveCompareEnabled}
-          filters={filters}
-        />
-      </AsyncBoundary>
 
       <AsyncBoundary
         fallback={<ChartsRowSkeleton />}
