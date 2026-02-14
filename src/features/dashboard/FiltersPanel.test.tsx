@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
@@ -61,6 +61,8 @@ describe('FiltersPanel', () => {
     await userEvent.type(screen.getByLabelText(/Search ID prefix/i), 'batch-2025');
 
     expect(screen.getByTestId('source')).toHaveTextContent('user');
-    expect(screen.getByTestId('search')).toHaveTextContent('batch-2025');
+    await waitFor(() => {
+      expect(screen.getByTestId('search')).toHaveTextContent('batch-2025');
+    });
   });
 });

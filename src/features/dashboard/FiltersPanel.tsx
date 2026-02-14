@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { UI_INPUT_MD, UI_LABEL_CLASS, UI_SELECT_MD } from '@/components/ui/styleTokens';
 import { useI18n } from '@/i18n/useI18n';
 import type { MockFilters } from '@/lib/types';
@@ -36,6 +36,33 @@ export function FiltersPanel({
   defaultWeightMax,
 }: FiltersPanelProps) {
   const { t } = useI18n();
+  const [searchInputValue, setSearchInputValue] = useState(filters.search ?? '');
+  const searchCommitTimer = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (searchCommitTimer.current !== null) {
+        window.clearTimeout(searchCommitTimer.current);
+      }
+    },
+    [],
+  );
+
+  const commitSearchInput = () => {
+    if (searchCommitTimer.current !== null) {
+      window.clearTimeout(searchCommitTimer.current);
+      searchCommitTimer.current = null;
+    }
+    setFilters((current) => {
+      if ((current.search ?? '') === searchInputValue) {
+        return current;
+      }
+      return {
+        ...current,
+        search: searchInputValue,
+      };
+    });
+  };
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -119,13 +146,31 @@ export function FiltersPanel({
           id="filters-search-input"
           className={INPUT_CLASS}
           placeholder={t('filtersSearchPlaceholder')}
-          value={filters.search ?? ''}
-          onChange={(event) =>
-            setFilters((current) => ({
-              ...current,
-              search: event.target.value,
-            }))
-          }
+          value={searchInputValue}
+          onChange={(event) => {
+            const nextValue = event.target.value;
+            setSearchInputValue(nextValue);
+            if (searchCommitTimer.current !== null) {
+              window.clearTimeout(searchCommitTimer.current);
+            }
+            searchCommitTimer.current = window.setTimeout(() => {
+              setFilters((current) => {
+                if ((current.search ?? '') === nextValue) {
+                  return current;
+                }
+                return {
+                  ...current,
+                  search: nextValue,
+                };
+              });
+            }, 250);
+          }}
+          onBlur={commitSearchInput}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              commitSearchInput();
+            }
+          }}
         />
       </label>
 
