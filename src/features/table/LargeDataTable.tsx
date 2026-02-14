@@ -17,6 +17,7 @@ const COMPACT_ROW_HEIGHT = 24;
 const DEFAULT_COL_WIDTHS = [160, 200, 140, 140];
 const MIN_COL_WIDTH = 120;
 const MAX_COL_WIDTH = 360;
+const TABLE_DENSITY_STORAGE_KEY = 'bdv_table_compact_density';
 
 type LargeDataTableProps = {
   total: number;
@@ -79,7 +80,9 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
     startWidth: number;
   } | null>(null);
 
-  const [isCompact, setIsCompact] = useState(false);
+  const [isCompact, setIsCompact] = useState(
+    () => window.localStorage.getItem(TABLE_DENSITY_STORAGE_KEY) === '1',
+  );
   const [columnWidths, setColumnWidths] = useState(DEFAULT_COL_WIDTHS);
 
   const rowHeight = isCompact ? COMPACT_ROW_HEIGHT : DEFAULT_ROW_HEIGHT;
@@ -186,6 +189,10 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(TABLE_DENSITY_STORAGE_KEY, isCompact ? '1' : '0');
+  }, [isCompact]);
 
   if (isError) {
     return (

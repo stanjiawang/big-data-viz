@@ -1,7 +1,5 @@
 import type { RefObject } from 'react';
 import { Card } from '@/components/ui/Card';
-import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import type { DetailView } from '@/features/dashboard/sections';
@@ -56,13 +54,21 @@ export function DashboardDetailView({
             {t('dashboardDetailedView')}: {detailLabelByView[detailView]}
           </h2>
           <div className="flex flex-wrap items-center justify-end gap-2 lg:flex-nowrap">
-            <LanguageSwitcher />
-            <ThemeToggle />
             <button
               type="button"
-              className={`${ACTION_BUTTON_CLASS} w-40`}
+              className={`${ACTION_BUTTON_CLASS} h-9 min-w-0 gap-2 px-3 normal-case`}
               onClick={onBackToDashboard}
             >
+              <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4">
+                <path
+                  d="M11.75 4.75 6.5 10l5.25 5.25"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.8"
+                />
+              </svg>
               {t('dashboardBackToDashboard')}
             </button>
           </div>

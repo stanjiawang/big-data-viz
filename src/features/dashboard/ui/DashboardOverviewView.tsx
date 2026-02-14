@@ -5,7 +5,7 @@ import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
 import { Card } from '@/components/ui/Card';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { UI_BUTTON_GHOST_SM, UI_INPUT_MD, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
+import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS, UI_SELECT_MD } from '@/components/ui/styleTokens';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
 import {
   ChartsRowSkeleton,
@@ -20,10 +20,12 @@ import { KpiSection } from '@/features/dashboard/sections/KpiSection';
 import type { DetailView } from '@/features/dashboard/sections/types';
 import { SectionCardActions } from '@/features/dashboard/sections/shared';
 import { ChartsSection, SummarySection, TableSection } from '@/features/dashboard/ui/lazySections';
+import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
 import { useI18n } from '@/i18n/useI18n';
 import type { MockFilters } from '@/lib/types';
 
 const ACTION_BUTTON_CLASS = UI_BUTTON_GHOST_SM;
+const TOP_CARD_IDS = ['filters', 'summary'] as const;
 type DatasetSizeOption = (typeof DATASET_SIZES)[number];
 
 type DashboardOverviewViewProps = {
@@ -75,6 +77,7 @@ export function DashboardOverviewView({
   const queryClient = useQueryClient();
   const isFetching = useIsFetching() > 0;
   const effectiveCompareEnabled = compareEnabled && canUseCompareMode;
+  const topCardReorder = useDragReorder(TOP_CARD_IDS, 'bdv_overview_top_cards_order');
 
   const selectedLabels = filters.labels ?? [];
   const weightMinValue = filters.weightMin ?? defaultWeightMin;
@@ -141,26 +144,42 @@ export function DashboardOverviewView({
           <span className="hidden h-4 w-px bg-slate-200 sm:inline" />
           <div className="flex flex-wrap items-center gap-2">
             <span className={UI_LABEL_CLASS}>{t('dashboardCompareDataset')}</span>
-            <select
-              aria-label={t('dashboardCompareDataset')}
-              className={`${UI_INPUT_MD} h-9 w-28 px-2 text-xs`}
-              value={compareDatasetSize.value}
-              onChange={(event) => {
-                const nextSize = DATASET_SIZES.find(
-                  (option) => option.value === Number(event.target.value),
-                );
-                if (nextSize) {
-                  setCompareDatasetSize(nextSize);
-                }
-              }}
-              disabled={!effectiveCompareEnabled}
-            >
-              {DATASET_SIZES.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <span className="relative block">
+              <select
+                aria-label={t('dashboardCompareDataset')}
+                className={`${UI_SELECT_MD} h-9 w-28 px-2 pr-7 text-xs`}
+                value={compareDatasetSize.value}
+                onChange={(event) => {
+                  const nextSize = DATASET_SIZES.find(
+                    (option) => option.value === Number(event.target.value),
+                  );
+                  if (nextSize) {
+                    setCompareDatasetSize(nextSize);
+                  }
+                }}
+                disabled={!effectiveCompareEnabled}
+              >
+                {DATASET_SIZES.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+              >
+                <path
+                  d="M5.25 7.75 10 12.25l4.75-4.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.75"
+                />
+              </svg>
+            </span>
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2 lg:flex-nowrap">
             <button
@@ -182,57 +201,83 @@ export function DashboardOverviewView({
       </section>
 
       <section className="grid gap-6 lg:grid-cols-12">
-        <Card
-          title={t('dashboardFilters')}
-          description={t('sectionFiltersDescription')}
-          subtitle={t('techReactStateUrl')}
-          className="hidden lg:block lg:col-span-5"
-        >
-          {isFetching ? (
-            <FiltersSkeleton />
-          ) : (
-            <FiltersPanel
-              datasetSize={datasetSize}
-              setDatasetSize={setDatasetSize}
-              filters={filters}
-              setFilters={setFilters}
-              selectedLabels={selectedLabels}
-              weightMinValue={weightMinValue}
-              weightMaxValue={weightMaxValue}
-              defaultWeightMin={defaultWeightMin}
-              defaultWeightMax={defaultWeightMax}
-            />
-          )}
-        </Card>
-
-        <Card
-          sectionRef={summaryCardRef}
-          title={t('sectionSummaryTitle')}
-          description={t('sectionSummaryDescription')}
-          subtitle={t('techEchartsQuery')}
-          className="lg:col-span-7"
-          actions={
-            <SectionCardActions
-              onOpenDetail={() => onOpenDetail('summary')}
-              exportTargetRef={summaryVisualizationRef}
-              exportFileName="summary"
-            />
+        {topCardReorder.order.map((cardId) => {
+          if (cardId === 'filters') {
+            return (
+              <div
+                key={cardId}
+                className={`hidden lg:col-span-5 lg:block ${topCardReorder.overId === cardId && topCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
+                draggable
+                onDragStart={() => topCardReorder.onDragStart(cardId)}
+                onDragOver={(event) => topCardReorder.onDragOver(event, cardId)}
+                onDrop={() => topCardReorder.onDrop(cardId)}
+                onDragEnd={topCardReorder.onDragEnd}
+              >
+                <Card
+                  title={t('dashboardFilters')}
+                  description={t('sectionFiltersDescription')}
+                  subtitle={t('techReactStateUrl')}
+                >
+                  {isFetching ? (
+                    <FiltersSkeleton />
+                  ) : (
+                    <FiltersPanel
+                      datasetSize={datasetSize}
+                      setDatasetSize={setDatasetSize}
+                      filters={filters}
+                      setFilters={setFilters}
+                      selectedLabels={selectedLabels}
+                      weightMinValue={weightMinValue}
+                      weightMaxValue={weightMaxValue}
+                      defaultWeightMin={defaultWeightMin}
+                      defaultWeightMax={defaultWeightMax}
+                    />
+                  )}
+                </Card>
+              </div>
+            );
           }
-        >
-          <AsyncBoundary
-            fallback={<SummarySkeleton />}
-            errorTitle={t('dashboardSummaryFailedTitle')}
-            errorMessage={t('dashboardSummaryFailedMessage')}
-          >
-            <SummarySection
-              datasetSize={datasetSize}
-              compareDatasetSize={compareDatasetSize}
-              compareEnabled={effectiveCompareEnabled}
-              filters={filters}
-              visualizationRef={summaryVisualizationRef}
-            />
-          </AsyncBoundary>
-        </Card>
+
+          return (
+            <div
+              key={cardId}
+              className={`lg:col-span-7 ${topCardReorder.overId === cardId && topCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
+              draggable
+              onDragStart={() => topCardReorder.onDragStart(cardId)}
+              onDragOver={(event) => topCardReorder.onDragOver(event, cardId)}
+              onDrop={() => topCardReorder.onDrop(cardId)}
+              onDragEnd={topCardReorder.onDragEnd}
+            >
+              <Card
+                sectionRef={summaryCardRef}
+                title={t('sectionSummaryTitle')}
+                description={t('sectionSummaryDescription')}
+                subtitle={t('techEchartsQuery')}
+                actions={
+                  <SectionCardActions
+                    onOpenDetail={() => onOpenDetail('summary')}
+                    exportTargetRef={summaryVisualizationRef}
+                    exportFileName="summary"
+                  />
+                }
+              >
+                <AsyncBoundary
+                  fallback={<SummarySkeleton />}
+                  errorTitle={t('dashboardSummaryFailedTitle')}
+                  errorMessage={t('dashboardSummaryFailedMessage')}
+                >
+                  <SummarySection
+                    datasetSize={datasetSize}
+                    compareDatasetSize={compareDatasetSize}
+                    compareEnabled={effectiveCompareEnabled}
+                    filters={filters}
+                    visualizationRef={summaryVisualizationRef}
+                  />
+                </AsyncBoundary>
+              </Card>
+            </div>
+          );
+        })}
       </section>
 
       <AsyncBoundary
@@ -259,6 +304,7 @@ export function DashboardOverviewView({
           compareEnabled={effectiveCompareEnabled}
           filters={filters}
           onOpenDetail={onOpenDetail}
+          draggable
         />
       </AsyncBoundary>
 
@@ -273,6 +319,7 @@ export function DashboardOverviewView({
           compareEnabled={effectiveCompareEnabled}
           filters={filters}
           onOpenDetail={onOpenDetail}
+          draggable
         />
       </AsyncBoundary>
 

@@ -11,4 +11,5 @@ export type DashboardSectionProps = {
   expanded?: boolean;
   onOpenDetail?: (_view: DetailView) => void;
   focusView?: Extract<DetailView, 'timeSeries' | 'embedding' | 'graph' | 'd3'>;
+  draggable?: boolean;
 };

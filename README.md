@@ -6,7 +6,7 @@ Enterprise-ready workspace for large-scale AI training data analytics, built wit
 
 - Scalable dashboard layout with responsive grid + flex patterns
 - Mocked big-data APIs via MSW for local development
-- Interactive visualizations (time series, embedding cloud, relationship graph)
+- Interactive visualizations (ECharts time series/bar/pie, D3 embedding scatter, Deck.gl embedding cloud, Sigma.js relationship graph)
 - Virtualized large table for multi-million row browsing
 - Runtime language switcher with `react-intl` (`en`, `zh-CN`)
 - Accessibility baseline enforced with Playwright + axe-core
@@ -19,7 +19,7 @@ Enterprise-ready workspace for large-scale AI training data analytics, built wit
 - Tailwind CSS
 - React Query
 - MSW (Mock Service Worker)
-- Deck.gl + Sigma.js
+- ECharts + D3 + Deck.gl + Sigma.js
 - react-intl
 - Jest + React Testing Library
 - Playwright + @axe-core/playwright

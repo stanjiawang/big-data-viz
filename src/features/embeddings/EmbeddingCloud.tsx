@@ -4,6 +4,7 @@ import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
 import { ScatterplotLayer } from '@deck.gl/layers';
 import { UI_BUTTON_GHOST_SM } from '@/components/ui/styleTokens';
+import { useI18n } from '@/i18n/useI18n';
 import type { TrainingRecord } from '@/lib/types';
 
 type EmbeddingCloudProps = {
@@ -30,6 +31,7 @@ export function EmbeddingCloud({
   height = 224,
   exportTargetRef,
 }: EmbeddingCloudProps) {
+  const { t } = useI18n();
   const [webglOk] = useState(() => isWebGLAvailable());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [viewState, setViewState] = useState({
@@ -121,12 +123,12 @@ export function EmbeddingCloud({
       className="relative overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-b from-slate-50 to-white"
       style={{ height }}
     >
-      <div className="absolute left-2 top-2 z-10 rounded-md bg-white/90 px-2 py-1 text-[10px] uppercase tracking-wide text-slate-500 shadow-sm backdrop-blur">
+      <div className="absolute left-2 top-2 z-10 rounded-md bg-white px-2 py-1 text-[10px] uppercase tracking-wide text-slate-500 shadow-sm">
         Zoom: scroll | Pan: drag
       </div>
       <button
         type="button"
-        className={`absolute left-2 top-9 z-10 ${UI_BUTTON_GHOST_SM} h-9 bg-white/90 px-2 shadow-sm backdrop-blur`}
+        className={`absolute left-2 top-9 z-10 ${UI_BUTTON_GHOST_SM} h-9 bg-white px-2 shadow-sm`}
         onClick={() =>
           setViewState({
             target: [0, 0, 0],
@@ -136,10 +138,10 @@ export function EmbeddingCloud({
           })
         }
       >
-        Reset view
+        {t('d3ResetView')}
       </button>
       {hoveredId ? (
-        <div className="absolute right-2 top-2 z-10 rounded-md bg-white/90 px-2 py-1 text-xs text-slate-600 shadow-sm backdrop-blur">
+        <div className="absolute right-2 top-2 z-10 rounded-md bg-white px-2 py-1 text-xs text-slate-600 shadow-sm">
           Node: {hoveredId}
         </div>
       ) : null}
@@ -171,7 +173,7 @@ export function EmbeddingCloud({
             const point = object as { id: string };
             setHoveredId(point.id);
           }}
-          style={{ position: 'absolute', inset: '0' }}
+          style={{ position: 'absolute', inset: '0', background: 'transparent' }}
         />
       </div>
     </div>

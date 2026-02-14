@@ -83,8 +83,8 @@ export function SectionCardActions({
 }) {
   return (
     <div className="flex items-center justify-end gap-2 whitespace-nowrap">
-      {onOpenDetail ? <DetailButton onClick={onOpenDetail} /> : null}
       <ExportImageButton targetRef={exportTargetRef} fileName={exportFileName} />
+      {onOpenDetail ? <DetailButton onClick={onOpenDetail} /> : null}
     </div>
   );
 }

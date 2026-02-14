@@ -277,7 +277,7 @@ export function RelationshipGraph({
       <div className="grid min-h-0 flex-1 gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_220px]">
         <div
           ref={exportTargetRef}
-          className="relative min-h-0 overflow-hidden rounded-lg bg-slate-50/60"
+          className="relative min-h-0 overflow-hidden rounded-lg bg-slate-50"
         >
           <div className="h-full">
             <SigmaContainer
@@ -323,7 +323,7 @@ export function RelationshipGraph({
           </div>
         </div>
 
-        <aside className="flex min-h-0 flex-col gap-3 rounded-lg bg-white/70 p-3">
+        <aside className="flex min-h-0 flex-col gap-3 rounded-lg bg-white p-3">
           {clusters.length > 0 ? (
             <div className="flex flex-wrap gap-2 rounded-lg bg-white p-2">
               {clusters.map((cluster) => {
