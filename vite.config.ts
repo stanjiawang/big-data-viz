@@ -56,7 +56,21 @@ export default defineConfig(({ mode }) => {
       __APP_AUTH_OIDC_LOGOUT_URL__: defineLiteral(env.VITE_AUTH_OIDC_LOGOUT_URL),
     },
     build: {
+      // Chunk budgets are enforced by scripts/check-performance.mjs;
+      // raise Vite's generic warning threshold to avoid duplicate noisy CI warnings.
+      chunkSizeWarningLimit: 2300,
       rollupOptions: {
+        onwarn(warning, warn) {
+          const message = warning.message ?? '';
+          const isLoadersGlSpawnWarning =
+            warning.code === 'MISSING_EXPORT' &&
+            message.includes('"spawn" is not exported by "__vite-browser-external"') &&
+            message.includes('@loaders.gl/worker-utils');
+          if (isLoadersGlSpawnWarning) {
+            return;
+          }
+          warn(warning);
+        },
         output: {
           manualChunks(id) {
             if (id.includes('node_modules/react-intl') || id.includes('node_modules/@formatjs/')) {
