@@ -184,6 +184,7 @@ export function RelationshipGraph({
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const [selectedClusters, setSelectedClusters] = useState<Set<string>>(new Set());
   const [showEdges, setShowEdges] = useState(true);
+  const [showHintTooltip, setShowHintTooltip] = useState(false);
 
   const clusters = useMemo(() => {
     const clusterSet = new Set<string>();
@@ -323,85 +324,103 @@ export function RelationshipGraph({
           </div>
         </div>
 
-        <aside className="flex min-h-0 flex-col gap-3 rounded-lg bg-white p-3">
+        <aside className="flex min-h-0 flex-col gap-4 rounded-lg bg-slate-50/70 p-3">
           {clusters.length > 0 ? (
-            <div className="flex flex-wrap gap-2 rounded-lg bg-white p-2">
-              {clusters.map((cluster) => {
-                const active = selectedClusters.has(cluster);
-                return (
-                  <button
-                    key={cluster}
-                    type="button"
-                    className={active ? UI_CHIP_ACTIVE : UI_CHIP_INTERACTIVE}
-                    onClick={() => {
-                      setSelectedNode(null);
-                      setHoveredNode(null);
-                      setTooltip(null);
-                      setSelectedClusters((current) => {
-                        const next = new Set(current);
-                        if (next.has(cluster)) {
-                          next.delete(cluster);
-                        } else {
-                          next.add(cluster);
-                        }
-                        return next;
-                      });
-                    }}
-                  >
-                    {cluster}
-                  </button>
-                );
-              })}
-              {selectedClusters.size > 0 ? (
-                <button
-                  type="button"
-                  className={`${UI_BUTTON_GHOST_SM} h-8 px-2 text-xs`}
-                  onClick={() => {
-                    setSelectedNode(null);
-                    setHoveredNode(null);
-                    setTooltip(null);
-                    setSelectedClusters(new Set());
-                  }}
-                >
-                  Clear
-                </button>
-              ) : null}
+            <div className="shrink-0 space-y-2">
+              <div className={UI_LABEL_CLASS}>Clusters</div>
+              <div className="grid grid-cols-2 gap-2.5">
+                {clusters.map((cluster) => {
+                  const active = selectedClusters.has(cluster);
+                  return (
+                    <button
+                      key={cluster}
+                      type="button"
+                      className={`${active ? UI_CHIP_ACTIVE : UI_CHIP_INTERACTIVE} h-9 w-full px-3`}
+                      onClick={() => {
+                        setSelectedNode(null);
+                        setHoveredNode(null);
+                        setTooltip(null);
+                        setSelectedClusters((current) => {
+                          const next = new Set(current);
+                          if (next.has(cluster)) {
+                            next.delete(cluster);
+                          } else {
+                            next.add(cluster);
+                          }
+                          return next;
+                        });
+                      }}
+                    >
+                      {cluster}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           ) : null}
 
-          <button
-            type="button"
-            className={`${UI_BUTTON_GHOST_SM} h-8 w-auto self-start px-3 text-xs`}
-            onClick={() => setShowEdges((current) => !current)}
-          >
-            {showEdges ? 'Hide edges' : 'Show edges'}
-          </button>
+          <div className="shrink-0 space-y-2">
+            <div className="relative">
+              <button
+                type="button"
+                className={`${UI_BUTTON_GHOST_SM} h-8 w-full px-3 text-xs`}
+                onClick={() => setShowEdges((current) => !current)}
+                onMouseEnter={() => setShowHintTooltip(true)}
+                onMouseLeave={() => setShowHintTooltip(false)}
+                onFocus={() => setShowHintTooltip(true)}
+                onBlur={() => setShowHintTooltip(false)}
+              >
+                {showEdges ? 'Hide edges' : 'Show edges'}
+              </button>
+              {!selectedNodeData && showHintTooltip ? (
+                <div className="pointer-events-none absolute left-0 top-full z-10 mt-1 w-56 rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600 shadow-sm">
+                  Select a node to inspect details.
+                </div>
+              ) : null}
+            </div>
+            {selectedClusters.size > 0 ? (
+              <button
+                type="button"
+                className={`${UI_BUTTON_GHOST_SM} h-8 w-full px-2 text-xs`}
+                onClick={() => {
+                  setSelectedNode(null);
+                  setHoveredNode(null);
+                  setTooltip(null);
+                  setSelectedClusters(new Set());
+                }}
+              >
+                Clear
+              </button>
+            ) : null}
+          </div>
 
           {selectedNodeData ? (
-            <div className="rounded-lg bg-white px-3 py-2 text-xs text-slate-700">
-              <div className="font-semibold">{selectedNodeData.id}</div>
-              <div>Cluster: {selectedNodeData.group}</div>
+            <div className="shrink-0 rounded-lg bg-white px-3 py-2.5 text-xs text-slate-700">
+              <div className={UI_LABEL_CLASS}>Selected node</div>
+              <div className="mt-1 font-semibold">{selectedNodeData.id}</div>
+              <div className="mt-1">Cluster: {selectedNodeData.group}</div>
               <div>Weight: {selectedNodeData.weight}</div>
             </div>
-          ) : (
-            <div className="rounded-lg bg-white px-3 py-2 text-xs text-slate-600">
-              Select a node to inspect details.
-            </div>
-          )}
+          ) : null}
 
           {legendItems.length > 0 ? (
             <div
-              className="min-h-0 flex-1 space-y-1 overflow-y-auto rounded-lg bg-white p-2 text-xs text-slate-600"
+              className="shrink-0 space-y-1.5 rounded-lg bg-white px-3 py-2.5 text-xs text-slate-600"
               tabIndex={0}
               aria-label="Graph legend"
             >
               <div className={UI_LABEL_CLASS}>Legend</div>
-              {legendItems.map((item) => (
-                <div key={item.label} className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span>{item.label}</span>
-                </div>
-              ))}
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                {legendItems.map((item) => (
+                  <div key={item.label} className="flex items-center gap-2">
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : null}
         </aside>
