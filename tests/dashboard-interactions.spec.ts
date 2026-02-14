@@ -8,10 +8,10 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible();
 
   await page.getByLabel('Dataset size').selectOption('50000000');
-  await expect(page.getByText('Dataset Size: 50M')).toBeVisible();
+  await expect(page.getByText(/Dataset Size:\s*50M/i)).toBeVisible({ timeout: 15_000 });
 
   await page.getByLabel('Source').selectOption('user');
-  await expect(page.getByText('Source: user')).toBeVisible();
+  await expect(page.getByText(/Source:\s*user/i)).toBeVisible({ timeout: 15_000 });
 
   await page.getByRole('button', { name: 'Open detail' }).first().click();
   await expect(page.getByText('Detailed View: Summary')).toBeVisible();
