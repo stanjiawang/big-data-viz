@@ -104,7 +104,11 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
     filters,
   });
 
-  const rowCount = firstChunk?.total ?? total;
+  // Mock responses can under-report filtered totals on the first page.
+  // Keep virtualization anchored to the selected dataset size so scrolling
+  // does not stop at a single chunk.
+  const rowCount = Math.max(total, firstChunk?.total ?? 0);
+  const serializedFilters = JSON.stringify(filters);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
@@ -130,6 +134,32 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
       return chunk?.records[localIndex] ?? null;
     };
   }, [queryClient, total, filters]);
+
+  const loadedRowCount = useMemo(() => {
+    const queries = queryClient.getQueriesData<DataChunk>({
+      queryKey: ['mock-data', 'chunk'],
+    });
+    const loadedByOffset = new Map<number, number>();
+
+    for (const [key, chunk] of queries) {
+      if (!chunk) continue;
+      const params = (key as readonly unknown[])[2] as
+        | {
+            offset?: number;
+            total?: number;
+            vectorSize?: number;
+            filters?: MockFilters;
+          }
+        | undefined;
+      if (!params) continue;
+      if (params.total !== total || params.vectorSize !== VECTOR_SIZE) continue;
+      if (JSON.stringify(params.filters ?? {}) !== serializedFilters) continue;
+      const offset = params.offset ?? 0;
+      loadedByOffset.set(offset, Math.max(loadedByOffset.get(offset) ?? 0, chunk.records.length));
+    }
+
+    return Array.from(loadedByOffset.values()).reduce((sum, size) => sum + size, 0);
+  }, [queryClient, serializedFilters, total]);
 
   useEffect(() => {
     const items = virtualizer.getVirtualItems();
@@ -285,7 +315,7 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
 
       <div className="flex items-center justify-between bg-slate-50 px-4 py-2 text-xs text-slate-500">
         <span>
-          {t('tableRowsLoaded')}: {Math.min(rowCount, PAGE_SIZE * 5).toLocaleString()}
+          {t('tableRowsLoaded')}: {Math.min(rowCount, loadedRowCount).toLocaleString()}
         </span>
         <span>
           {t('tableTotalRows')}: {rowCount.toLocaleString()}
