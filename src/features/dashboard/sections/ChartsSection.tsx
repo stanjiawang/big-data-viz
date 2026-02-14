@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type DragEvent } from 'react';
 import { Card } from '@/components/ui/Card';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { useI18n } from '@/i18n/useI18n';
@@ -14,6 +14,7 @@ import type { DashboardSectionProps } from '@/features/dashboard/sections/types'
 import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
 
 const CHART_CARD_IDS = ['timeSeries', 'embedding', 'graph', 'd3'] as const;
+type ChartCardId = (typeof CHART_CARD_IDS)[number];
 
 export function ChartsSection({
   datasetSize,
@@ -47,6 +48,19 @@ export function ChartsSection({
   const timeYMinValue = timeYMin === '' ? undefined : Number(timeYMin);
   const timeYMaxValue = timeYMax === '' ? undefined : Number(timeYMax);
 
+  const createDragHandle = (cardId: ChartCardId) =>
+    draggable
+      ? {
+          isDragging: chartCardReorder.draggingId === cardId,
+          onDragStart: (event: DragEvent<HTMLDivElement>) => {
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', cardId);
+            chartCardReorder.onDragStart(cardId);
+          },
+          onDragEnd: chartCardReorder.onDragEnd,
+        }
+      : undefined;
+
   const renderTimeSeriesCard = () => (
     <Card
       title={t('sectionTimeSeriesTitle')}
@@ -54,6 +68,7 @@ export function ChartsSection({
       subtitle={t('techEchartsQuery')}
       className="flex h-full flex-col"
       contentClassName="flex-1"
+      dragHandle={createDragHandle('timeSeries')}
       actions={
         <SectionCardActions
           onOpenDetail={onOpenDetail ? () => onOpenDetail('timeSeries') : undefined}
@@ -142,6 +157,7 @@ export function ChartsSection({
       subtitle={t('techDeckGl')}
       className="flex h-full flex-col"
       contentClassName="flex-1"
+      dragHandle={createDragHandle('embedding')}
       actions={
         <SectionCardActions
           onOpenDetail={onOpenDetail ? () => onOpenDetail('embedding') : undefined}
@@ -165,6 +181,7 @@ export function ChartsSection({
       subtitle={t('techSigma')}
       className="flex h-full flex-col"
       contentClassName="flex-1"
+      dragHandle={createDragHandle('graph')}
       actions={
         <SectionCardActions
           onOpenDetail={onOpenDetail ? () => onOpenDetail('graph') : undefined}
@@ -188,6 +205,7 @@ export function ChartsSection({
       subtitle={t('techD3')}
       className="flex h-full flex-col"
       contentClassName="flex-1"
+      dragHandle={createDragHandle('d3')}
       actions={
         <SectionCardActions
           onOpenDetail={onOpenDetail ? () => onOpenDetail('d3') : undefined}
@@ -230,11 +248,8 @@ export function ChartsSection({
         <div
           key={cardId}
           className={`lg:col-span-6 ${chartCardReorder.overId === cardId && chartCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
-          draggable={draggable}
-          onDragStart={() => chartCardReorder.onDragStart(cardId)}
           onDragOver={(event) => chartCardReorder.onDragOver(event, cardId)}
           onDrop={() => chartCardReorder.onDrop(cardId)}
-          onDragEnd={chartCardReorder.onDragEnd}
         >
           {cardById[cardId]}
         </div>
