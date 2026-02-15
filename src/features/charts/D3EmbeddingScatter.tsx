@@ -11,9 +11,11 @@ type D3EmbeddingScatterProps = {
   isLoading?: boolean;
   isError?: boolean;
   exportTargetRef?: RefObject<HTMLDivElement | null>;
+  onPointClick?: (_point: { label: string; id?: string }) => void;
 };
 
 type ScatterPoint = {
+  id: string;
   x: number;
   y: number;
   weight: number;
@@ -38,6 +40,7 @@ export function D3EmbeddingScatter({
   isLoading,
   isError,
   exportTargetRef,
+  onPointClick,
 }: D3EmbeddingScatterProps) {
   const { t } = useI18n();
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -50,6 +53,7 @@ export function D3EmbeddingScatter({
 
   const points = useMemo(() => {
     return records.slice(0, MAX_POINTS).map((record) => ({
+      id: record.id,
       x: record.features[0] ?? 0,
       y: record.features[1] ?? 0,
       weight: record.weight,
@@ -149,6 +153,12 @@ export function D3EmbeddingScatter({
       })
       .on('mouseleave', () => {
         setHovered(null);
+      })
+      .on('click', (_event: MouseEvent, point: ScatterPoint) => {
+        onPointClick?.({
+          id: point.id,
+          label: point.label,
+        });
       });
 
     circles
@@ -190,7 +200,7 @@ export function D3EmbeddingScatter({
     return () => {
       zoomTarget.on('.zoom', null);
     };
-  }, [height, visiblePoints, labels, pointOpacity, pointScale, resetNonce]);
+  }, [height, visiblePoints, labels, pointOpacity, pointScale, resetNonce, onPointClick]);
 
   let overlayMessage: string | null = null;
   if (isError) {

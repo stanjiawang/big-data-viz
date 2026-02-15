@@ -15,6 +15,7 @@ type PieChartProps = {
   isLoading?: boolean;
   isError?: boolean;
   exportTargetRef?: RefObject<HTMLDivElement | null>;
+  onItemClick?: (_name: string) => void;
 };
 
 export function PieChart({
@@ -24,6 +25,7 @@ export function PieChart({
   isLoading,
   isError,
   exportTargetRef,
+  onItemClick,
 }: PieChartProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
@@ -79,6 +81,23 @@ export function PieChart({
   useEffect(() => {
     chartInstance.current?.setOption(option, { notMerge: true });
   }, [option]);
+
+  useEffect(() => {
+    if (!chartInstance.current || !onItemClick) {
+      return;
+    }
+
+    const handleClick = (params: { name?: string }) => {
+      if (typeof params.name === 'string' && params.name.length > 0) {
+        onItemClick(params.name);
+      }
+    };
+
+    chartInstance.current.on('click', handleClick);
+    return () => {
+      chartInstance.current?.off('click', handleClick);
+    };
+  }, [onItemClick]);
 
   const overlayMessage = isError
     ? 'Failed to load chart.'

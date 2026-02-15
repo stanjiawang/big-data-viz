@@ -20,6 +20,7 @@ type BarChartProps = {
   yMin?: number;
   yMax?: number;
   exportTargetRef?: RefObject<HTMLDivElement | null>;
+  onItemClick?: (_name: string) => void;
 };
 
 export function BarChart({
@@ -34,6 +35,7 @@ export function BarChart({
   yMin,
   yMax,
   exportTargetRef,
+  onItemClick,
 }: BarChartProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
@@ -113,6 +115,23 @@ export function BarChart({
   useEffect(() => {
     chartInstance.current?.setOption(option, { notMerge: true });
   }, [option]);
+
+  useEffect(() => {
+    if (!chartInstance.current || !onItemClick) {
+      return;
+    }
+
+    const handleClick = (params: { name?: string }) => {
+      if (typeof params.name === 'string' && params.name.length > 0) {
+        onItemClick(params.name);
+      }
+    };
+
+    chartInstance.current.on('click', handleClick);
+    return () => {
+      chartInstance.current?.off('click', handleClick);
+    };
+  }, [onItemClick]);
 
   const overlayMessage = isError
     ? 'Failed to load chart.'

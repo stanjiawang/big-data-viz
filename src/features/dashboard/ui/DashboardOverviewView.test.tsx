@@ -124,4 +124,22 @@ describe('DashboardOverviewView', () => {
     expect(props.onSaveCurrentAsNewView).toHaveBeenCalledWith('Daily baseline');
     expect(props.setActiveSavedViewId).toHaveBeenCalledWith('view-1');
   });
+
+  it('clears cross-filters from active filter chips', async () => {
+    const user = userEvent.setup();
+    const props = renderView({
+      filters: {
+        labels: ['class-A'],
+        source: 'sensor',
+        search: 'node-3',
+      },
+    });
+
+    expect(screen.getByText('Labels: class-A')).toBeInTheDocument();
+    expect(screen.getByText('Source: sensor')).toBeInTheDocument();
+    expect(screen.getByText('Search: node-3')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Clear all' }));
+    expect(props.setFilters).toHaveBeenCalledTimes(1);
+  });
 });

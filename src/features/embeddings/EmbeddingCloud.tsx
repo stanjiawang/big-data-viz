@@ -7,12 +7,21 @@ import { UI_BUTTON_GHOST_SM } from '@/components/ui/styleTokens';
 import { useI18n } from '@/i18n/useI18n';
 import type { TrainingRecord } from '@/lib/types';
 
+type EmbeddingPoint = {
+  id: string;
+  position: [number, number];
+  weight: number;
+  label: string;
+  source: TrainingRecord['source'];
+};
+
 type EmbeddingCloudProps = {
   records?: TrainingRecord[];
   isLoading?: boolean;
   isError?: boolean;
   height?: number;
   exportTargetRef?: RefObject<HTMLDivElement | null>;
+  onPointClick?: (_point: { id: string; label: string; source: TrainingRecord['source'] }) => void;
 };
 
 function isWebGLAvailable() {
@@ -30,6 +39,7 @@ export function EmbeddingCloud({
   isError,
   height = 224,
   exportTargetRef,
+  onPointClick,
 }: EmbeddingCloudProps) {
   const { t } = useI18n();
   const [webglOk] = useState(() => isWebGLAvailable());
@@ -41,12 +51,13 @@ export function EmbeddingCloud({
     maxZoom: 6,
   });
 
-  const points = useMemo(() => {
+  const points = useMemo<EmbeddingPoint[]>(() => {
     return records.map((record) => ({
       id: record.id,
       position: [record.features[0] ?? 0, record.features[1] ?? 0],
       weight: record.weight,
       label: record.label,
+      source: record.source,
     }));
   }, [records]);
 
@@ -54,7 +65,7 @@ export function EmbeddingCloud({
 
   const layer = useMemo(
     () =>
-      new ScatterplotLayer({
+      new ScatterplotLayer<EmbeddingPoint>({
         id: 'embedding-cloud',
         data: points,
         getPosition: (point) => point.position,
@@ -172,6 +183,17 @@ export function EmbeddingCloud({
             if (!object) return setHoveredId(null);
             const point = object as { id: string };
             setHoveredId(point.id);
+          }}
+          onClick={({ object }) => {
+            if (!object || !onPointClick) {
+              return;
+            }
+            const point = object as EmbeddingPoint;
+            onPointClick({
+              id: point.id,
+              label: point.label,
+              source: point.source,
+            });
           }}
           style={{ position: 'absolute', inset: '0', background: 'transparent' }}
         />

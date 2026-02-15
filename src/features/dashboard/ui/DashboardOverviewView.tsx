@@ -7,6 +7,7 @@ import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import {
   UI_BUTTON_GHOST_SM,
+  UI_CHIP_INTERACTIVE,
   UI_INPUT_MD,
   UI_LABEL_CLASS,
   UI_SELECT_MD,
@@ -21,11 +22,11 @@ import {
 } from '@/features/dashboard/SectionSkeletons';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import { SectionCardActions } from '@/features/dashboard/sections/shared';
+import type { CrossFilterPatch, DetailView } from '@/features/dashboard/sections/types';
 import type { DashboardSavedView } from '@/features/dashboard/state/useDashboardState';
 import { buildDashboardSearchParams } from '@/features/dashboard/state/urlState';
 import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadges';
 import { KpiSection } from '@/features/dashboard/sections/KpiSection';
-import type { DetailView } from '@/features/dashboard/sections/types';
 import { ChartsSection, SummarySection, TableSection } from '@/features/dashboard/ui/lazySections';
 import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
 import { useI18n } from '@/i18n/useI18n';
@@ -114,6 +115,16 @@ export function DashboardOverviewView({
   ];
   const searchBadgePrefix = `${t('dashboardBadgeSearch')}:`;
 
+  const activeFilterChips = [
+    ...(selectedLabels.length > 0
+      ? [`${t('dashboardActiveLabels')}: ${selectedLabels.join(', ')}`]
+      : []),
+    ...(filters.source && filters.source !== 'all'
+      ? [`${t('dashboardActiveSource')}: ${filters.source}`]
+      : []),
+    ...(filters.search ? [`${t('dashboardActiveSearch')}: ${filters.search}`] : []),
+  ];
+
   const focusSearchFilter = () => {
     const searchInput = document.getElementById('filters-search-input') as HTMLInputElement | null;
     if (!searchInput) return;
@@ -144,6 +155,30 @@ export function DashboardOverviewView({
     }
     setActiveSavedViewId(viewId);
     setNewViewName('');
+  };
+
+  const applyCrossFilter = (patch: CrossFilterPatch) => {
+    setFilters((current) => {
+      const nextLabels = patch.labels ?? current.labels;
+      const nextLabel =
+        patch.label ?? (nextLabels && nextLabels.length > 0 ? nextLabels[0] : undefined);
+      return {
+        ...current,
+        ...patch,
+        label: nextLabel,
+        labels: nextLabels,
+      };
+    });
+  };
+
+  const clearCrossFilters = () => {
+    setFilters((current) => ({
+      ...current,
+      label: undefined,
+      labels: undefined,
+      source: 'all',
+      search: '',
+    }));
   };
 
   const copyShareLink = async () => {
@@ -279,6 +314,27 @@ export function DashboardOverviewView({
               {t('dashboardFilters')}
             </button>
           </div>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-b border-slate-100 pb-3">
+          <span className={UI_LABEL_CLASS}>{t('dashboardActiveFilters')}</span>
+          {activeFilterChips.length > 0 ? (
+            activeFilterChips.map((chip) => (
+              <span key={chip} className={UI_CHIP_INTERACTIVE}>
+                {chip}
+              </span>
+            ))
+          ) : (
+            <span className="text-xs text-slate-600">{t('dashboardNoActiveFilters')}</span>
+          )}
+          <button
+            type="button"
+            className={`${ACTION_BUTTON_CLASS} ml-auto h-8 px-2 text-[11px]`}
+            onClick={clearCrossFilters}
+            disabled={activeFilterChips.length === 0}
+          >
+            {t('dashboardClearCrossFilters')}
+          </button>
         </div>
 
         <div className="mt-3 grid gap-2 xl:grid-cols-[minmax(220px,280px)_1fr_auto] xl:items-center">
@@ -477,6 +533,7 @@ export function DashboardOverviewView({
                     compareDatasetSize={compareDatasetSize}
                     compareEnabled={effectiveCompareEnabled}
                     filters={filters}
+                    onCrossFilter={applyCrossFilter}
                     visualizationRef={summaryVisualizationRef}
                   />
                 </AsyncBoundary>
@@ -496,6 +553,7 @@ export function DashboardOverviewView({
           compareDatasetSize={compareDatasetSize}
           compareEnabled={effectiveCompareEnabled}
           filters={filters}
+          onCrossFilter={applyCrossFilter}
           onOpenDetail={onOpenDetail}
           draggable
         />

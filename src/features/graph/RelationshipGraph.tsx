@@ -33,6 +33,8 @@ type RelationshipGraphProps = {
   isError?: boolean;
   height?: number;
   exportTargetRef?: RefObject<HTMLDivElement | null>;
+  onClusterSelect?: (_cluster: string) => void;
+  onNodeSelect?: (_nodeId: string) => void;
 };
 
 type SigmaNodeEvent = {
@@ -177,6 +179,8 @@ export function RelationshipGraph({
   isError,
   height = 220,
   exportTargetRef,
+  onClusterSelect,
+  onNodeSelect,
 }: RelationshipGraphProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
@@ -308,6 +312,7 @@ export function RelationshipGraph({
                 }}
                 onSelect={(id) => {
                   setSelectedNode(id);
+                  onNodeSelect?.(id);
                 }}
                 onClear={() => {
                   setSelectedNode(null);
@@ -346,6 +351,7 @@ export function RelationshipGraph({
                             next.delete(cluster);
                           } else {
                             next.add(cluster);
+                            onClusterSelect?.(cluster);
                           }
                           return next;
                         });

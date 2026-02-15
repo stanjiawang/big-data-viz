@@ -13,8 +13,8 @@ test('enables compare mode and renders compare sections', async ({ page }) => {
 test('renders source and search badges from URL state', async ({ page }) => {
   await page.goto('/?source=user&search=batch-42');
 
-  await expect(page.getByText('Source: user')).toBeVisible();
-  await expect(page.getByText('Search: batch-42')).toBeVisible();
+  await expect(page.getByText('Source: user').first()).toBeVisible();
+  await expect(page.getByText('Search: batch-42').first()).toBeVisible();
 });
 
 test('renders label count badge from URL state', async ({ page }) => {

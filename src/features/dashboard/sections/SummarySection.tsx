@@ -18,6 +18,7 @@ export function SummarySection({
   filters,
   expanded = false,
   visualizationRef,
+  onCrossFilter,
 }: SummarySectionProps) {
   const { t } = useI18n();
   const { data: chunk } = useMockDataSuspense({
@@ -68,6 +69,12 @@ export function SummarySection({
             title={t('chartLabelDistribution')}
             data={labelDistribution}
             height={expanded ? 280 : 200}
+            onItemClick={(label) => {
+              onCrossFilter?.({
+                label,
+                labels: [label],
+              });
+            }}
           />
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-3">
@@ -80,6 +87,11 @@ export function SummarySection({
             xEndPercent={barXEnd}
             yMin={barYMinValue}
             yMax={barYMaxValue}
+            onItemClick={(source) => {
+              onCrossFilter?.({
+                source: source as DashboardSectionProps['filters']['source'],
+              });
+            }}
           />
         </div>
       </div>

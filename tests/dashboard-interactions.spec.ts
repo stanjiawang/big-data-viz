@@ -34,6 +34,8 @@ test('dashboard interactive controls work across detail, table, and graph sectio
 
   await page.getByRole('button', { name: 'cluster-1' }).click();
   await expect(page.getByRole('button', { name: 'Clear' })).toBeVisible();
+  await expect(page.getByText('Labels: class-A')).toBeVisible();
+  await expect(page.getByText('Search: cluster-1')).toBeVisible();
   await page.getByRole('button', { name: /Hide edges/i }).click();
   await expect(page.getByRole('button', { name: /Show edges/i })).toBeVisible();
 });

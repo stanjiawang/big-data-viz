@@ -7,6 +7,7 @@ import { TimeSeriesChart } from '@/features/charts/TimeSeriesChart';
 import { useGraphSuspense } from '@/features/data/queries/useGraph';
 import { useMockDataSuspense } from '@/features/data/queries/useMockData';
 import { useTimeSeriesSuspense } from '@/features/data/queries/useTimeSeries';
+import { LABEL_OPTIONS } from '@/features/dashboard/constants/filterOptions';
 import { EmbeddingCloud } from '@/features/embeddings/EmbeddingCloud';
 import { RelationshipGraph } from '@/features/graph/RelationshipGraph';
 import { RangeSummary, SectionCardActions } from '@/features/dashboard/sections/shared';
@@ -16,11 +17,21 @@ import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
 const CHART_CARD_IDS = ['timeSeries', 'embedding', 'graph', 'd3'] as const;
 type ChartCardId = (typeof CHART_CARD_IDS)[number];
 
+function mapClusterToLabel(cluster: string) {
+  const match = /cluster-(\d+)/i.exec(cluster);
+  const rawIndex = match ? Number(match[1]) - 1 : 0;
+  const safeIndex = Number.isNaN(rawIndex)
+    ? 0
+    : ((rawIndex % LABEL_OPTIONS.length) + LABEL_OPTIONS.length) % LABEL_OPTIONS.length;
+  return LABEL_OPTIONS[safeIndex];
+}
+
 export function ChartsSection({
   datasetSize,
   filters,
   expanded = false,
   onOpenDetail,
+  onCrossFilter,
   focusView,
   draggable = false,
 }: DashboardSectionProps) {
@@ -170,6 +181,13 @@ export function ChartsSection({
         records={chunk?.records}
         height={expanded ? 620 : 360}
         exportTargetRef={embeddingImageRef}
+        onPointClick={(point) => {
+          onCrossFilter?.({
+            labels: [point.label],
+            label: point.label,
+            source: point.source,
+          });
+        }}
       />
     </Card>
   );
@@ -194,6 +212,19 @@ export function ChartsSection({
         data={graph}
         height={expanded ? 620 : 380}
         exportTargetRef={graphImageRef}
+        onClusterSelect={(cluster) => {
+          const label = mapClusterToLabel(cluster);
+          onCrossFilter?.({
+            label,
+            labels: [label],
+            search: cluster,
+          });
+        }}
+        onNodeSelect={(nodeId) => {
+          onCrossFilter?.({
+            search: nodeId,
+          });
+        }}
       />
     </Card>
   );
@@ -218,6 +249,12 @@ export function ChartsSection({
         records={chunk?.records}
         height={expanded ? 620 : 380}
         exportTargetRef={d3ImageRef}
+        onPointClick={(point) => {
+          onCrossFilter?.({
+            label: point.label,
+            labels: [point.label],
+          });
+        }}
       />
     </Card>
   );

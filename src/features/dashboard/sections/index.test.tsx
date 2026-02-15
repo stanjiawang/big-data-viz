@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { API_SCHEMA_VERSION } from '@/lib/contracts';
 import type { DataChunk, MockFilters } from '@/lib/types';
 import {
@@ -10,11 +11,19 @@ import {
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 
 jest.mock('@/features/charts/BarChart', () => ({
-  BarChart: ({ title }: { title: string }) => <div>{title}</div>,
+  BarChart: ({ title, onItemClick }: { title: string; onItemClick?: (_name: string) => void }) => (
+    <button type="button" onClick={() => onItemClick?.('user')}>
+      {title}
+    </button>
+  ),
 }));
 
 jest.mock('@/features/charts/PieChart', () => ({
-  PieChart: ({ title }: { title: string }) => <div>{title}</div>,
+  PieChart: ({ title, onItemClick }: { title: string; onItemClick?: (_name: string) => void }) => (
+    <button type="button" onClick={() => onItemClick?.('class-A')}>
+      {title}
+    </button>
+  ),
 }));
 
 jest.mock('@/features/charts/TimeSeriesChart', () => ({
@@ -88,6 +97,18 @@ describe('dashboard/sections', () => {
     render(<SummarySection {...baseProps} />);
     expect(screen.getByText('Label Distribution')).toBeInTheDocument();
     expect(screen.getByText('Source Volume')).toBeInTheDocument();
+  });
+
+  it('emits cross-filter patch from summary mark clicks', async () => {
+    const user = userEvent.setup();
+    const onCrossFilter = jest.fn();
+    render(<SummarySection {...baseProps} onCrossFilter={onCrossFilter} />);
+
+    await user.click(screen.getByRole('button', { name: 'Label Distribution' }));
+    await user.click(screen.getByRole('button', { name: 'Source Volume' }));
+
+    expect(onCrossFilter).toHaveBeenCalledWith({ label: 'class-A', labels: ['class-A'] });
+    expect(onCrossFilter).toHaveBeenCalledWith({ source: 'user' });
   });
 
   it('renders charts section content', () => {
