@@ -12,7 +12,7 @@ Big Data Viz Lab is a frontend analytics console for large-scale AI training dat
 - Server state: TanStack Query
 - API transport: `src/lib/httpClient.ts` and `src/lib/apiClient.ts`
 - Mock backend: MSW handlers in `src/mocks/handlers.ts`
-- Rendering: ECharts, deck.gl, Sigma
+- Rendering: ECharts, D3, deck.gl, Sigma, TanStack Virtual
 
 ## Target Enterprise Topology
 

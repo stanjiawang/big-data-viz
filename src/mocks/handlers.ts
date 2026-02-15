@@ -11,6 +11,16 @@ type MockControls = {
   requireTenant: boolean;
 };
 
+const ALLOWED_LABELS = new Set(['class-A', 'class-B', 'class-C', 'class-D', 'class-E', 'all']);
+const ALLOWED_SOURCES = new Set<TrainingRecord['source'] | 'all'>([
+  'all',
+  'user',
+  'sensor',
+  'system',
+  'synthetic',
+]);
+const MAX_SEARCH_LENGTH = 64;
+
 function parseBoolean(value: string | null, fallback = false) {
   if (value === null || value === '') {
     return fallback;
@@ -99,17 +109,22 @@ export function parseNumber(value: string | null, fallback?: number) {
 }
 
 export function parseFilters(searchParams: URLSearchParams): MockFilters {
-  const label = searchParams.get('label') ?? undefined;
+  const rawLabel = searchParams.get('label');
+  const label = rawLabel && ALLOWED_LABELS.has(rawLabel) ? rawLabel : undefined;
   const labels = searchParams.get('labels')
     ? searchParams
         .get('labels')
         ?.split(',')
         .map((value) => value.trim())
-        .filter(Boolean)
+        .filter((value) => ALLOWED_LABELS.has(value) && value !== 'all')
     : undefined;
+  const rawSource = searchParams.get('source');
   const source =
-    (searchParams.get('source') as TrainingRecord['source'] | 'all' | null) ?? undefined;
-  const search = searchParams.get('search') ?? undefined;
+    rawSource && ALLOWED_SOURCES.has(rawSource as TrainingRecord['source'] | 'all')
+      ? (rawSource as TrainingRecord['source'] | 'all')
+      : undefined;
+  const rawSearch = searchParams.get('search') ?? undefined;
+  const search = rawSearch ? rawSearch.slice(0, MAX_SEARCH_LENGTH) : undefined;
   const weightMin = parseNumber(searchParams.get('weightMin'));
   const weightMax = parseNumber(searchParams.get('weightMax'));
 

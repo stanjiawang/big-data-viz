@@ -77,6 +77,24 @@ describe('msw handlers', () => {
     });
   });
 
+  it('sanitizes invalid filter values', () => {
+    const params = new URLSearchParams({
+      label: 'unknown-label',
+      labels: 'class-A,unknown-label,all',
+      source: 'unknown-source',
+      search: 'x'.repeat(80),
+    });
+
+    expect(parseFilters(params)).toEqual({
+      label: undefined,
+      labels: ['class-A'],
+      source: undefined,
+      search: 'x'.repeat(64),
+      weightMin: undefined,
+      weightMax: undefined,
+    });
+  });
+
   it('parses mock controls from search params', () => {
     const params = new URLSearchParams({
       mockFailure: 'rate-limit',

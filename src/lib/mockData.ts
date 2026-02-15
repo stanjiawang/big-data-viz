@@ -35,27 +35,6 @@ function withinWeightRange(weight: number, filters?: MockFilters) {
   return weight >= min && weight <= max;
 }
 
-function hasActiveFilters(filters?: MockFilters) {
-  if (!filters) return false;
-  if (filters.search) return true;
-  if (filters.label && filters.label !== 'all') return true;
-  if (filters.labels && filters.labels.length > 0) return true;
-  if (filters.source && filters.source !== 'all') return true;
-  if (
-    filters.weightMin !== undefined &&
-    Math.abs(filters.weightMin - DEFAULT_WEIGHT_MIN) > 0.0001
-  ) {
-    return true;
-  }
-  if (
-    filters.weightMax !== undefined &&
-    Math.abs(filters.weightMax - DEFAULT_WEIGHT_MAX) > 0.0001
-  ) {
-    return true;
-  }
-  return false;
-}
-
 function matchesFilters(record: TrainingRecord, filters?: MockFilters) {
   if (!filters) return true;
 
@@ -116,11 +95,10 @@ export function generateChunk(
     attempts += 1;
   }
 
-  const effectiveTotal = hasActiveFilters(filters) ? records.length : total;
-
   return {
     schemaVersion: API_SCHEMA_VERSION,
-    total: effectiveTotal,
+    // Keep total stable across chunks so virtualized clients can page consistently.
+    total,
     offset,
     limit: records.length,
     records,

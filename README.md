@@ -8,6 +8,8 @@ Enterprise-ready workspace for large-scale AI training data analytics, built wit
 - Mocked big-data APIs via MSW for local development
 - Interactive visualizations (ECharts time series/bar/pie, D3 embedding scatter, Deck.gl embedding cloud, Sigma.js relationship graph)
 - Virtualized large table for multi-million row browsing
+  - data is fetched in chunks (`PAGE_SIZE=200`) and prefetched while scrolling
+  - `Rows loaded` shows currently cached rows for active filters
 - Runtime language switcher with `react-intl` (`en`, `zh-CN`)
 - Accessibility baseline enforced with Playwright + axe-core
 - Strict linting, formatting, and type-checking
@@ -66,6 +68,8 @@ pnpm run format
 pnpm run stylelint
 pnpm test
 pnpm test:e2e
+pnpm run test:render-perf
+pnpm run test:perf
 pnpm run test:e2e:auth
 pnpm run test:e2e:a11y
 ```

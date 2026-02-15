@@ -31,6 +31,21 @@ describe('mockData generators', () => {
     expect(chunk.records[0]).toEqual(mockDataFixtures.chunkWithSearchFilter.records[0]);
   });
 
+  it('keeps total stable when filters are active', () => {
+    const chunk = generateChunk(
+      {
+        total: 1_000,
+        offset: 0,
+        limit: 20,
+        vectorSize: 8,
+        filters: { labels: ['class-A'], source: 'user', search: 'batch' },
+      },
+      { nowMs: FIXTURE_NOW_MS },
+    );
+
+    expect(chunk.total).toBe(1_000);
+  });
+
   it('generates deterministic time series fixtures', () => {
     const series = generateTimeSeries('ingestion', { nowMs: FIXTURE_NOW_MS });
 

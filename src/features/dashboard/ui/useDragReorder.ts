@@ -15,7 +15,16 @@ function moveItem<T>(items: T[], fromIndex: number, toIndex: number): T[] {
 export function useDragReorder<T extends string>(ids: readonly T[], storageKey: string) {
   const [order, setOrder] = useState<T[]>(() => {
     const fallback = [...ids];
-    const raw = window.localStorage.getItem(storageKey);
+    if (typeof window === 'undefined') {
+      return fallback;
+    }
+
+    let raw: string | null = null;
+    try {
+      raw = window.localStorage.getItem(storageKey);
+    } catch {
+      return fallback;
+    }
     if (!raw) return fallback;
 
     try {
@@ -32,7 +41,14 @@ export function useDragReorder<T extends string>(ids: readonly T[], storageKey: 
   const [overId, setOverId] = useState<T | null>(null);
 
   useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(order));
+    if (typeof window === 'undefined') {
+      return;
+    }
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(order));
+    } catch {
+      // no-op: storage may be unavailable in private mode or restricted environments.
+    }
   }, [order, storageKey]);
 
   const onDragStart = (id: T) => {
