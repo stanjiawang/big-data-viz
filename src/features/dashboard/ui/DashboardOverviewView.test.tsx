@@ -52,6 +52,13 @@ function renderView(overrides: Partial<ComponentProps<typeof DashboardOverviewVi
     compareDatasetSize: DATASET_SIZES[2],
     setCompareDatasetSize: jest.fn(),
     canUseCompareMode: true,
+    savedViews: [],
+    activeSavedViewId: null,
+    setActiveSavedViewId: jest.fn(),
+    onApplySavedView: jest.fn(),
+    onSaveCurrentAsNewView: jest.fn(() => 'view-1'),
+    onUpdateActiveSavedView: jest.fn(),
+    onDeleteActiveSavedView: jest.fn(),
     onOpenDetail: jest.fn(),
     isFilterOpen: false,
     onOpenFilters: jest.fn(),
@@ -105,5 +112,16 @@ describe('DashboardOverviewView', () => {
 
     await user.click(screen.getByRole('button', { name: 'Close' }));
     expect(props.onCloseFilters).toHaveBeenCalledTimes(1);
+  });
+
+  it('saves a new saved view from the control bar', async () => {
+    const user = userEvent.setup();
+    const props = renderView();
+
+    await user.type(screen.getByPlaceholderText('e.g. Ops baseline'), 'Daily baseline');
+    await user.click(screen.getByRole('button', { name: 'Save new' }));
+
+    expect(props.onSaveCurrentAsNewView).toHaveBeenCalledWith('Daily baseline');
+    expect(props.setActiveSavedViewId).toHaveBeenCalledWith('view-1');
   });
 });

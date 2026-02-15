@@ -14,6 +14,8 @@ export type DashboardUrlState = {
   datasetSize: (typeof DATASET_SIZES)[number];
   detailView: DetailView | null;
   filters: MockFilters;
+  compareEnabled: boolean | null;
+  compareDatasetSize: (typeof DATASET_SIZES)[number] | null;
 };
 
 export function parseDashboardSearchParams(search: string): DashboardUrlState {
@@ -34,6 +36,14 @@ export function parseDashboardSearchParams(search: string): DashboardUrlState {
   const searchValue = params.get('search') ?? '';
   const weightMin = params.get('weightMin') ? Number(params.get('weightMin')) : undefined;
   const weightMax = params.get('weightMax') ? Number(params.get('weightMax')) : undefined;
+  const compareRaw = params.get('compare');
+  const compareEnabled =
+    compareRaw === null ? null : compareRaw === '1' || compareRaw.toLowerCase() === 'true';
+  const compareSizeValue = Number(params.get('compareSize'));
+  const compareDatasetSize =
+    params.get('compareSize') === null
+      ? null
+      : (DATASET_SIZES.find((option) => option.value === compareSizeValue) ?? DATASET_SIZES[2]);
 
   return {
     datasetSize,
@@ -46,6 +56,8 @@ export function parseDashboardSearchParams(search: string): DashboardUrlState {
       weightMin,
       weightMax,
     } satisfies MockFilters,
+    compareEnabled,
+    compareDatasetSize,
   };
 }
 
@@ -53,11 +65,15 @@ export function buildDashboardSearchParams({
   datasetSize,
   detailView,
   filters,
+  compareEnabled,
+  compareDatasetSize,
   currentSearch,
 }: {
   datasetSize: (typeof DATASET_SIZES)[number];
   detailView: DetailView | null;
   filters: MockFilters;
+  compareEnabled: boolean;
+  compareDatasetSize: (typeof DATASET_SIZES)[number];
   currentSearch: string;
 }) {
   const params = new URLSearchParams();
@@ -83,6 +99,8 @@ export function buildDashboardSearchParams({
   if (detailView) {
     params.set('detail', detailView);
   }
+  params.set('compare', compareEnabled ? '1' : '0');
+  params.set('compareSize', String(compareDatasetSize.value));
 
   MOCK_CONTROL_PARAMS.forEach((key) => {
     const value = currentParams.get(key);
@@ -98,11 +116,15 @@ export function syncDashboardSearchParams(args: {
   datasetSize: (typeof DATASET_SIZES)[number];
   detailView: DetailView | null;
   filters: MockFilters;
+  compareEnabled: boolean;
+  compareDatasetSize: (typeof DATASET_SIZES)[number];
 }) {
   const params = buildDashboardSearchParams({
     datasetSize: args.datasetSize,
     detailView: args.detailView,
     filters: args.filters,
+    compareEnabled: args.compareEnabled,
+    compareDatasetSize: args.compareDatasetSize,
     currentSearch: window.location.search,
   });
   const nextUrl = `${window.location.pathname}?${params.toString()}`;

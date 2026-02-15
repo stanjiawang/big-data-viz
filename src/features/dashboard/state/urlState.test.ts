@@ -6,13 +6,15 @@ import {
 import type { MockFilters } from '@/lib/types';
 
 describe('dashboard url state', () => {
-  it('parses dataset, detail view and filters from search params', () => {
+  it('parses dataset, detail view, compare state and filters from search params', () => {
     const parsed = parseDashboardSearchParams(
-      '?size=10000000&detail=graph&label=class-A&labels=class-A,class-C&source=sensor&search=batch&weightMin=0.8&weightMax=2.2',
+      '?size=10000000&detail=graph&label=class-A&labels=class-A,class-C&source=sensor&search=batch&weightMin=0.8&weightMax=2.2&compare=1&compareSize=50000000',
     );
 
     expect(parsed.datasetSize).toEqual(DATASET_SIZES[2]);
     expect(parsed.detailView).toBe('graph');
+    expect(parsed.compareEnabled).toBe(true);
+    expect(parsed.compareDatasetSize).toEqual(DATASET_SIZES[3]);
     expect(parsed.filters).toEqual<MockFilters>({
       label: 'class-A',
       labels: ['class-A', 'class-C'],
@@ -28,6 +30,8 @@ describe('dashboard url state', () => {
 
     expect(parsed.datasetSize).toEqual(DATASET_SIZES[1]);
     expect(parsed.detailView).toBeNull();
+    expect(parsed.compareEnabled).toBeNull();
+    expect(parsed.compareDatasetSize).toBeNull();
     expect(parsed.filters).toEqual<MockFilters>({
       label: undefined,
       labels: undefined,
@@ -50,6 +54,8 @@ describe('dashboard url state', () => {
         weightMin: 0.5,
         weightMax: 1.6,
       },
+      compareEnabled: false,
+      compareDatasetSize: DATASET_SIZES[0],
       currentSearch: '?mockFailure=rate-limit&mockDelayMs=100',
     });
 
@@ -57,6 +63,8 @@ describe('dashboard url state', () => {
     expect(params.get('detail')).toBe('summary');
     expect(params.get('label')).toBe('class-B');
     expect(params.get('labels')).toBe('class-B');
+    expect(params.get('compare')).toBe('0');
+    expect(params.get('compareSize')).toBe('100000');
     expect(params.get('mockFailure')).toBe('rate-limit');
     expect(params.get('mockDelayMs')).toBe('100');
   });

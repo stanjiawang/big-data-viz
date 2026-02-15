@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import type { DetailView } from '@/features/dashboard/sections';
 import {
@@ -11,6 +11,22 @@ export const DEFAULT_WEIGHT_MIN = 0.5;
 export const DEFAULT_WEIGHT_MAX = 2.5;
 const COMPARE_ENABLED_STORAGE_KEY = 'bdv_compare_enabled';
 const COMPARE_SIZE_STORAGE_KEY = 'bdv_compare_dataset_size';
+const SAVED_VIEWS_STORAGE_KEY = 'bdv_saved_views';
+
+export type DashboardSavedState = {
+  datasetSizeValue: number;
+  filters: MockFilters;
+  compareEnabled: boolean;
+  compareDatasetSizeValue: number;
+};
+
+export type DashboardSavedView = {
+  id: string;
+  name: string;
+  state: DashboardSavedState;
+  createdAt: string;
+  updatedAt: string;
+};
 
 function safeReadStorage(key: string): string | null {
   if (typeof window === 'undefined') {
@@ -34,6 +50,28 @@ function safeWriteStorage(key: string, value: string) {
   }
 }
 
+function sanitizeSavedState(state: DashboardSavedState): DashboardSavedState {
+  const datasetSize =
+    DATASET_SIZES.find((option) => option.value === state.datasetSizeValue) ?? DATASET_SIZES[1];
+  const compareDatasetSize =
+    DATASET_SIZES.find((option) => option.value === state.compareDatasetSizeValue) ??
+    DATASET_SIZES[2];
+
+  return {
+    datasetSizeValue: datasetSize.value,
+    compareDatasetSizeValue: compareDatasetSize.value,
+    compareEnabled: state.compareEnabled,
+    filters: {
+      label: state.filters.label,
+      labels: state.filters.labels,
+      source: state.filters.source ?? 'all',
+      search: state.filters.search ?? '',
+      weightMin: state.filters.weightMin,
+      weightMax: state.filters.weightMax,
+    },
+  };
+}
+
 export function resolveInitialCompareEnabled() {
   return safeReadStorage(COMPARE_ENABLED_STORAGE_KEY) === '1';
 }
@@ -44,24 +82,99 @@ export function resolveInitialCompareDatasetSize() {
   return DATASET_SIZES.find((option) => option.value === parsed) ?? DATASET_SIZES[2];
 }
 
+export function resolveSavedViews() {
+  const raw = safeReadStorage(SAVED_VIEWS_STORAGE_KEY);
+  if (!raw) {
+    return [] as DashboardSavedView[];
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) {
+      return [] as DashboardSavedView[];
+    }
+
+    return parsed
+      .filter((view): view is DashboardSavedView => {
+        if (!view || typeof view !== 'object') {
+          return false;
+        }
+        const candidate = view as Partial<DashboardSavedView>;
+        return (
+          typeof candidate.id === 'string' &&
+          typeof candidate.name === 'string' &&
+          typeof candidate.createdAt === 'string' &&
+          typeof candidate.updatedAt === 'string' &&
+          typeof candidate.state === 'object' &&
+          candidate.state !== null
+        );
+      })
+      .map((view) => ({
+        ...view,
+        state: sanitizeSavedState(view.state),
+      }));
+  } catch {
+    return [] as DashboardSavedView[];
+  }
+}
+
+function createSavedState(params: {
+  datasetSize: (typeof DATASET_SIZES)[number];
+  filters: MockFilters;
+  compareEnabled: boolean;
+  compareDatasetSize: (typeof DATASET_SIZES)[number];
+}): DashboardSavedState {
+  return {
+    datasetSizeValue: params.datasetSize.value,
+    filters: { ...params.filters },
+    compareEnabled: params.compareEnabled,
+    compareDatasetSizeValue: params.compareDatasetSize.value,
+  };
+}
+
+function applySavedState(state: DashboardSavedState) {
+  const datasetSize =
+    DATASET_SIZES.find((option) => option.value === state.datasetSizeValue) ?? DATASET_SIZES[1];
+  const compareDatasetSize =
+    DATASET_SIZES.find((option) => option.value === state.compareDatasetSizeValue) ??
+    DATASET_SIZES[2];
+
+  return {
+    datasetSize,
+    filters: {
+      ...state.filters,
+      source: state.filters.source ?? 'all',
+      search: state.filters.search ?? '',
+    } satisfies MockFilters,
+    compareEnabled: state.compareEnabled,
+    compareDatasetSize,
+  };
+}
+
 export function useDashboardState() {
   const [initialUrlState] = useState(() => parseDashboardSearchParams(window.location.search));
   const [datasetSize, setDatasetSize] = useState(initialUrlState.datasetSize);
   const [detailView, setDetailView] = useState<DetailView | null>(initialUrlState.detailView);
   const [filters, setFilters] = useState<MockFilters>(initialUrlState.filters);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [compareEnabled, setCompareEnabled] = useState(() => resolveInitialCompareEnabled());
-  const [compareDatasetSize, setCompareDatasetSize] = useState(() =>
-    resolveInitialCompareDatasetSize(),
+  const [compareEnabled, setCompareEnabled] = useState(
+    () => initialUrlState.compareEnabled ?? resolveInitialCompareEnabled(),
   );
+  const [compareDatasetSize, setCompareDatasetSize] = useState(
+    () => initialUrlState.compareDatasetSize ?? resolveInitialCompareDatasetSize(),
+  );
+  const [savedViews, setSavedViews] = useState<DashboardSavedView[]>(() => resolveSavedViews());
+  const [activeSavedViewId, setActiveSavedViewId] = useState<string | null>(null);
 
   useEffect(() => {
     syncDashboardSearchParams({
       datasetSize,
       detailView,
       filters,
+      compareEnabled,
+      compareDatasetSize,
     });
-  }, [datasetSize, detailView, filters]);
+  }, [datasetSize, detailView, filters, compareEnabled, compareDatasetSize]);
 
   useEffect(() => {
     safeWriteStorage(COMPARE_ENABLED_STORAGE_KEY, compareEnabled ? '1' : '0');
@@ -70,6 +183,107 @@ export function useDashboardState() {
   useEffect(() => {
     safeWriteStorage(COMPARE_SIZE_STORAGE_KEY, String(compareDatasetSize.value));
   }, [compareDatasetSize]);
+
+  useEffect(() => {
+    safeWriteStorage(SAVED_VIEWS_STORAGE_KEY, JSON.stringify(savedViews));
+  }, [savedViews]);
+
+  const currentStateSnapshot = useMemo(
+    () =>
+      createSavedState({
+        datasetSize,
+        filters,
+        compareEnabled,
+        compareDatasetSize,
+      }),
+    [datasetSize, filters, compareEnabled, compareDatasetSize],
+  );
+
+  const applySavedView = (viewId: string) => {
+    const selected = savedViews.find((view) => view.id === viewId);
+    if (!selected) {
+      return false;
+    }
+
+    const nextState = applySavedState(selected.state);
+    setDatasetSize(nextState.datasetSize);
+    setFilters(nextState.filters);
+    setCompareEnabled(nextState.compareEnabled);
+    setCompareDatasetSize(nextState.compareDatasetSize);
+    setActiveSavedViewId(viewId);
+    return true;
+  };
+
+  const saveCurrentAsNewView = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const id =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `view-${Date.now()}`;
+    const now = new Date().toISOString();
+
+    const nextView: DashboardSavedView = {
+      id,
+      name: trimmed,
+      state: currentStateSnapshot,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    setSavedViews((current) => [nextView, ...current]);
+    setActiveSavedViewId(id);
+    return id;
+  };
+
+  const updateActiveSavedView = () => {
+    if (!activeSavedViewId) {
+      return false;
+    }
+
+    let didUpdate = false;
+    setSavedViews((current) =>
+      current.map((view) => {
+        if (view.id !== activeSavedViewId) {
+          return view;
+        }
+        didUpdate = true;
+        return {
+          ...view,
+          state: currentStateSnapshot,
+          updatedAt: new Date().toISOString(),
+        };
+      }),
+    );
+
+    return didUpdate;
+  };
+
+  const deleteActiveSavedView = () => {
+    if (!activeSavedViewId) {
+      return false;
+    }
+
+    let didDelete = false;
+    setSavedViews((current) =>
+      current.filter((view) => {
+        if (view.id === activeSavedViewId) {
+          didDelete = true;
+          return false;
+        }
+        return true;
+      }),
+    );
+
+    if (didDelete) {
+      setActiveSavedViewId(null);
+    }
+
+    return didDelete;
+  };
 
   return {
     datasetSize,
@@ -84,5 +298,13 @@ export function useDashboardState() {
     setCompareEnabled,
     compareDatasetSize,
     setCompareDatasetSize,
+    savedViews,
+    activeSavedViewId,
+    setActiveSavedViewId,
+    currentStateSnapshot,
+    applySavedView,
+    saveCurrentAsNewView,
+    updateActiveSavedView,
+    deleteActiveSavedView,
   };
 }

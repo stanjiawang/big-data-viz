@@ -2,6 +2,7 @@ import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import {
   resolveInitialCompareDatasetSize,
   resolveInitialCompareEnabled,
+  resolveSavedViews,
 } from '@/features/dashboard/state/useDashboardState';
 
 describe('useDashboardState storage resolvers', () => {
@@ -23,11 +24,40 @@ describe('useDashboardState storage resolvers', () => {
 
     expect(resolveInitialCompareEnabled()).toBe(false);
     expect(resolveInitialCompareDatasetSize()).toEqual(DATASET_SIZES[2]);
+    expect(resolveSavedViews()).toEqual([]);
   });
 
   it('reads compare dataset size from storage when valid', () => {
     window.localStorage.setItem('bdv_compare_dataset_size', String(DATASET_SIZES[1].value));
 
     expect(resolveInitialCompareDatasetSize()).toEqual(DATASET_SIZES[1]);
+  });
+
+  it('reads saved views from storage and sanitizes invalid dataset sizes', () => {
+    window.localStorage.setItem(
+      'bdv_saved_views',
+      JSON.stringify([
+        {
+          id: 'view-1',
+          name: 'Baseline',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: '2026-01-01T00:00:00.000Z',
+          state: {
+            datasetSizeValue: 123,
+            compareDatasetSizeValue: 456,
+            compareEnabled: true,
+            filters: {
+              source: 'all',
+              search: '',
+            },
+          },
+        },
+      ]),
+    );
+
+    const views = resolveSavedViews();
+    expect(views).toHaveLength(1);
+    expect(views[0].state.datasetSizeValue).toBe(DATASET_SIZES[1].value);
+    expect(views[0].state.compareDatasetSizeValue).toBe(DATASET_SIZES[2].value);
   });
 });

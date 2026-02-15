@@ -29,6 +29,13 @@ export function DashboardPage() {
     setCompareEnabled,
     compareDatasetSize,
     setCompareDatasetSize,
+    savedViews,
+    activeSavedViewId,
+    setActiveSavedViewId,
+    applySavedView,
+    saveCurrentAsNewView,
+    updateActiveSavedView,
+    deleteActiveSavedView,
   } = useDashboardState();
 
   const canUseCompareMode = canAccessFeature(
@@ -67,6 +74,13 @@ export function DashboardPage() {
       compareDatasetSize={compareDatasetSize}
       setCompareDatasetSize={setCompareDatasetSize}
       canUseCompareMode={canUseCompareMode}
+      savedViews={savedViews}
+      activeSavedViewId={activeSavedViewId}
+      setActiveSavedViewId={setActiveSavedViewId}
+      onApplySavedView={applySavedView}
+      onSaveCurrentAsNewView={saveCurrentAsNewView}
+      onUpdateActiveSavedView={updateActiveSavedView}
+      onDeleteActiveSavedView={deleteActiveSavedView}
       onOpenDetail={setDetailView}
       isFilterOpen={isFilterOpen}
       onOpenFilters={() => setIsFilterOpen(true)}
