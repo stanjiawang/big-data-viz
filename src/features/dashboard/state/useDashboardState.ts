@@ -12,12 +12,34 @@ export const DEFAULT_WEIGHT_MAX = 2.5;
 const COMPARE_ENABLED_STORAGE_KEY = 'bdv_compare_enabled';
 const COMPARE_SIZE_STORAGE_KEY = 'bdv_compare_dataset_size';
 
-function resolveInitialCompareEnabled() {
-  return window.localStorage.getItem(COMPARE_ENABLED_STORAGE_KEY) === '1';
+function safeReadStorage(key: string): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
 }
 
-function resolveInitialCompareDatasetSize() {
-  const raw = window.localStorage.getItem(COMPARE_SIZE_STORAGE_KEY);
+function safeWriteStorage(key: string, value: string) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // ignore storage write failures in restricted environments
+  }
+}
+
+export function resolveInitialCompareEnabled() {
+  return safeReadStorage(COMPARE_ENABLED_STORAGE_KEY) === '1';
+}
+
+export function resolveInitialCompareDatasetSize() {
+  const raw = safeReadStorage(COMPARE_SIZE_STORAGE_KEY);
   const parsed = Number(raw);
   return DATASET_SIZES.find((option) => option.value === parsed) ?? DATASET_SIZES[2];
 }
@@ -42,11 +64,11 @@ export function useDashboardState() {
   }, [datasetSize, detailView, filters]);
 
   useEffect(() => {
-    window.localStorage.setItem(COMPARE_ENABLED_STORAGE_KEY, compareEnabled ? '1' : '0');
+    safeWriteStorage(COMPARE_ENABLED_STORAGE_KEY, compareEnabled ? '1' : '0');
   }, [compareEnabled]);
 
   useEffect(() => {
-    window.localStorage.setItem(COMPARE_SIZE_STORAGE_KEY, String(compareDatasetSize.value));
+    safeWriteStorage(COMPARE_SIZE_STORAGE_KEY, String(compareDatasetSize.value));
   }, [compareDatasetSize]);
 
   return {
