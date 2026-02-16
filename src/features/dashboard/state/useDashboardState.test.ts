@@ -2,6 +2,8 @@ import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import {
   resolveInitialCompareDatasetSize,
   resolveInitialCompareEnabled,
+  resolveInitialRealtimeEnabled,
+  resolveInitialRealtimePaused,
   resolveSavedViews,
 } from '@/features/dashboard/state/useDashboardState';
 
@@ -17,6 +19,14 @@ describe('useDashboardState storage resolvers', () => {
     expect(resolveInitialCompareEnabled()).toBe(true);
   });
 
+  it('reads realtime flags from storage', () => {
+    window.localStorage.setItem('bdv_realtime_enabled', '1');
+    window.localStorage.setItem('bdv_realtime_paused', '1');
+
+    expect(resolveInitialRealtimeEnabled()).toBe(true);
+    expect(resolveInitialRealtimePaused()).toBe(true);
+  });
+
   it('falls back when storage access throws', () => {
     jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('blocked');
@@ -24,6 +34,8 @@ describe('useDashboardState storage resolvers', () => {
 
     expect(resolveInitialCompareEnabled()).toBe(false);
     expect(resolveInitialCompareDatasetSize()).toEqual(DATASET_SIZES[2]);
+    expect(resolveInitialRealtimeEnabled()).toBe(false);
+    expect(resolveInitialRealtimePaused()).toBe(false);
     expect(resolveSavedViews()).toEqual([]);
   });
 

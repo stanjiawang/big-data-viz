@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/auth/useAuth';
 import { canAccessFeature } from '@/config/featureAccess';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
@@ -7,6 +8,7 @@ import {
   DEFAULT_WEIGHT_MIN,
   useDashboardState,
 } from '@/features/dashboard/state/useDashboardState';
+import { useRealtimeStream } from '@/features/realtime/useRealtimeStream';
 import { DashboardDetailView } from '@/features/dashboard/ui/DashboardDetailView';
 import { DashboardOverviewView } from '@/features/dashboard/ui/DashboardOverviewView';
 
@@ -15,6 +17,7 @@ export function DashboardPage() {
   const summaryVisualizationRef = useRef<HTMLDivElement | null>(null);
   const runtimeConfig = getRuntimeConfig();
   const auth = useAuth();
+  const queryClient = useQueryClient();
 
   const {
     datasetSize,
@@ -29,6 +32,10 @@ export function DashboardPage() {
     setCompareEnabled,
     compareDatasetSize,
     setCompareDatasetSize,
+    realtimeEnabled,
+    setRealtimeEnabled,
+    realtimePaused,
+    setRealtimePaused,
     savedViews,
     activeSavedViewId,
     setActiveSavedViewId,
@@ -44,6 +51,12 @@ export function DashboardPage() {
     runtimeConfig.enableAuth,
   );
   const effectiveCompareEnabled = compareEnabled && canUseCompareMode;
+
+  const realtime = useRealtimeStream({
+    enabled: realtimeEnabled,
+    paused: realtimePaused,
+    onTick: () => void queryClient.invalidateQueries(),
+  });
 
   if (detailView) {
     return (
@@ -74,6 +87,11 @@ export function DashboardPage() {
       compareDatasetSize={compareDatasetSize}
       setCompareDatasetSize={setCompareDatasetSize}
       canUseCompareMode={canUseCompareMode}
+      realtimeEnabled={realtimeEnabled}
+      setRealtimeEnabled={setRealtimeEnabled}
+      realtimePaused={realtimePaused}
+      setRealtimePaused={setRealtimePaused}
+      realtimeStatus={realtime.status}
       savedViews={savedViews}
       activeSavedViewId={activeSavedViewId}
       setActiveSavedViewId={setActiveSavedViewId}

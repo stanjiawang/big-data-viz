@@ -12,6 +12,8 @@ export const DEFAULT_WEIGHT_MAX = 2.5;
 const COMPARE_ENABLED_STORAGE_KEY = 'bdv_compare_enabled';
 const COMPARE_SIZE_STORAGE_KEY = 'bdv_compare_dataset_size';
 const SAVED_VIEWS_STORAGE_KEY = 'bdv_saved_views';
+const REALTIME_ENABLED_STORAGE_KEY = 'bdv_realtime_enabled';
+const REALTIME_PAUSED_STORAGE_KEY = 'bdv_realtime_paused';
 
 export type DashboardSavedState = {
   datasetSizeValue: number;
@@ -80,6 +82,14 @@ export function resolveInitialCompareDatasetSize() {
   const raw = safeReadStorage(COMPARE_SIZE_STORAGE_KEY);
   const parsed = Number(raw);
   return DATASET_SIZES.find((option) => option.value === parsed) ?? DATASET_SIZES[2];
+}
+
+export function resolveInitialRealtimeEnabled() {
+  return safeReadStorage(REALTIME_ENABLED_STORAGE_KEY) === '1';
+}
+
+export function resolveInitialRealtimePaused() {
+  return safeReadStorage(REALTIME_PAUSED_STORAGE_KEY) === '1';
 }
 
 export function resolveSavedViews() {
@@ -163,6 +173,8 @@ export function useDashboardState() {
   const [compareDatasetSize, setCompareDatasetSize] = useState(
     () => initialUrlState.compareDatasetSize ?? resolveInitialCompareDatasetSize(),
   );
+  const [realtimeEnabled, setRealtimeEnabled] = useState(() => resolveInitialRealtimeEnabled());
+  const [realtimePaused, setRealtimePaused] = useState(() => resolveInitialRealtimePaused());
   const [savedViews, setSavedViews] = useState<DashboardSavedView[]>(() => resolveSavedViews());
   const [activeSavedViewId, setActiveSavedViewId] = useState<string | null>(null);
 
@@ -187,6 +199,14 @@ export function useDashboardState() {
   useEffect(() => {
     safeWriteStorage(SAVED_VIEWS_STORAGE_KEY, JSON.stringify(savedViews));
   }, [savedViews]);
+
+  useEffect(() => {
+    safeWriteStorage(REALTIME_ENABLED_STORAGE_KEY, realtimeEnabled ? '1' : '0');
+  }, [realtimeEnabled]);
+
+  useEffect(() => {
+    safeWriteStorage(REALTIME_PAUSED_STORAGE_KEY, realtimePaused ? '1' : '0');
+  }, [realtimePaused]);
 
   const currentStateSnapshot = useMemo(
     () =>
@@ -298,6 +318,10 @@ export function useDashboardState() {
     setCompareEnabled,
     compareDatasetSize,
     setCompareDatasetSize,
+    realtimeEnabled,
+    setRealtimeEnabled,
+    realtimePaused,
+    setRealtimePaused,
     savedViews,
     activeSavedViewId,
     setActiveSavedViewId,

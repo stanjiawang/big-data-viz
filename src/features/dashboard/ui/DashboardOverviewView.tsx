@@ -23,6 +23,7 @@ import {
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import { SectionCardActions } from '@/features/dashboard/sections/shared';
 import type { CrossFilterPatch, DetailView } from '@/features/dashboard/sections/types';
+import type { RealtimeStatus } from '@/features/realtime/useRealtimeStream';
 import type { DashboardSavedView } from '@/features/dashboard/state/useDashboardState';
 import { buildDashboardSearchParams } from '@/features/dashboard/state/urlState';
 import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadges';
@@ -49,6 +50,11 @@ type DashboardOverviewViewProps = {
   compareDatasetSize: DatasetSizeOption;
   setCompareDatasetSize: Dispatch<SetStateAction<DatasetSizeOption>>;
   canUseCompareMode: boolean;
+  realtimeEnabled: boolean;
+  setRealtimeEnabled: Dispatch<SetStateAction<boolean>>;
+  realtimePaused: boolean;
+  setRealtimePaused: Dispatch<SetStateAction<boolean>>;
+  realtimeStatus: RealtimeStatus;
   savedViews: DashboardSavedView[];
   activeSavedViewId: string | null;
   setActiveSavedViewId: Dispatch<SetStateAction<string | null>>;
@@ -79,6 +85,11 @@ export function DashboardOverviewView({
   compareDatasetSize,
   setCompareDatasetSize,
   canUseCompareMode,
+  realtimeEnabled,
+  setRealtimeEnabled,
+  realtimePaused,
+  setRealtimePaused,
+  realtimeStatus,
   savedViews,
   activeSavedViewId,
   setActiveSavedViewId,
@@ -114,6 +125,26 @@ export function DashboardOverviewView({
     `${t('dashboardBadgeSearch')}: ${filters.search || t('dashboardBadgeEmpty')}`,
   ];
   const searchBadgePrefix = `${t('dashboardBadgeSearch')}:`;
+  const realtimeStatusLabel =
+    realtimeStatus === 'live'
+      ? t('realtimeStatusLive')
+      : realtimeStatus === 'paused'
+        ? t('realtimeStatusPaused')
+        : realtimeStatus === 'stale'
+          ? t('realtimeStatusStale')
+          : realtimeStatus === 'error'
+            ? t('realtimeStatusError')
+            : t('realtimeStatusOff');
+  const realtimeStatusClass =
+    realtimeStatus === 'live'
+      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+      : realtimeStatus === 'paused'
+        ? 'border-amber-200 bg-amber-50 text-amber-700'
+        : realtimeStatus === 'stale'
+          ? 'border-orange-200 bg-orange-50 text-orange-700'
+          : realtimeStatus === 'error'
+            ? 'border-rose-200 bg-rose-50 text-rose-700'
+            : 'border-slate-200 bg-slate-50 text-slate-600';
 
   const activeFilterChips = [
     ...(selectedLabels.length > 0
@@ -297,6 +328,38 @@ export function DashboardOverviewView({
                 />
               </svg>
             </span>
+          </div>
+          <span className="hidden h-4 w-px bg-slate-200 sm:inline" />
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={UI_LABEL_CLASS}>{t('realtimeMode')}</span>
+            <span
+              className={`inline-flex h-8 items-center rounded-full border px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${realtimeStatusClass}`}
+            >
+              {realtimeStatusLabel}
+            </span>
+            <button
+              type="button"
+              className={`${ACTION_BUTTON_CLASS} h-8 px-2 text-[11px]`}
+              onClick={() => {
+                setRealtimeEnabled((current) => {
+                  const next = !current;
+                  if (next) {
+                    setRealtimePaused(false);
+                  }
+                  return next;
+                });
+              }}
+            >
+              {realtimeEnabled ? t('realtimeDisable') : t('realtimeEnable')}
+            </button>
+            <button
+              type="button"
+              className={`${ACTION_BUTTON_CLASS} h-8 px-2 text-[11px]`}
+              disabled={!realtimeEnabled}
+              onClick={() => setRealtimePaused((current) => !current)}
+            >
+              {realtimePaused ? t('realtimeResume') : t('realtimePause')}
+            </button>
           </div>
           <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto lg:flex-nowrap">
             <button

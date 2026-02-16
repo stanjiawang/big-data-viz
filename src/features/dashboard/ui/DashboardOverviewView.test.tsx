@@ -52,6 +52,11 @@ function renderView(overrides: Partial<ComponentProps<typeof DashboardOverviewVi
     compareDatasetSize: DATASET_SIZES[2],
     setCompareDatasetSize: jest.fn(),
     canUseCompareMode: true,
+    realtimeEnabled: false,
+    setRealtimeEnabled: jest.fn(),
+    realtimePaused: false,
+    setRealtimePaused: jest.fn(),
+    realtimeStatus: 'off',
     savedViews: [],
     activeSavedViewId: null,
     setActiveSavedViewId: jest.fn(),
@@ -141,5 +146,18 @@ describe('DashboardOverviewView', () => {
 
     await user.click(screen.getByRole('button', { name: 'Clear all' }));
     expect(props.setFilters).toHaveBeenCalledTimes(1);
+  });
+
+  it('toggles realtime controls', async () => {
+    const user = userEvent.setup();
+    const props = renderView({
+      realtimeEnabled: true,
+      realtimePaused: false,
+      realtimeStatus: 'live',
+    });
+
+    expect(screen.getByText('Live')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Pause' }));
+    expect(props.setRealtimePaused).toHaveBeenCalledTimes(1);
   });
 });

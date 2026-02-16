@@ -13,6 +13,11 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   await page.getByLabel('Source').selectOption('user');
   await expect(page.getByText(/Source:\s*user/i)).toBeVisible({ timeout: 15_000 });
 
+  await page.getByRole('button', { name: 'Enable live' }).click();
+  await expect(page.getByRole('button', { name: 'Disable live' })).toBeVisible();
+  await page.getByRole('button', { name: 'Pause' }).click();
+  await expect(page.getByRole('button', { name: 'Resume' })).toBeVisible();
+
   await page.getByRole('button', { name: 'Open detail' }).first().click();
   await expect(page.getByText('Detailed View: Summary')).toBeVisible();
   await page.getByRole('button', { name: 'Back to dashboard' }).click();
