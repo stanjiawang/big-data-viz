@@ -15,6 +15,7 @@ All notable changes to this project are tracked in this file.
 - Dependency policy gate (`test:dependency-policy`) and SBOM generator (`sbom:generate`) for CI governance.
 - Phase 6 productionization spec (`docs/roadmap/phase-06-productionization.md`) and deployment guide (`docs/deploy.md`) for Vercel + Cloudflare Pages.
 - Demo runtime profile support (`VITE_RUNTIME_PROFILE=demo`) with dedicated scripts (`pnpm run dev:demo`, `pnpm run build:demo`).
+- CI quality dashboard artifacts (`quality-dashboard`) with consolidated coverage, bundle perf, render benchmark, and accessibility gate status.
 
 ### Changed
 

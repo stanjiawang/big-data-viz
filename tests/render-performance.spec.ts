@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 import { expect, test } from '@playwright/test';
 
 const SAMPLE_COUNT = Number(process.env.PERF_RENDER_SAMPLES ?? 3);
@@ -7,6 +9,10 @@ const GRAPH_BUDGET_MS = Number(process.env.PERF_MAX_GRAPH_RENDER_MS ?? 3200);
 const PAGE_READY_TIMEOUT_MS = Number(process.env.PERF_PAGE_READY_TIMEOUT_MS ?? 25_000);
 const GRAPH_READY_TIMEOUT_MS = Number(process.env.PERF_GRAPH_READY_TIMEOUT_MS ?? 30_000);
 const SAMPLE_MAX_ATTEMPTS = Number(process.env.PERF_SAMPLE_MAX_ATTEMPTS ?? 3);
+const RENDER_BENCHMARK_ARTIFACT_PATH = path.resolve(
+  process.cwd(),
+  'artifacts/render-benchmark.json',
+);
 
 function median(values: number[]) {
   const sorted = [...values].sort((left, right) => left - right);
@@ -133,6 +139,9 @@ test('meets render budgets for large table and relationship graph', async ({ pag
       graphMedianMs,
     },
   };
+
+  await mkdir(path.dirname(RENDER_BENCHMARK_ARTIFACT_PATH), { recursive: true });
+  await writeFile(RENDER_BENCHMARK_ARTIFACT_PATH, JSON.stringify(report, null, 2));
 
   test.info().annotations.push({
     type: 'render-benchmark',

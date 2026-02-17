@@ -144,4 +144,4 @@ Spec:
 
 ## Immediate Next Step
 
-- Start Phase 6, Slice 1: one-click deployment docs and demo-mode runtime profile.
+- Start Phase 6, Slice 3: demo packaging handoff and release-note finalization.

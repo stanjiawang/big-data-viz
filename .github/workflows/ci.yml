@@ -75,3 +75,18 @@ jobs:
         run: pnpm test:e2e
       - name: E2E auth tests
         run: pnpm run test:e2e:auth
+      - name: E2E accessibility tests
+        run: pnpm run test:e2e:a11y
+      - name: Generate quality dashboard artifact
+        run: pnpm run quality:dashboard
+      - name: Upload quality dashboard artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-dashboard
+          path: |
+            artifacts/quality-dashboard.json
+            artifacts/quality-dashboard.md
+            artifacts/performance-budget.json
+            artifacts/render-benchmark.json
+            coverage/coverage-summary.json
+          if-no-files-found: error

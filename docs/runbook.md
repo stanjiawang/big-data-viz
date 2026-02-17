@@ -28,6 +28,7 @@ Demo profile local run:
 13. `pnpm test:e2e`
 14. `pnpm run test:e2e:auth`
 15. `pnpm run test:e2e:a11y`
+16. `pnpm run quality:dashboard`
 
 ## Common Failures
 

@@ -4,6 +4,8 @@ import zlib from 'node:zlib';
 
 const distDir = path.resolve(process.cwd(), 'dist');
 const assetsDir = path.resolve(distDir, 'assets');
+const artifactsDir = path.resolve(process.cwd(), 'artifacts');
+const perfArtifactPath = path.resolve(artifactsDir, 'performance-budget.json');
 
 const budgets = {
   maxMainJsGzipKb: Number(process.env.PERF_MAX_MAIN_JS_GZIP_KB ?? 550),
@@ -112,6 +114,13 @@ async function run() {
   };
 
   const failures = validateBudgets(metrics);
+  const report = {
+    generatedAt: new Date().toISOString(),
+    budgets,
+    metrics,
+    passed: failures.length === 0,
+    failures,
+  };
 
   console.log('Performance budget metrics:');
   console.log(`- Largest JS chunk (gzip): ${formatKb(metrics.mainJsGzipBytes)}`);
@@ -125,6 +134,8 @@ async function run() {
   console.log(`- PERF_MAX_TOTAL_ASSETS_GZIP_KB=${budgets.maxTotalAssetsGzipKb}`);
 
   if (failures.length > 0) {
+    await fs.mkdir(artifactsDir, { recursive: true });
+    await fs.writeFile(perfArtifactPath, JSON.stringify(report, null, 2));
     console.error('Performance budget validation failed:');
     failures.forEach((failure) => {
       console.error(`- ${failure}`);
@@ -132,6 +143,8 @@ async function run() {
     process.exit(1);
   }
 
+  await fs.mkdir(artifactsDir, { recursive: true });
+  await fs.writeFile(perfArtifactPath, JSON.stringify(report, null, 2));
   console.log('Performance budget validation passed.');
 }
 

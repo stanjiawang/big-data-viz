@@ -102,6 +102,7 @@ pnpm run test:render-perf
 pnpm run test:perf
 pnpm run test:dependency-policy
 pnpm run sbom:generate
+pnpm run quality:dashboard
 pnpm run test:e2e:auth
 pnpm run test:e2e:a11y
 ```
@@ -111,10 +112,12 @@ pnpm run test:e2e:a11y
 `test:e2e:a11y` runs only the axe-core accessibility specs.
 `test:dependency-policy` fails on high/critical dependency vulnerabilities.
 `sbom:generate` writes CycloneDX SBOM output to `artifacts/sbom.cdx.json`.
+`quality:dashboard` writes consolidated CI quality artifacts under `artifacts/`.
 
 ## Deployment
 
 - Deploy guide (Vercel + Cloudflare Pages): `docs/deploy.md`
+- Quality dashboard artifact guide: `docs/quality-dashboard.md`
 
 ## Deployment Security Baseline
 

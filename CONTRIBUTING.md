@@ -26,6 +26,7 @@ pnpm run test:e2e:auth
 pnpm run test:e2e:a11y
 pnpm run test:perf
 pnpm run test:render-perf
+pnpm run quality:dashboard
 ```
 
 ## i18n and Accessibility Requirements
