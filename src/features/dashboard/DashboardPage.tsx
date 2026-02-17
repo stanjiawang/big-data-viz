@@ -39,8 +39,15 @@ export function DashboardPage() {
     savedViews,
     activeSavedViewId,
     setActiveSavedViewId,
+    snapshots,
+    activeSnapshotId,
+    setActiveSnapshotId,
     applySavedView,
     saveCurrentAsNewView,
+    captureSnapshot,
+    replaySnapshot,
+    deleteActiveSnapshot,
+    clearSnapshots,
     updateActiveSavedView,
     deleteActiveSavedView,
   } = useDashboardState();
@@ -95,8 +102,15 @@ export function DashboardPage() {
       savedViews={savedViews}
       activeSavedViewId={activeSavedViewId}
       setActiveSavedViewId={setActiveSavedViewId}
+      snapshots={snapshots}
+      activeSnapshotId={activeSnapshotId}
+      setActiveSnapshotId={setActiveSnapshotId}
       onApplySavedView={applySavedView}
       onSaveCurrentAsNewView={saveCurrentAsNewView}
+      onCaptureSnapshot={captureSnapshot}
+      onReplaySnapshot={replaySnapshot}
+      onDeleteActiveSnapshot={deleteActiveSnapshot}
+      onClearSnapshots={clearSnapshots}
       onUpdateActiveSavedView={updateActiveSavedView}
       onDeleteActiveSavedView={deleteActiveSavedView}
       onOpenDetail={setDetailView}

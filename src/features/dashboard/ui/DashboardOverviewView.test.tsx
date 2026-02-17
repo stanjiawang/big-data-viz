@@ -60,8 +60,15 @@ function renderView(overrides: Partial<ComponentProps<typeof DashboardOverviewVi
     savedViews: [],
     activeSavedViewId: null,
     setActiveSavedViewId: jest.fn(),
+    snapshots: [],
+    activeSnapshotId: null,
+    setActiveSnapshotId: jest.fn(),
     onApplySavedView: jest.fn(),
     onSaveCurrentAsNewView: jest.fn(() => 'view-1'),
+    onCaptureSnapshot: jest.fn(() => 'snapshot-1'),
+    onReplaySnapshot: jest.fn(),
+    onDeleteActiveSnapshot: jest.fn(),
+    onClearSnapshots: jest.fn(),
     onUpdateActiveSavedView: jest.fn(),
     onDeleteActiveSavedView: jest.fn(),
     onOpenDetail: jest.fn(),
@@ -159,5 +166,31 @@ describe('DashboardOverviewView', () => {
     expect(screen.getByText('Live')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Pause' }));
     expect(props.setRealtimePaused).toHaveBeenCalledTimes(1);
+  });
+
+  it('captures and replays snapshots from timeline controls', async () => {
+    const user = userEvent.setup();
+    const props = renderView({
+      snapshots: [
+        {
+          id: 'snapshot-1',
+          name: 'Snapshot 1',
+          capturedAt: '2026-02-16T00:00:00.000Z',
+          state: {
+            datasetSizeValue: DATASET_SIZES[1].value,
+            compareDatasetSizeValue: DATASET_SIZES[2].value,
+            compareEnabled: false,
+            filters: { source: 'all', search: '' },
+          },
+        },
+      ],
+      activeSnapshotId: 'snapshot-1',
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Capture snapshot' }));
+    await user.click(screen.getByRole('button', { name: 'Replay snapshot' }));
+
+    expect(props.onCaptureSnapshot).toHaveBeenCalledTimes(1);
+    expect(props.onReplaySnapshot).toHaveBeenCalledWith('snapshot-1');
   });
 });

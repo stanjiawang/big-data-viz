@@ -24,7 +24,10 @@ import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import { SectionCardActions } from '@/features/dashboard/sections/shared';
 import type { CrossFilterPatch, DetailView } from '@/features/dashboard/sections/types';
 import type { RealtimeStatus } from '@/features/realtime/useRealtimeStream';
-import type { DashboardSavedView } from '@/features/dashboard/state/useDashboardState';
+import type {
+  DashboardSavedView,
+  DashboardSnapshot,
+} from '@/features/dashboard/state/useDashboardState';
 import { buildDashboardSearchParams } from '@/features/dashboard/state/urlState';
 import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadges';
 import { KpiSection } from '@/features/dashboard/sections/KpiSection';
@@ -58,8 +61,15 @@ type DashboardOverviewViewProps = {
   savedViews: DashboardSavedView[];
   activeSavedViewId: string | null;
   setActiveSavedViewId: Dispatch<SetStateAction<string | null>>;
+  snapshots: DashboardSnapshot[];
+  activeSnapshotId: string | null;
+  setActiveSnapshotId: Dispatch<SetStateAction<string | null>>;
   onApplySavedView: (_viewId: string) => boolean;
   onSaveCurrentAsNewView: (_name: string) => string | null;
+  onCaptureSnapshot: (_name?: string) => string;
+  onReplaySnapshot: (_snapshotId: string) => boolean;
+  onDeleteActiveSnapshot: () => boolean;
+  onClearSnapshots: () => boolean;
   onUpdateActiveSavedView: () => boolean;
   onDeleteActiveSavedView: () => boolean;
   onOpenDetail: (_view: DetailView) => void;
@@ -93,8 +103,15 @@ export function DashboardOverviewView({
   savedViews,
   activeSavedViewId,
   setActiveSavedViewId,
+  snapshots,
+  activeSnapshotId,
+  setActiveSnapshotId,
   onApplySavedView,
   onSaveCurrentAsNewView,
+  onCaptureSnapshot,
+  onReplaySnapshot,
+  onDeleteActiveSnapshot,
+  onClearSnapshots,
   onUpdateActiveSavedView,
   onDeleteActiveSavedView,
   onOpenDetail,
@@ -186,6 +203,13 @@ export function DashboardOverviewView({
     }
     setActiveSavedViewId(viewId);
     setNewViewName('');
+  };
+
+  const handleReplaySnapshot = () => {
+    if (!activeSnapshotId) {
+      return;
+    }
+    onReplaySnapshot(activeSnapshotId);
   };
 
   const applyCrossFilter = (patch: CrossFilterPatch) => {
@@ -496,6 +520,79 @@ export function DashboardOverviewView({
                   ? t('dashboardCopyLinkFailed')
                   : ''}
             </span>
+          </div>
+        </div>
+
+        <div className="mt-3 grid gap-2 border-t border-slate-100 pt-3 xl:grid-cols-[minmax(220px,280px)_1fr] xl:items-center">
+          <label className="flex flex-col gap-1">
+            <span className={UI_LABEL_CLASS}>{t('snapshotTimelineTitle')}</span>
+            <span className="relative block">
+              <select
+                aria-label={t('snapshotTimelineTitle')}
+                value={activeSnapshotId ?? ''}
+                className={`${UI_SELECT_MD} h-9 w-full px-2 pr-7 text-xs`}
+                onChange={(event) =>
+                  setActiveSnapshotId(event.target.value ? event.target.value : null)
+                }
+              >
+                <option value="">{t('snapshotNoItems')}</option>
+                {snapshots.map((snapshot) => (
+                  <option key={snapshot.id} value={snapshot.id}>
+                    {snapshot.name}
+                  </option>
+                ))}
+              </select>
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+              >
+                <path
+                  d="M5.25 7.75 10 12.25l4.75-4.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.75"
+                />
+              </svg>
+            </span>
+          </label>
+
+          <div className="grid gap-2 sm:grid-cols-4 sm:items-end">
+            <button
+              type="button"
+              className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+              onClick={() => {
+                onCaptureSnapshot();
+              }}
+            >
+              {t('snapshotCapture')}
+            </button>
+            <button
+              type="button"
+              className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+              disabled={!activeSnapshotId}
+              onClick={handleReplaySnapshot}
+            >
+              {t('snapshotReplay')}
+            </button>
+            <button
+              type="button"
+              className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+              disabled={!activeSnapshotId}
+              onClick={onDeleteActiveSnapshot}
+            >
+              {t('snapshotDelete')}
+            </button>
+            <button
+              type="button"
+              className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+              disabled={snapshots.length === 0}
+              onClick={onClearSnapshots}
+            >
+              {t('snapshotClear')}
+            </button>
           </div>
         </div>
       </section>

@@ -13,6 +13,14 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   await page.getByLabel('Source').selectOption('user');
   await expect(page.getByText(/Source:\s*user/i)).toBeVisible({ timeout: 15_000 });
 
+  await page.getByRole('button', { name: 'Capture snapshot' }).click();
+  const snapshotTimeline = page.getByLabel('Snapshot timeline');
+  await expect(snapshotTimeline).not.toHaveValue('');
+  await page.getByRole('button', { name: 'Clear all' }).click();
+  await snapshotTimeline.selectOption({ label: 'Snapshot 1' });
+  await page.getByRole('button', { name: 'Replay snapshot' }).click();
+  await expect(page.getByText(/Source:\s*user/i).first()).toBeVisible({ timeout: 15_000 });
+
   await page.getByRole('button', { name: 'Enable live' }).click();
   await expect(page.getByRole('button', { name: 'Disable live' })).toBeVisible();
   await page.getByRole('button', { name: 'Pause' }).click();
@@ -37,10 +45,13 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   const scrollTop = await tableViewport.evaluate((element) => element.scrollTop);
   expect(scrollTop).toBeGreaterThan(100);
 
+  const graphCard = page.locator('section', {
+    has: page.getByRole('heading', { name: 'Relationship Graph' }),
+  });
   await page.getByRole('button', { name: 'cluster-1' }).click();
-  await expect(page.getByRole('button', { name: 'Clear' })).toBeVisible();
-  await expect(page.getByText('Labels: class-A')).toBeVisible();
-  await expect(page.getByText('Search: cluster-1')).toBeVisible();
+  await expect(graphCard.getByRole('button', { name: 'Clear' })).toBeVisible();
+  await expect(page.getByText('Labels: class-A').first()).toBeVisible();
+  await expect(page.getByText('Search: cluster-1').first()).toBeVisible();
   await page.getByRole('button', { name: /Hide edges/i }).click();
   await expect(page.getByRole('button', { name: /Show edges/i })).toBeVisible();
 });

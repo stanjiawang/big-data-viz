@@ -14,6 +14,7 @@ const COMPARE_SIZE_STORAGE_KEY = 'bdv_compare_dataset_size';
 const SAVED_VIEWS_STORAGE_KEY = 'bdv_saved_views';
 const REALTIME_ENABLED_STORAGE_KEY = 'bdv_realtime_enabled';
 const REALTIME_PAUSED_STORAGE_KEY = 'bdv_realtime_paused';
+const SNAPSHOTS_STORAGE_KEY = 'bdv_snapshot_timeline';
 
 export type DashboardSavedState = {
   datasetSizeValue: number;
@@ -28,6 +29,13 @@ export type DashboardSavedView = {
   state: DashboardSavedState;
   createdAt: string;
   updatedAt: string;
+};
+
+export type DashboardSnapshot = {
+  id: string;
+  name: string;
+  state: DashboardSavedState;
+  capturedAt: string;
 };
 
 function safeReadStorage(key: string): string | null {
@@ -128,6 +136,41 @@ export function resolveSavedViews() {
   }
 }
 
+export function resolveSnapshots() {
+  const raw = safeReadStorage(SNAPSHOTS_STORAGE_KEY);
+  if (!raw) {
+    return [] as DashboardSnapshot[];
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) {
+      return [] as DashboardSnapshot[];
+    }
+
+    return parsed
+      .filter((snapshot): snapshot is DashboardSnapshot => {
+        if (!snapshot || typeof snapshot !== 'object') {
+          return false;
+        }
+        const candidate = snapshot as Partial<DashboardSnapshot>;
+        return (
+          typeof candidate.id === 'string' &&
+          typeof candidate.name === 'string' &&
+          typeof candidate.capturedAt === 'string' &&
+          typeof candidate.state === 'object' &&
+          candidate.state !== null
+        );
+      })
+      .map((snapshot) => ({
+        ...snapshot,
+        state: sanitizeSavedState(snapshot.state),
+      }));
+  } catch {
+    return [] as DashboardSnapshot[];
+  }
+}
+
 function createSavedState(params: {
   datasetSize: (typeof DATASET_SIZES)[number];
   filters: MockFilters;
@@ -177,6 +220,8 @@ export function useDashboardState() {
   const [realtimePaused, setRealtimePaused] = useState(() => resolveInitialRealtimePaused());
   const [savedViews, setSavedViews] = useState<DashboardSavedView[]>(() => resolveSavedViews());
   const [activeSavedViewId, setActiveSavedViewId] = useState<string | null>(null);
+  const [snapshots, setSnapshots] = useState<DashboardSnapshot[]>(() => resolveSnapshots());
+  const [activeSnapshotId, setActiveSnapshotId] = useState<string | null>(null);
 
   useEffect(() => {
     syncDashboardSearchParams({
@@ -207,6 +252,10 @@ export function useDashboardState() {
   useEffect(() => {
     safeWriteStorage(REALTIME_PAUSED_STORAGE_KEY, realtimePaused ? '1' : '0');
   }, [realtimePaused]);
+
+  useEffect(() => {
+    safeWriteStorage(SNAPSHOTS_STORAGE_KEY, JSON.stringify(snapshots));
+  }, [snapshots]);
 
   const currentStateSnapshot = useMemo(
     () =>
@@ -257,6 +306,73 @@ export function useDashboardState() {
     setSavedViews((current) => [nextView, ...current]);
     setActiveSavedViewId(id);
     return id;
+  };
+
+  const captureSnapshot = (name?: string) => {
+    const id =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `snapshot-${Date.now()}`;
+    const nextName = name?.trim() ? name.trim() : `Snapshot ${snapshots.length + 1}`;
+    const capturedAt = new Date().toISOString();
+
+    const nextSnapshot: DashboardSnapshot = {
+      id,
+      name: nextName,
+      state: currentStateSnapshot,
+      capturedAt,
+    };
+
+    setSnapshots((current) => [nextSnapshot, ...current].slice(0, 20));
+    setActiveSnapshotId(id);
+    return id;
+  };
+
+  const replaySnapshot = (snapshotId: string) => {
+    const selected = snapshots.find((snapshot) => snapshot.id === snapshotId);
+    if (!selected) {
+      return false;
+    }
+
+    const nextState = applySavedState(selected.state);
+    setDatasetSize(nextState.datasetSize);
+    setFilters(nextState.filters);
+    setCompareEnabled(nextState.compareEnabled);
+    setCompareDatasetSize(nextState.compareDatasetSize);
+    setActiveSnapshotId(snapshotId);
+    return true;
+  };
+
+  const deleteActiveSnapshot = () => {
+    if (!activeSnapshotId) {
+      return false;
+    }
+
+    let didDelete = false;
+    setSnapshots((current) =>
+      current.filter((snapshot) => {
+        if (snapshot.id === activeSnapshotId) {
+          didDelete = true;
+          return false;
+        }
+        return true;
+      }),
+    );
+
+    if (didDelete) {
+      setActiveSnapshotId(null);
+    }
+
+    return didDelete;
+  };
+
+  const clearSnapshots = () => {
+    if (snapshots.length === 0) {
+      return false;
+    }
+    setSnapshots([]);
+    setActiveSnapshotId(null);
+    return true;
   };
 
   const updateActiveSavedView = () => {
@@ -325,9 +441,16 @@ export function useDashboardState() {
     savedViews,
     activeSavedViewId,
     setActiveSavedViewId,
+    snapshots,
+    activeSnapshotId,
+    setActiveSnapshotId,
     currentStateSnapshot,
     applySavedView,
     saveCurrentAsNewView,
+    captureSnapshot,
+    replaySnapshot,
+    deleteActiveSnapshot,
+    clearSnapshots,
     updateActiveSavedView,
     deleteActiveSavedView,
   };

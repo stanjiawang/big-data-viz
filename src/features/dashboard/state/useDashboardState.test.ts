@@ -4,6 +4,7 @@ import {
   resolveInitialCompareEnabled,
   resolveInitialRealtimeEnabled,
   resolveInitialRealtimePaused,
+  resolveSnapshots,
   resolveSavedViews,
 } from '@/features/dashboard/state/useDashboardState';
 
@@ -37,6 +38,7 @@ describe('useDashboardState storage resolvers', () => {
     expect(resolveInitialRealtimeEnabled()).toBe(false);
     expect(resolveInitialRealtimePaused()).toBe(false);
     expect(resolveSavedViews()).toEqual([]);
+    expect(resolveSnapshots()).toEqual([]);
   });
 
   it('reads compare dataset size from storage when valid', () => {
@@ -71,5 +73,29 @@ describe('useDashboardState storage resolvers', () => {
     expect(views).toHaveLength(1);
     expect(views[0].state.datasetSizeValue).toBe(DATASET_SIZES[1].value);
     expect(views[0].state.compareDatasetSizeValue).toBe(DATASET_SIZES[2].value);
+  });
+
+  it('reads snapshot timeline entries from storage', () => {
+    window.localStorage.setItem(
+      'bdv_snapshot_timeline',
+      JSON.stringify([
+        {
+          id: 'snapshot-1',
+          name: 'Snapshot 1',
+          capturedAt: '2026-02-16T00:00:00.000Z',
+          state: {
+            datasetSizeValue: DATASET_SIZES[3].value,
+            compareDatasetSizeValue: DATASET_SIZES[2].value,
+            compareEnabled: true,
+            filters: { source: 'sensor', search: 'node-1' },
+          },
+        },
+      ]),
+    );
+
+    const snapshots = resolveSnapshots();
+    expect(snapshots).toHaveLength(1);
+    expect(snapshots[0].name).toBe('Snapshot 1');
+    expect(snapshots[0].state.datasetSizeValue).toBe(DATASET_SIZES[3].value);
   });
 });
