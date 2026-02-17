@@ -1,5 +1,6 @@
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import {
+  resolveAnnotations,
   resolveInitialCompareDatasetSize,
   resolveInitialCompareEnabled,
   resolveInitialRealtimeEnabled,
@@ -39,6 +40,7 @@ describe('useDashboardState storage resolvers', () => {
     expect(resolveInitialRealtimePaused()).toBe(false);
     expect(resolveSavedViews()).toEqual([]);
     expect(resolveSnapshots()).toEqual([]);
+    expect(resolveAnnotations()).toEqual([]);
   });
 
   it('reads compare dataset size from storage when valid', () => {
@@ -97,5 +99,31 @@ describe('useDashboardState storage resolvers', () => {
     expect(snapshots).toHaveLength(1);
     expect(snapshots[0].name).toBe('Snapshot 1');
     expect(snapshots[0].state.datasetSizeValue).toBe(DATASET_SIZES[3].value);
+  });
+
+  it('reads annotations from storage and filters invalid contexts', () => {
+    window.localStorage.setItem(
+      'bdv_dashboard_annotations',
+      JSON.stringify([
+        {
+          id: 'annotation-1',
+          context: 'graph',
+          message: 'Investigate disconnected nodes.',
+          createdAt: '2026-02-16T00:00:00.000Z',
+          updatedAt: '2026-02-16T00:00:00.000Z',
+        },
+        {
+          id: 'annotation-2',
+          context: 'invalid',
+          message: 'ignore',
+          createdAt: '2026-02-16T00:00:00.000Z',
+          updatedAt: '2026-02-16T00:00:00.000Z',
+        },
+      ]),
+    );
+
+    const annotations = resolveAnnotations();
+    expect(annotations).toHaveLength(1);
+    expect(annotations[0].context).toBe('graph');
   });
 });

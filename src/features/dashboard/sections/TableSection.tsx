@@ -16,6 +16,7 @@ export function TableSection({
   compareEnabled,
   filters,
   onOpenDetail,
+  onAnnotate,
   draggable = false,
 }: DashboardSectionProps) {
   const { t } = useI18n();
@@ -46,6 +47,7 @@ export function TableSection({
           actions={
             <SectionCardActions
               onOpenDetail={onOpenDetail ? () => onOpenDetail('table') : undefined}
+              onAnnotate={onAnnotate ? () => onAnnotate('tablePrimary') : undefined}
               exportTargetRef={primaryTableRef}
               exportFileName="large-table-primary"
             />
@@ -66,6 +68,7 @@ export function TableSection({
           dragHandle={createDragHandle('compare')}
           actions={
             <SectionCardActions
+              onAnnotate={onAnnotate ? () => onAnnotate('tableCompare') : undefined}
               exportTargetRef={compareTableRef}
               exportFileName="large-table-compare"
             />
@@ -104,6 +107,7 @@ export function TableSection({
       actions={
         <SectionCardActions
           onOpenDetail={onOpenDetail ? () => onOpenDetail('table') : undefined}
+          onAnnotate={onAnnotate ? () => onAnnotate('tablePrimary') : undefined}
           exportTargetRef={primaryTableRef}
           exportFileName="large-table"
         />

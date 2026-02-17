@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
-import type { DetailView } from '@/features/dashboard/sections';
+import type { DashboardAnnotationContext, DetailView } from '@/features/dashboard/sections';
 import {
   parseDashboardSearchParams,
   syncDashboardSearchParams,
@@ -15,6 +15,7 @@ const SAVED_VIEWS_STORAGE_KEY = 'bdv_saved_views';
 const REALTIME_ENABLED_STORAGE_KEY = 'bdv_realtime_enabled';
 const REALTIME_PAUSED_STORAGE_KEY = 'bdv_realtime_paused';
 const SNAPSHOTS_STORAGE_KEY = 'bdv_snapshot_timeline';
+const ANNOTATIONS_STORAGE_KEY = 'bdv_dashboard_annotations';
 
 export type DashboardSavedState = {
   datasetSizeValue: number;
@@ -36,6 +37,14 @@ export type DashboardSnapshot = {
   name: string;
   state: DashboardSavedState;
   capturedAt: string;
+};
+
+export type DashboardAnnotation = {
+  id: string;
+  context: DashboardAnnotationContext;
+  message: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 function safeReadStorage(key: string): string | null {
@@ -171,6 +180,47 @@ export function resolveSnapshots() {
   }
 }
 
+export function resolveAnnotations() {
+  const raw = safeReadStorage(ANNOTATIONS_STORAGE_KEY);
+  if (!raw) {
+    return [] as DashboardAnnotation[];
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) {
+      return [] as DashboardAnnotation[];
+    }
+
+    const allowed = new Set<DashboardAnnotationContext>([
+      'summary',
+      'timeSeries',
+      'embedding',
+      'graph',
+      'd3',
+      'tablePrimary',
+      'tableCompare',
+    ]);
+
+    return parsed.filter((annotation): annotation is DashboardAnnotation => {
+      if (!annotation || typeof annotation !== 'object') {
+        return false;
+      }
+      const candidate = annotation as Partial<DashboardAnnotation>;
+      return (
+        typeof candidate.id === 'string' &&
+        typeof candidate.message === 'string' &&
+        typeof candidate.createdAt === 'string' &&
+        typeof candidate.updatedAt === 'string' &&
+        typeof candidate.context === 'string' &&
+        allowed.has(candidate.context as DashboardAnnotationContext)
+      );
+    });
+  } catch {
+    return [] as DashboardAnnotation[];
+  }
+}
+
 function createSavedState(params: {
   datasetSize: (typeof DATASET_SIZES)[number];
   filters: MockFilters;
@@ -222,6 +272,9 @@ export function useDashboardState() {
   const [activeSavedViewId, setActiveSavedViewId] = useState<string | null>(null);
   const [snapshots, setSnapshots] = useState<DashboardSnapshot[]>(() => resolveSnapshots());
   const [activeSnapshotId, setActiveSnapshotId] = useState<string | null>(null);
+  const [annotations, setAnnotations] = useState<DashboardAnnotation[]>(() => resolveAnnotations());
+  const [activeAnnotationContext, setActiveAnnotationContext] =
+    useState<DashboardAnnotationContext>('summary');
 
   useEffect(() => {
     syncDashboardSearchParams({
@@ -256,6 +309,10 @@ export function useDashboardState() {
   useEffect(() => {
     safeWriteStorage(SNAPSHOTS_STORAGE_KEY, JSON.stringify(snapshots));
   }, [snapshots]);
+
+  useEffect(() => {
+    safeWriteStorage(ANNOTATIONS_STORAGE_KEY, JSON.stringify(annotations));
+  }, [annotations]);
 
   const currentStateSnapshot = useMemo(
     () =>
@@ -375,6 +432,60 @@ export function useDashboardState() {
     return true;
   };
 
+  const createAnnotation = (context: DashboardAnnotationContext, message: string) => {
+    const trimmed = message.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const id =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `annotation-${Date.now()}`;
+    const now = new Date().toISOString();
+
+    const nextAnnotation: DashboardAnnotation = {
+      id,
+      context,
+      message: trimmed,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    setAnnotations((current) => [nextAnnotation, ...current].slice(0, 100));
+    setActiveAnnotationContext(context);
+    return id;
+  };
+
+  const deleteAnnotation = (annotationId: string) => {
+    let didDelete = false;
+    setAnnotations((current) =>
+      current.filter((annotation) => {
+        if (annotation.id === annotationId) {
+          didDelete = true;
+          return false;
+        }
+        return true;
+      }),
+    );
+    return didDelete;
+  };
+
+  const clearAnnotationsForContext = (context: DashboardAnnotationContext) => {
+    let didClear = false;
+    setAnnotations((current) => {
+      const next = current.filter((annotation) => {
+        if (annotation.context === context) {
+          didClear = true;
+          return false;
+        }
+        return true;
+      });
+      return next;
+    });
+    return didClear;
+  };
+
   const updateActiveSavedView = () => {
     if (!activeSavedViewId) {
       return false;
@@ -444,6 +555,9 @@ export function useDashboardState() {
     snapshots,
     activeSnapshotId,
     setActiveSnapshotId,
+    annotations,
+    activeAnnotationContext,
+    setActiveAnnotationContext,
     currentStateSnapshot,
     applySavedView,
     saveCurrentAsNewView,
@@ -451,6 +565,9 @@ export function useDashboardState() {
     replaySnapshot,
     deleteActiveSnapshot,
     clearSnapshots,
+    createAnnotation,
+    deleteAnnotation,
+    clearAnnotationsForContext,
     updateActiveSavedView,
     deleteActiveSavedView,
   };

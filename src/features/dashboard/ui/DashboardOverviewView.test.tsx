@@ -63,12 +63,18 @@ function renderView(overrides: Partial<ComponentProps<typeof DashboardOverviewVi
     snapshots: [],
     activeSnapshotId: null,
     setActiveSnapshotId: jest.fn(),
+    annotations: [],
+    activeAnnotationContext: 'summary',
+    setActiveAnnotationContext: jest.fn(),
     onApplySavedView: jest.fn(),
     onSaveCurrentAsNewView: jest.fn(() => 'view-1'),
     onCaptureSnapshot: jest.fn(() => 'snapshot-1'),
     onReplaySnapshot: jest.fn(),
     onDeleteActiveSnapshot: jest.fn(),
     onClearSnapshots: jest.fn(),
+    onCreateAnnotation: jest.fn(() => 'annotation-1'),
+    onDeleteAnnotation: jest.fn(),
+    onClearAnnotationsForContext: jest.fn(),
     onUpdateActiveSavedView: jest.fn(),
     onDeleteActiveSavedView: jest.fn(),
     onOpenDetail: jest.fn(),
@@ -192,5 +198,31 @@ describe('DashboardOverviewView', () => {
 
     expect(props.onCaptureSnapshot).toHaveBeenCalledTimes(1);
     expect(props.onReplaySnapshot).toHaveBeenCalledWith('snapshot-1');
+  });
+
+  it('creates and clears context annotations', async () => {
+    const user = userEvent.setup();
+    const props = renderView({
+      annotations: [
+        {
+          id: 'annotation-1',
+          context: 'summary',
+          message: 'Keep this trend for release notes.',
+          createdAt: '2026-02-16T00:00:00.000Z',
+          updatedAt: '2026-02-16T00:00:00.000Z',
+        },
+      ],
+      activeAnnotationContext: 'summary',
+    });
+
+    await user.type(
+      screen.getByPlaceholderText('e.g. Validate unexpected spike before report export'),
+      'Escalate regression check',
+    );
+    await user.click(screen.getByRole('button', { name: 'Add note' }));
+    expect(props.onCreateAnnotation).toHaveBeenCalledWith('summary', 'Escalate regression check');
+
+    await user.click(screen.getByRole('button', { name: 'Clear context' }));
+    expect(props.onClearAnnotationsForContext).toHaveBeenCalledWith('summary');
   });
 });

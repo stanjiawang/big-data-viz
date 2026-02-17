@@ -32,6 +32,7 @@ export function ChartsSection({
   expanded = false,
   onOpenDetail,
   onCrossFilter,
+  onAnnotate,
   focusView,
   draggable = false,
 }: DashboardSectionProps) {
@@ -83,6 +84,7 @@ export function ChartsSection({
       actions={
         <SectionCardActions
           onOpenDetail={onOpenDetail ? () => onOpenDetail('timeSeries') : undefined}
+          onAnnotate={onAnnotate ? () => onAnnotate('timeSeries') : undefined}
           exportTargetRef={timeSeriesImageRef}
           exportFileName="time-series"
         />
@@ -172,6 +174,7 @@ export function ChartsSection({
       actions={
         <SectionCardActions
           onOpenDetail={onOpenDetail ? () => onOpenDetail('embedding') : undefined}
+          onAnnotate={onAnnotate ? () => onAnnotate('embedding') : undefined}
           exportTargetRef={embeddingImageRef}
           exportFileName="embedding-cloud"
         />
@@ -203,6 +206,7 @@ export function ChartsSection({
       actions={
         <SectionCardActions
           onOpenDetail={onOpenDetail ? () => onOpenDetail('graph') : undefined}
+          onAnnotate={onAnnotate ? () => onAnnotate('graph') : undefined}
           exportTargetRef={graphImageRef}
           exportFileName="relationship-graph"
         />
@@ -240,6 +244,7 @@ export function ChartsSection({
       actions={
         <SectionCardActions
           onOpenDetail={onOpenDetail ? () => onOpenDetail('d3') : undefined}
+          onAnnotate={onAnnotate ? () => onAnnotate('d3') : undefined}
           exportTargetRef={d3ImageRef}
           exportFileName="d3-mock-data-demo"
         />

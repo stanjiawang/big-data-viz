@@ -13,6 +13,15 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   await page.getByLabel('Source').selectOption('user');
   await expect(page.getByText(/Source:\s*user/i)).toBeVisible({ timeout: 15_000 });
 
+  const annotationPanel = page.locator('section', {
+    has: page.getByRole('heading', { name: 'Annotations' }),
+  });
+  await annotationPanel
+    .getByPlaceholder('e.g. Validate unexpected spike before report export')
+    .fill('check table drift');
+  await annotationPanel.getByRole('button', { name: 'Add note' }).click();
+  await expect(annotationPanel.getByText('check table drift')).toBeVisible();
+
   await page.getByRole('button', { name: 'Capture snapshot' }).click();
   const snapshotTimeline = page.getByLabel('Snapshot timeline');
   await expect(snapshotTimeline).not.toHaveValue('');

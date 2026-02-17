@@ -42,12 +42,18 @@ export function DashboardPage() {
     snapshots,
     activeSnapshotId,
     setActiveSnapshotId,
+    annotations,
+    activeAnnotationContext,
+    setActiveAnnotationContext,
     applySavedView,
     saveCurrentAsNewView,
     captureSnapshot,
     replaySnapshot,
     deleteActiveSnapshot,
     clearSnapshots,
+    createAnnotation,
+    deleteAnnotation,
+    clearAnnotationsForContext,
     updateActiveSavedView,
     deleteActiveSavedView,
   } = useDashboardState();
@@ -105,12 +111,18 @@ export function DashboardPage() {
       snapshots={snapshots}
       activeSnapshotId={activeSnapshotId}
       setActiveSnapshotId={setActiveSnapshotId}
+      annotations={annotations}
+      activeAnnotationContext={activeAnnotationContext}
+      setActiveAnnotationContext={setActiveAnnotationContext}
       onApplySavedView={applySavedView}
       onSaveCurrentAsNewView={saveCurrentAsNewView}
       onCaptureSnapshot={captureSnapshot}
       onReplaySnapshot={replaySnapshot}
       onDeleteActiveSnapshot={deleteActiveSnapshot}
       onClearSnapshots={clearSnapshots}
+      onCreateAnnotation={createAnnotation}
+      onDeleteAnnotation={deleteAnnotation}
+      onClearAnnotationsForContext={clearAnnotationsForContext}
       onUpdateActiveSavedView={updateActiveSavedView}
       onDeleteActiveSavedView={deleteActiveSavedView}
       onOpenDetail={setDetailView}

@@ -74,17 +74,30 @@ function ExportImageButton({
 
 export function SectionCardActions({
   onOpenDetail,
+  onAnnotate,
   exportTargetRef,
   exportFileName,
 }: {
   onOpenDetail?: () => void;
+  onAnnotate?: () => void;
   exportTargetRef: RefObject<HTMLElement | null>;
   exportFileName: string;
 }) {
+  const { t } = useI18n();
+
   return (
     <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-nowrap">
       <ExportImageButton targetRef={exportTargetRef} fileName={exportFileName} />
       {onOpenDetail ? <DetailButton onClick={onOpenDetail} /> : null}
+      {onAnnotate ? (
+        <button
+          type="button"
+          className={`${UI_BUTTON_GHOST_SM} w-full sm:w-32`}
+          onClick={onAnnotate}
+        >
+          {t('annotationAdd')}
+        </button>
+      ) : null}
     </div>
   );
 }

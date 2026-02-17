@@ -22,14 +22,20 @@ import {
 } from '@/features/dashboard/SectionSkeletons';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import { SectionCardActions } from '@/features/dashboard/sections/shared';
-import type { CrossFilterPatch, DetailView } from '@/features/dashboard/sections/types';
+import type {
+  CrossFilterPatch,
+  DashboardAnnotationContext,
+  DetailView,
+} from '@/features/dashboard/sections/types';
 import type { RealtimeStatus } from '@/features/realtime/useRealtimeStream';
 import type {
   DashboardSavedView,
+  DashboardAnnotation,
   DashboardSnapshot,
 } from '@/features/dashboard/state/useDashboardState';
 import { buildDashboardSearchParams } from '@/features/dashboard/state/urlState';
 import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadges';
+import { AnnotationPanel } from '@/features/dashboard/ui/AnnotationPanel';
 import { KpiSection } from '@/features/dashboard/sections/KpiSection';
 import { ChartsSection, SummarySection, TableSection } from '@/features/dashboard/ui/lazySections';
 import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
@@ -64,12 +70,18 @@ type DashboardOverviewViewProps = {
   snapshots: DashboardSnapshot[];
   activeSnapshotId: string | null;
   setActiveSnapshotId: Dispatch<SetStateAction<string | null>>;
+  annotations: DashboardAnnotation[];
+  activeAnnotationContext: DashboardAnnotationContext;
+  setActiveAnnotationContext: Dispatch<SetStateAction<DashboardAnnotationContext>>;
   onApplySavedView: (_viewId: string) => boolean;
   onSaveCurrentAsNewView: (_name: string) => string | null;
   onCaptureSnapshot: (_name?: string) => string;
   onReplaySnapshot: (_snapshotId: string) => boolean;
   onDeleteActiveSnapshot: () => boolean;
   onClearSnapshots: () => boolean;
+  onCreateAnnotation: (_context: DashboardAnnotationContext, _message: string) => string | null;
+  onDeleteAnnotation: (_annotationId: string) => boolean;
+  onClearAnnotationsForContext: (_context: DashboardAnnotationContext) => boolean;
   onUpdateActiveSavedView: () => boolean;
   onDeleteActiveSavedView: () => boolean;
   onOpenDetail: (_view: DetailView) => void;
@@ -106,12 +118,18 @@ export function DashboardOverviewView({
   snapshots,
   activeSnapshotId,
   setActiveSnapshotId,
+  annotations,
+  activeAnnotationContext,
+  setActiveAnnotationContext,
   onApplySavedView,
   onSaveCurrentAsNewView,
   onCaptureSnapshot,
   onReplaySnapshot,
   onDeleteActiveSnapshot,
   onClearSnapshots,
+  onCreateAnnotation,
+  onDeleteAnnotation,
+  onClearAnnotationsForContext,
   onUpdateActiveSavedView,
   onDeleteActiveSavedView,
   onOpenDetail,
@@ -595,6 +613,16 @@ export function DashboardOverviewView({
             </button>
           </div>
         </div>
+        <div className="mt-3 border-t border-slate-100 pt-3">
+          <AnnotationPanel
+            annotations={annotations}
+            activeContext={activeAnnotationContext}
+            onContextChange={setActiveAnnotationContext}
+            onCreateAnnotation={onCreateAnnotation}
+            onDeleteAnnotation={onDeleteAnnotation}
+            onClearContext={onClearAnnotationsForContext}
+          />
+        </div>
       </section>
 
       <AsyncBoundary
@@ -678,6 +706,7 @@ export function DashboardOverviewView({
                 actions={
                   <SectionCardActions
                     onOpenDetail={() => onOpenDetail('summary')}
+                    onAnnotate={() => setActiveAnnotationContext('summary')}
                     exportTargetRef={summaryVisualizationRef}
                     exportFileName="summary"
                   />
@@ -715,6 +744,7 @@ export function DashboardOverviewView({
           filters={filters}
           onCrossFilter={applyCrossFilter}
           onOpenDetail={onOpenDetail}
+          onAnnotate={setActiveAnnotationContext}
           draggable
         />
       </AsyncBoundary>
@@ -730,6 +760,7 @@ export function DashboardOverviewView({
           compareEnabled={effectiveCompareEnabled}
           filters={filters}
           onOpenDetail={onOpenDetail}
+          onAnnotate={setActiveAnnotationContext}
           draggable
         />
       </AsyncBoundary>
