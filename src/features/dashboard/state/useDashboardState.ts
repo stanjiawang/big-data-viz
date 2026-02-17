@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, type SetStateAction } from 'react';
+import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import type { DashboardAnnotationContext, DetailView } from '@/features/dashboard/sections';
 import {
@@ -254,27 +256,194 @@ function applySavedState(state: DashboardSavedState) {
   };
 }
 
+function applyStateAction<T>(current: T, next: SetStateAction<T>) {
+  return typeof next === 'function' ? (next as (_prev: T) => T)(current) : next;
+}
+
+function resolveInitialUrlState() {
+  if (typeof window === 'undefined') {
+    return {
+      datasetSize: DATASET_SIZES[1],
+      detailView: null,
+      filters: {
+        source: 'all',
+        search: '',
+      } satisfies MockFilters,
+      compareEnabled: undefined,
+      compareDatasetSize: undefined,
+    };
+  }
+  return parseDashboardSearchParams(window.location.search);
+}
+
+type DashboardStoreState = {
+  datasetSize: (typeof DATASET_SIZES)[number];
+  detailView: DetailView | null;
+  filters: MockFilters;
+  isFilterOpen: boolean;
+  compareEnabled: boolean;
+  compareDatasetSize: (typeof DATASET_SIZES)[number];
+  realtimeEnabled: boolean;
+  realtimePaused: boolean;
+  savedViews: DashboardSavedView[];
+  activeSavedViewId: string | null;
+  snapshots: DashboardSnapshot[];
+  activeSnapshotId: string | null;
+  annotations: DashboardAnnotation[];
+  activeAnnotationContext: DashboardAnnotationContext;
+  setDatasetSize: (_next: SetStateAction<(typeof DATASET_SIZES)[number]>) => void;
+  setDetailView: (_next: SetStateAction<DetailView | null>) => void;
+  setFilters: (_next: SetStateAction<MockFilters>) => void;
+  setIsFilterOpen: (_next: SetStateAction<boolean>) => void;
+  setCompareEnabled: (_next: SetStateAction<boolean>) => void;
+  setCompareDatasetSize: (_next: SetStateAction<(typeof DATASET_SIZES)[number]>) => void;
+  setRealtimeEnabled: (_next: SetStateAction<boolean>) => void;
+  setRealtimePaused: (_next: SetStateAction<boolean>) => void;
+  setSavedViews: (_next: SetStateAction<DashboardSavedView[]>) => void;
+  setActiveSavedViewId: (_next: SetStateAction<string | null>) => void;
+  setSnapshots: (_next: SetStateAction<DashboardSnapshot[]>) => void;
+  setActiveSnapshotId: (_next: SetStateAction<string | null>) => void;
+  setAnnotations: (_next: SetStateAction<DashboardAnnotation[]>) => void;
+  setActiveAnnotationContext: (_next: SetStateAction<DashboardAnnotationContext>) => void;
+};
+
+const initialUrlState = resolveInitialUrlState();
+
+const useDashboardStore = create<DashboardStoreState>((set) => ({
+  datasetSize: initialUrlState.datasetSize,
+  detailView: initialUrlState.detailView,
+  filters: initialUrlState.filters,
+  isFilterOpen: false,
+  compareEnabled: initialUrlState.compareEnabled ?? resolveInitialCompareEnabled(),
+  compareDatasetSize: initialUrlState.compareDatasetSize ?? resolveInitialCompareDatasetSize(),
+  realtimeEnabled: resolveInitialRealtimeEnabled(),
+  realtimePaused: resolveInitialRealtimePaused(),
+  savedViews: resolveSavedViews(),
+  activeSavedViewId: null,
+  snapshots: resolveSnapshots(),
+  activeSnapshotId: null,
+  annotations: resolveAnnotations(),
+  activeAnnotationContext: 'summary',
+  setDatasetSize: (next) =>
+    set((state) => ({
+      datasetSize: applyStateAction(state.datasetSize, next),
+    })),
+  setDetailView: (next) =>
+    set((state) => ({
+      detailView: applyStateAction(state.detailView, next),
+    })),
+  setFilters: (next) =>
+    set((state) => ({
+      filters: applyStateAction(state.filters, next),
+    })),
+  setIsFilterOpen: (next) =>
+    set((state) => ({
+      isFilterOpen: applyStateAction(state.isFilterOpen, next),
+    })),
+  setCompareEnabled: (next) =>
+    set((state) => ({
+      compareEnabled: applyStateAction(state.compareEnabled, next),
+    })),
+  setCompareDatasetSize: (next) =>
+    set((state) => ({
+      compareDatasetSize: applyStateAction(state.compareDatasetSize, next),
+    })),
+  setRealtimeEnabled: (next) =>
+    set((state) => ({
+      realtimeEnabled: applyStateAction(state.realtimeEnabled, next),
+    })),
+  setRealtimePaused: (next) =>
+    set((state) => ({
+      realtimePaused: applyStateAction(state.realtimePaused, next),
+    })),
+  setSavedViews: (next) =>
+    set((state) => ({
+      savedViews: applyStateAction(state.savedViews, next),
+    })),
+  setActiveSavedViewId: (next) =>
+    set((state) => ({
+      activeSavedViewId: applyStateAction(state.activeSavedViewId, next),
+    })),
+  setSnapshots: (next) =>
+    set((state) => ({
+      snapshots: applyStateAction(state.snapshots, next),
+    })),
+  setActiveSnapshotId: (next) =>
+    set((state) => ({
+      activeSnapshotId: applyStateAction(state.activeSnapshotId, next),
+    })),
+  setAnnotations: (next) =>
+    set((state) => ({
+      annotations: applyStateAction(state.annotations, next),
+    })),
+  setActiveAnnotationContext: (next) =>
+    set((state) => ({
+      activeAnnotationContext: applyStateAction(state.activeAnnotationContext, next),
+    })),
+}));
+
 export function useDashboardState() {
-  const [initialUrlState] = useState(() => parseDashboardSearchParams(window.location.search));
-  const [datasetSize, setDatasetSize] = useState(initialUrlState.datasetSize);
-  const [detailView, setDetailView] = useState<DetailView | null>(initialUrlState.detailView);
-  const [filters, setFilters] = useState<MockFilters>(initialUrlState.filters);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [compareEnabled, setCompareEnabled] = useState(
-    () => initialUrlState.compareEnabled ?? resolveInitialCompareEnabled(),
+  const {
+    datasetSize,
+    setDatasetSize,
+    detailView,
+    setDetailView,
+    filters,
+    setFilters,
+    isFilterOpen,
+    setIsFilterOpen,
+    compareEnabled,
+    setCompareEnabled,
+    compareDatasetSize,
+    setCompareDatasetSize,
+    realtimeEnabled,
+    setRealtimeEnabled,
+    realtimePaused,
+    setRealtimePaused,
+    savedViews,
+    setSavedViews,
+    activeSavedViewId,
+    setActiveSavedViewId,
+    snapshots,
+    setSnapshots,
+    activeSnapshotId,
+    setActiveSnapshotId,
+    annotations,
+    setAnnotations,
+    activeAnnotationContext,
+    setActiveAnnotationContext,
+  } = useDashboardStore(
+    useShallow((state) => ({
+      datasetSize: state.datasetSize,
+      setDatasetSize: state.setDatasetSize,
+      detailView: state.detailView,
+      setDetailView: state.setDetailView,
+      filters: state.filters,
+      setFilters: state.setFilters,
+      isFilterOpen: state.isFilterOpen,
+      setIsFilterOpen: state.setIsFilterOpen,
+      compareEnabled: state.compareEnabled,
+      setCompareEnabled: state.setCompareEnabled,
+      compareDatasetSize: state.compareDatasetSize,
+      setCompareDatasetSize: state.setCompareDatasetSize,
+      realtimeEnabled: state.realtimeEnabled,
+      setRealtimeEnabled: state.setRealtimeEnabled,
+      realtimePaused: state.realtimePaused,
+      setRealtimePaused: state.setRealtimePaused,
+      savedViews: state.savedViews,
+      setSavedViews: state.setSavedViews,
+      activeSavedViewId: state.activeSavedViewId,
+      setActiveSavedViewId: state.setActiveSavedViewId,
+      snapshots: state.snapshots,
+      setSnapshots: state.setSnapshots,
+      activeSnapshotId: state.activeSnapshotId,
+      setActiveSnapshotId: state.setActiveSnapshotId,
+      annotations: state.annotations,
+      setAnnotations: state.setAnnotations,
+      activeAnnotationContext: state.activeAnnotationContext,
+      setActiveAnnotationContext: state.setActiveAnnotationContext,
+    })),
   );
-  const [compareDatasetSize, setCompareDatasetSize] = useState(
-    () => initialUrlState.compareDatasetSize ?? resolveInitialCompareDatasetSize(),
-  );
-  const [realtimeEnabled, setRealtimeEnabled] = useState(() => resolveInitialRealtimeEnabled());
-  const [realtimePaused, setRealtimePaused] = useState(() => resolveInitialRealtimePaused());
-  const [savedViews, setSavedViews] = useState<DashboardSavedView[]>(() => resolveSavedViews());
-  const [activeSavedViewId, setActiveSavedViewId] = useState<string | null>(null);
-  const [snapshots, setSnapshots] = useState<DashboardSnapshot[]>(() => resolveSnapshots());
-  const [activeSnapshotId, setActiveSnapshotId] = useState<string | null>(null);
-  const [annotations, setAnnotations] = useState<DashboardAnnotation[]>(() => resolveAnnotations());
-  const [activeAnnotationContext, setActiveAnnotationContext] =
-    useState<DashboardAnnotationContext>('summary');
 
   useEffect(() => {
     syncDashboardSearchParams({

@@ -140,7 +140,7 @@ export const messages = {
     sectionTableCompareTitle: 'Large Table (Compare)',
     sectionTableDescription: 'Virtualized grid for multi-million row browsing.',
 
-    techReactStateUrl: 'Tech stack: React State + URL Params',
+    techReactStateUrl: 'Tech stack: Zustand + URL Params',
     techEchartsQuery: 'Tech stack: ECharts + React Query',
     techDeckGl: 'Tech stack: deck.gl + WebGL',
     techSigma: 'Tech stack: Sigma.js + Graphology',
@@ -334,7 +334,7 @@ export const messages = {
     sectionTableCompareTitle: '大表格（对比）',
     sectionTableDescription: '用于千万级行浏览的虚拟化表格。',
 
-    techReactStateUrl: '技术栈：React State + URL Params',
+    techReactStateUrl: '技术栈：Zustand + URL Params',
     techEchartsQuery: '技术栈：ECharts + React Query',
     techDeckGl: '技术栈：deck.gl + WebGL',
     techSigma: '技术栈：Sigma.js + Graphology',
