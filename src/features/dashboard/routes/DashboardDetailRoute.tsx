@@ -4,7 +4,11 @@ import { useAuth } from '@/auth/useAuth';
 import { canAccessFeature } from '@/config/featureAccess';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import type { DetailView } from '@/features/dashboard/sections';
-import { useDashboardState } from '@/features/dashboard/state/useDashboardState';
+import {
+  useDashboardCompareState,
+  useDashboardFilterPanelState,
+  useDashboardNavigationState,
+} from '@/features/dashboard/state/useDashboardState';
 import { DashboardDetailView } from '@/features/dashboard/ui/DashboardDetailView';
 
 const DETAIL_VIEWS: DetailView[] = ['summary', 'timeSeries', 'embedding', 'graph', 'd3', 'table'];
@@ -22,8 +26,9 @@ export function DashboardDetailRoute() {
   const summaryCardRef = useRef<HTMLElement | null>(null);
   const summaryVisualizationRef = useRef<HTMLDivElement | null>(null);
 
-  const { datasetSize, compareDatasetSize, compareEnabled, filters, setDetailView } =
-    useDashboardState();
+  const { datasetSize, setDetailView } = useDashboardNavigationState();
+  const { compareDatasetSize, compareEnabled } = useDashboardCompareState();
+  const { filters } = useDashboardFilterPanelState();
   const canUseCompareMode = canAccessFeature(
     auth.session,
     'compare_mode',

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, type SetStateAction } from 'react';
+import { useCallback, useEffect, useMemo, type SetStateAction } from 'react';
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
@@ -383,67 +383,18 @@ const useDashboardStore = create<DashboardStoreState>((set) => ({
 }));
 
 export function useDashboardState() {
-  const {
-    datasetSize,
-    setDatasetSize,
-    detailView,
-    setDetailView,
-    filters,
-    setFilters,
-    isFilterOpen,
-    setIsFilterOpen,
-    compareEnabled,
-    setCompareEnabled,
-    compareDatasetSize,
-    setCompareDatasetSize,
-    realtimeEnabled,
-    setRealtimeEnabled,
-    realtimePaused,
-    setRealtimePaused,
-    savedViews,
-    setSavedViews,
-    activeSavedViewId,
-    setActiveSavedViewId,
-    snapshots,
-    setSnapshots,
-    activeSnapshotId,
-    setActiveSnapshotId,
-    annotations,
-    setAnnotations,
-    activeAnnotationContext,
-    setActiveAnnotationContext,
-  } = useDashboardStore(
-    useShallow((state) => ({
-      datasetSize: state.datasetSize,
-      setDatasetSize: state.setDatasetSize,
-      detailView: state.detailView,
-      setDetailView: state.setDetailView,
-      filters: state.filters,
-      setFilters: state.setFilters,
-      isFilterOpen: state.isFilterOpen,
-      setIsFilterOpen: state.setIsFilterOpen,
-      compareEnabled: state.compareEnabled,
-      setCompareEnabled: state.setCompareEnabled,
-      compareDatasetSize: state.compareDatasetSize,
-      setCompareDatasetSize: state.setCompareDatasetSize,
-      realtimeEnabled: state.realtimeEnabled,
-      setRealtimeEnabled: state.setRealtimeEnabled,
-      realtimePaused: state.realtimePaused,
-      setRealtimePaused: state.setRealtimePaused,
-      savedViews: state.savedViews,
-      setSavedViews: state.setSavedViews,
-      activeSavedViewId: state.activeSavedViewId,
-      setActiveSavedViewId: state.setActiveSavedViewId,
-      snapshots: state.snapshots,
-      setSnapshots: state.setSnapshots,
-      activeSnapshotId: state.activeSnapshotId,
-      setActiveSnapshotId: state.setActiveSnapshotId,
-      annotations: state.annotations,
-      setAnnotations: state.setAnnotations,
-      activeAnnotationContext: state.activeAnnotationContext,
-      setActiveAnnotationContext: state.setActiveAnnotationContext,
-    })),
-  );
+  const { datasetSize, setDatasetSize, detailView, setDetailView } = useDashboardNavigationState();
+  const { filters, setFilters, isFilterOpen, setIsFilterOpen } = useDashboardFilterPanelState();
+  const { compareEnabled, setCompareEnabled, compareDatasetSize, setCompareDatasetSize } =
+    useDashboardCompareState();
+  const { realtimeEnabled, setRealtimeEnabled, realtimePaused, setRealtimePaused } =
+    useDashboardRealtimeState();
+  const { savedViews, setSavedViews, activeSavedViewId, setActiveSavedViewId } =
+    useDashboardSavedViewsState();
+  const { snapshots, setSnapshots, activeSnapshotId, setActiveSnapshotId } =
+    useDashboardSnapshotsState();
+  const { annotations, setAnnotations, activeAnnotationContext, setActiveAnnotationContext } =
+    useDashboardAnnotationsState();
 
   useEffect(() => {
     syncDashboardSearchParams({
@@ -728,6 +679,339 @@ export function useDashboardState() {
     activeAnnotationContext,
     setActiveAnnotationContext,
     currentStateSnapshot,
+    applySavedView,
+    saveCurrentAsNewView,
+    captureSnapshot,
+    replaySnapshot,
+    deleteActiveSnapshot,
+    clearSnapshots,
+    createAnnotation,
+    deleteAnnotation,
+    clearAnnotationsForContext,
+    updateActiveSavedView,
+    deleteActiveSavedView,
+  };
+}
+
+export function useDashboardNavigationState() {
+  return useDashboardStore(
+    useShallow((state) => ({
+      datasetSize: state.datasetSize,
+      setDatasetSize: state.setDatasetSize,
+      detailView: state.detailView,
+      setDetailView: state.setDetailView,
+    })),
+  );
+}
+
+export function useDashboardFilterPanelState() {
+  return useDashboardStore(
+    useShallow((state) => ({
+      filters: state.filters,
+      setFilters: state.setFilters,
+      isFilterOpen: state.isFilterOpen,
+      setIsFilterOpen: state.setIsFilterOpen,
+    })),
+  );
+}
+
+export function useDashboardCompareState() {
+  return useDashboardStore(
+    useShallow((state) => ({
+      compareEnabled: state.compareEnabled,
+      setCompareEnabled: state.setCompareEnabled,
+      compareDatasetSize: state.compareDatasetSize,
+      setCompareDatasetSize: state.setCompareDatasetSize,
+    })),
+  );
+}
+
+export function useDashboardRealtimeState() {
+  return useDashboardStore(
+    useShallow((state) => ({
+      realtimeEnabled: state.realtimeEnabled,
+      setRealtimeEnabled: state.setRealtimeEnabled,
+      realtimePaused: state.realtimePaused,
+      setRealtimePaused: state.setRealtimePaused,
+    })),
+  );
+}
+
+export function useDashboardSavedViewsState() {
+  return useDashboardStore(
+    useShallow((state) => ({
+      savedViews: state.savedViews,
+      setSavedViews: state.setSavedViews,
+      activeSavedViewId: state.activeSavedViewId,
+      setActiveSavedViewId: state.setActiveSavedViewId,
+    })),
+  );
+}
+
+export function useDashboardSnapshotsState() {
+  return useDashboardStore(
+    useShallow((state) => ({
+      snapshots: state.snapshots,
+      setSnapshots: state.setSnapshots,
+      activeSnapshotId: state.activeSnapshotId,
+      setActiveSnapshotId: state.setActiveSnapshotId,
+    })),
+  );
+}
+
+export function useDashboardAnnotationsState() {
+  return useDashboardStore(
+    useShallow((state) => ({
+      annotations: state.annotations,
+      setAnnotations: state.setAnnotations,
+      activeAnnotationContext: state.activeAnnotationContext,
+      setActiveAnnotationContext: state.setActiveAnnotationContext,
+    })),
+  );
+}
+
+export function useDashboardActions() {
+  const applySavedView = useCallback((viewId: string) => {
+    const state = useDashboardStore.getState();
+    const selected = state.savedViews.find((view) => view.id === viewId);
+    if (!selected) {
+      return false;
+    }
+
+    const nextState = applySavedState(selected.state);
+    state.setDatasetSize(nextState.datasetSize);
+    state.setFilters(nextState.filters);
+    state.setCompareEnabled(nextState.compareEnabled);
+    state.setCompareDatasetSize(nextState.compareDatasetSize);
+    state.setActiveSavedViewId(viewId);
+    return true;
+  }, []);
+
+  const saveCurrentAsNewView = useCallback((name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const state = useDashboardStore.getState();
+    const id =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `view-${Date.now()}`;
+    const now = new Date().toISOString();
+    const currentStateSnapshot = createSavedState({
+      datasetSize: state.datasetSize,
+      filters: state.filters,
+      compareEnabled: state.compareEnabled,
+      compareDatasetSize: state.compareDatasetSize,
+    });
+
+    const nextView: DashboardSavedView = {
+      id,
+      name: trimmed,
+      state: currentStateSnapshot,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    state.setSavedViews((current) => [nextView, ...current]);
+    state.setActiveSavedViewId(id);
+    return id;
+  }, []);
+
+  const captureSnapshot = useCallback((name?: string) => {
+    const state = useDashboardStore.getState();
+    const id =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `snapshot-${Date.now()}`;
+    const nextName = name?.trim() ? name.trim() : `Snapshot ${state.snapshots.length + 1}`;
+    const capturedAt = new Date().toISOString();
+    const currentStateSnapshot = createSavedState({
+      datasetSize: state.datasetSize,
+      filters: state.filters,
+      compareEnabled: state.compareEnabled,
+      compareDatasetSize: state.compareDatasetSize,
+    });
+
+    const nextSnapshot: DashboardSnapshot = {
+      id,
+      name: nextName,
+      state: currentStateSnapshot,
+      capturedAt,
+    };
+
+    state.setSnapshots((current) => [nextSnapshot, ...current].slice(0, 20));
+    state.setActiveSnapshotId(id);
+    return id;
+  }, []);
+
+  const replaySnapshot = useCallback((snapshotId: string) => {
+    const state = useDashboardStore.getState();
+    const selected = state.snapshots.find((snapshot) => snapshot.id === snapshotId);
+    if (!selected) {
+      return false;
+    }
+
+    const nextState = applySavedState(selected.state);
+    state.setDatasetSize(nextState.datasetSize);
+    state.setFilters(nextState.filters);
+    state.setCompareEnabled(nextState.compareEnabled);
+    state.setCompareDatasetSize(nextState.compareDatasetSize);
+    state.setActiveSnapshotId(snapshotId);
+    return true;
+  }, []);
+
+  const deleteActiveSnapshot = useCallback(() => {
+    const state = useDashboardStore.getState();
+    const activeSnapshotId = state.activeSnapshotId;
+    if (!activeSnapshotId) {
+      return false;
+    }
+
+    let didDelete = false;
+    state.setSnapshots((current) =>
+      current.filter((snapshot) => {
+        if (snapshot.id === activeSnapshotId) {
+          didDelete = true;
+          return false;
+        }
+        return true;
+      }),
+    );
+
+    if (didDelete) {
+      state.setActiveSnapshotId(null);
+    }
+
+    return didDelete;
+  }, []);
+
+  const clearSnapshots = useCallback(() => {
+    const state = useDashboardStore.getState();
+    if (state.snapshots.length === 0) {
+      return false;
+    }
+    state.setSnapshots([]);
+    state.setActiveSnapshotId(null);
+    return true;
+  }, []);
+
+  const createAnnotation = useCallback((context: DashboardAnnotationContext, message: string) => {
+    const trimmed = message.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const state = useDashboardStore.getState();
+    const id =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `annotation-${Date.now()}`;
+    const now = new Date().toISOString();
+
+    const nextAnnotation: DashboardAnnotation = {
+      id,
+      context,
+      message: trimmed,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    state.setAnnotations((current) => [nextAnnotation, ...current].slice(0, 100));
+    state.setActiveAnnotationContext(context);
+    return id;
+  }, []);
+
+  const deleteAnnotation = useCallback((annotationId: string) => {
+    const state = useDashboardStore.getState();
+    let didDelete = false;
+    state.setAnnotations((current) =>
+      current.filter((annotation) => {
+        if (annotation.id === annotationId) {
+          didDelete = true;
+          return false;
+        }
+        return true;
+      }),
+    );
+    return didDelete;
+  }, []);
+
+  const clearAnnotationsForContext = useCallback((context: DashboardAnnotationContext) => {
+    const state = useDashboardStore.getState();
+    let didClear = false;
+    state.setAnnotations((current) => {
+      const next = current.filter((annotation) => {
+        if (annotation.context === context) {
+          didClear = true;
+          return false;
+        }
+        return true;
+      });
+      return next;
+    });
+    return didClear;
+  }, []);
+
+  const updateActiveSavedView = useCallback(() => {
+    const state = useDashboardStore.getState();
+    const activeSavedViewId = state.activeSavedViewId;
+    if (!activeSavedViewId) {
+      return false;
+    }
+
+    const currentStateSnapshot = createSavedState({
+      datasetSize: state.datasetSize,
+      filters: state.filters,
+      compareEnabled: state.compareEnabled,
+      compareDatasetSize: state.compareDatasetSize,
+    });
+
+    let didUpdate = false;
+    state.setSavedViews((current) =>
+      current.map((view) => {
+        if (view.id !== activeSavedViewId) {
+          return view;
+        }
+        didUpdate = true;
+        return {
+          ...view,
+          state: currentStateSnapshot,
+          updatedAt: new Date().toISOString(),
+        };
+      }),
+    );
+
+    return didUpdate;
+  }, []);
+
+  const deleteActiveSavedView = useCallback(() => {
+    const state = useDashboardStore.getState();
+    const activeSavedViewId = state.activeSavedViewId;
+    if (!activeSavedViewId) {
+      return false;
+    }
+
+    let didDelete = false;
+    state.setSavedViews((current) =>
+      current.filter((view) => {
+        if (view.id === activeSavedViewId) {
+          didDelete = true;
+          return false;
+        }
+        return true;
+      }),
+    );
+
+    if (didDelete) {
+      state.setActiveSavedViewId(null);
+    }
+
+    return didDelete;
+  }, []);
+
+  return {
     applySavedView,
     saveCurrentAsNewView,
     captureSnapshot,

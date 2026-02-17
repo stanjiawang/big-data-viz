@@ -7,7 +7,14 @@ import { getRuntimeConfig } from '@/config/runtimeConfig';
 import {
   DEFAULT_WEIGHT_MAX,
   DEFAULT_WEIGHT_MIN,
-  useDashboardState,
+  useDashboardAnnotationsState,
+  useDashboardActions,
+  useDashboardCompareState,
+  useDashboardFilterPanelState,
+  useDashboardNavigationState,
+  useDashboardRealtimeState,
+  useDashboardSavedViewsState,
+  useDashboardSnapshotsState,
 } from '@/features/dashboard/state/useDashboardState';
 import type { DetailView } from '@/features/dashboard/sections';
 import { useRealtimeStream } from '@/features/realtime/useRealtimeStream';
@@ -23,30 +30,17 @@ export function DashboardOverviewRoute() {
   const auth = useAuth();
   const queryClient = useQueryClient();
 
+  const { datasetSize, setDatasetSize, setDetailView } = useDashboardNavigationState();
+  const { filters, setFilters, isFilterOpen, setIsFilterOpen } = useDashboardFilterPanelState();
+  const { compareEnabled, setCompareEnabled, compareDatasetSize, setCompareDatasetSize } =
+    useDashboardCompareState();
+  const { realtimeEnabled, setRealtimeEnabled, realtimePaused, setRealtimePaused } =
+    useDashboardRealtimeState();
+  const { savedViews, activeSavedViewId, setActiveSavedViewId } = useDashboardSavedViewsState();
+  const { snapshots, activeSnapshotId, setActiveSnapshotId } = useDashboardSnapshotsState();
+  const { annotations, activeAnnotationContext, setActiveAnnotationContext } =
+    useDashboardAnnotationsState();
   const {
-    datasetSize,
-    setDatasetSize,
-    filters,
-    setFilters,
-    isFilterOpen,
-    setIsFilterOpen,
-    compareEnabled,
-    setCompareEnabled,
-    compareDatasetSize,
-    setCompareDatasetSize,
-    realtimeEnabled,
-    setRealtimeEnabled,
-    realtimePaused,
-    setRealtimePaused,
-    savedViews,
-    activeSavedViewId,
-    setActiveSavedViewId,
-    snapshots,
-    activeSnapshotId,
-    setActiveSnapshotId,
-    annotations,
-    activeAnnotationContext,
-    setActiveAnnotationContext,
     applySavedView,
     saveCurrentAsNewView,
     captureSnapshot,
@@ -58,8 +52,7 @@ export function DashboardOverviewRoute() {
     clearAnnotationsForContext,
     updateActiveSavedView,
     deleteActiveSavedView,
-    setDetailView,
-  } = useDashboardState();
+  } = useDashboardActions();
 
   const canUseCompareMode = canAccessFeature(
     auth.session,
