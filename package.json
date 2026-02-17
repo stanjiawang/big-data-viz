@@ -26,6 +26,7 @@
     "test:e2e:auth": "PW_AUTH_SUITE=1 playwright test",
     "prepare": "husky",
     "check:env": "node scripts/check-env.mjs",
+    "test:security-headers": "node scripts/check-security-headers.mjs",
     "test:render-perf": "playwright test tests/render-performance.spec.ts --workers=1",
     "test:e2e:a11y": "playwright test tests/a11y.spec.ts"
   },

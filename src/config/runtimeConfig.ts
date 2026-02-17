@@ -21,6 +21,7 @@ export type RuntimeConfig = {
   authRequireTenant: boolean;
   authTenantId: string;
   authProvider: 'mock' | 'oidc';
+  authSessionStorage: 'session' | 'local';
   authOidcAuthorizeUrl: string;
   authOidcTokenUrl: string;
   authOidcClientId: string;
@@ -139,6 +140,14 @@ function parseAuthProvider(value: string | undefined): 'mock' | 'oidc' {
   return 'mock';
 }
 
+function parseAuthSessionStorage(value: string | undefined): 'session' | 'local' {
+  if (value === 'local') {
+    return 'local';
+  }
+
+  return 'session';
+}
+
 export function getRuntimeConfig(): RuntimeConfig {
   const mode = resolveMode();
 
@@ -216,6 +225,9 @@ export function getRuntimeConfig(): RuntimeConfig {
   const authProvider = parseAuthProvider(
     typeof __APP_AUTH_PROVIDER__ !== 'undefined' ? __APP_AUTH_PROVIDER__ : undefined,
   );
+  const authSessionStorage = parseAuthSessionStorage(
+    typeof __APP_AUTH_SESSION_STORAGE__ !== 'undefined' ? __APP_AUTH_SESSION_STORAGE__ : undefined,
+  );
 
   const authOidcAuthorizeUrl = normalizeToken(
     typeof __APP_AUTH_OIDC_AUTHORIZE_URL__ !== 'undefined'
@@ -282,6 +294,7 @@ export function getRuntimeConfig(): RuntimeConfig {
     authRequireTenant,
     authTenantId,
     authProvider,
+    authSessionStorage,
     authOidcAuthorizeUrl,
     authOidcTokenUrl,
     authOidcClientId,

@@ -1,4 +1,4 @@
-import { AUTH_SESSION_STORAGE_KEY } from '@/auth/authClient';
+import { readAuthSession } from '@/auth/authClient';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { ApiError } from '@/lib/errors';
 import { emitTelemetry, recordMetric, reportError } from '@/lib/telemetry';
@@ -12,13 +12,6 @@ type HttpRequestOptions = {
 
 type RequestRetryState = {
   attempts: number;
-};
-
-type SessionShape = {
-  accessToken?: string;
-  user?: {
-    tenantId?: string;
-  };
 };
 
 function nowMs() {
@@ -106,27 +99,17 @@ function generateRequestId() {
 }
 
 function readAuthHeaders() {
-  if (typeof window === 'undefined' || !window.localStorage) {
+  if (typeof window === 'undefined') {
     return {} as Record<string, string>;
   }
 
   const authHeaders: Record<string, string> = {};
-  const sessionRaw = window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY);
-
-  if (sessionRaw) {
-    try {
-      const session = JSON.parse(sessionRaw) as SessionShape;
-
-      if (session.accessToken) {
-        authHeaders.Authorization = `Bearer ${session.accessToken}`;
-      }
-
-      if (session.user?.tenantId) {
-        authHeaders['X-Tenant-Id'] = session.user.tenantId;
-      }
-    } catch {
-      // Ignore bad session payloads and send request without auth context.
-    }
+  const session = readAuthSession();
+  if (session?.accessToken) {
+    authHeaders.Authorization = `Bearer ${session.accessToken}`;
+  }
+  if (session?.user?.tenantId) {
+    authHeaders['X-Tenant-Id'] = session.user.tenantId;
   }
 
   const search = new URLSearchParams(window.location.search);

@@ -11,15 +11,16 @@
 1. `pnpm run lint`
 2. `pnpm run typecheck`
 3. `pnpm run stylelint`
-4. `pnpm run test:contracts`
-5. `pnpm run test:perf`
-6. `pnpm run test:render-perf`
-7. `pnpm run test:reliability`
-8. `pnpm run test:release-governance`
-9. `pnpm test`
-10. `pnpm test:e2e`
-11. `pnpm run test:e2e:auth`
-12. `pnpm run test:e2e:a11y`
+4. `pnpm run test:security-headers`
+5. `pnpm run test:contracts`
+6. `pnpm run test:perf`
+7. `pnpm run test:render-perf`
+8. `pnpm run test:reliability`
+9. `pnpm run test:release-governance`
+10. `pnpm test`
+11. `pnpm test:e2e`
+12. `pnpm run test:e2e:auth`
+13. `pnpm run test:e2e:a11y`
 
 ## Common Failures
 

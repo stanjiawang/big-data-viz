@@ -19,6 +19,7 @@ function createRuntimeConfig(overrides: Partial<RuntimeConfig> = {}): RuntimeCon
     authRequireTenant: false,
     authTenantId: '',
     authProvider: 'mock',
+    authSessionStorage: 'local',
     authOidcAuthorizeUrl: '',
     authOidcTokenUrl: '',
     authOidcClientId: '',
@@ -36,6 +37,7 @@ function createRuntimeConfig(overrides: Partial<RuntimeConfig> = {}): RuntimeCon
 describe('authClient', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    window.sessionStorage.clear();
     window.history.replaceState({}, '', '/');
   });
 
@@ -51,6 +53,21 @@ describe('authClient', () => {
     expect(session?.user.roles).toEqual(['analyst']);
     expect(session?.user.email).toBe(MOCK_AUTH_ACCOUNTS[0].email);
     expect(window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY)).toBeTruthy();
+  });
+
+  it('uses sessionStorage when authSessionStorage=session', async () => {
+    const client = createAuthClient(
+      createRuntimeConfig({
+        authSessionStorage: 'session',
+      }),
+    );
+    await client.signIn({
+      email: MOCK_AUTH_ACCOUNTS[0].email,
+      password: MOCK_AUTH_ACCOUNTS[0].password,
+    });
+
+    expect(window.sessionStorage.getItem(AUTH_SESSION_STORAGE_KEY)).toBeTruthy();
+    expect(window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY)).toBeNull();
   });
 
   it('rejects invalid mock credentials', async () => {
@@ -105,7 +122,7 @@ describe('authClient', () => {
       );
 
       await client.signIn().catch(() => undefined);
-      expect(window.localStorage.getItem('bdv.auth.oidc.transaction')).toContain('codeVerifier');
+      expect(window.sessionStorage.getItem('bdv.auth.oidc.transaction')).toContain('codeVerifier');
     } finally {
       Object.defineProperty(globalThis, 'crypto', {
         configurable: true,
@@ -134,7 +151,7 @@ describe('authClient', () => {
       writable: true,
     });
 
-    window.localStorage.setItem(
+    window.sessionStorage.setItem(
       'bdv.auth.oidc.transaction',
       JSON.stringify({
         codeVerifier: 'verifier-1',
@@ -177,7 +194,7 @@ describe('authClient', () => {
   });
 
   it('rejects callback when OIDC state does not match', async () => {
-    window.localStorage.setItem(
+    window.sessionStorage.setItem(
       'bdv.auth.oidc.transaction',
       JSON.stringify({
         codeVerifier: 'verifier-1',

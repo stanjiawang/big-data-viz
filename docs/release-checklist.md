@@ -5,6 +5,8 @@
 - [ ] Reliability, performance, and contract gates passed
 - [ ] Accessibility e2e gate passed (`pnpm run test:e2e:a11y`)
 - [ ] i18n smoke check completed for `en` and `zh-CN`
+- [ ] Security header profile verified for deployment target (`public/_headers` or `vercel.json`)
+- [ ] Auth session storage mode reviewed (`VITE_AUTH_SESSION_STORAGE=session` by default)
 - [ ] Rollback plan and owner confirmed
 - [ ] Post-release monitoring window scheduled
 - [ ] Auth rollout checklist completed for the target environment

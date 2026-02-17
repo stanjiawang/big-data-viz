@@ -18,6 +18,7 @@ describe('runtimeConfig', () => {
         authRequireTenant: false,
         authTenantId: '',
         authProvider: 'mock',
+        authSessionStorage: 'session',
         authOidcAuthorizeUrl: '',
         authOidcTokenUrl: '',
         authOidcClientId: '',

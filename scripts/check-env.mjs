@@ -14,6 +14,7 @@ const appCommitSha = process.env.VITE_APP_COMMIT_SHA;
 const authRequiredRoles = process.env.VITE_AUTH_REQUIRED_ROLES;
 const authRequireTenant = process.env.VITE_AUTH_REQUIRE_TENANT;
 const authTenantId = process.env.VITE_AUTH_TENANT_ID;
+const authSessionStorage = process.env.VITE_AUTH_SESSION_STORAGE;
 
 const mocksEnabled = enableMsw === 'true';
 
@@ -82,6 +83,14 @@ if (retryJitterRatio !== undefined && retryJitterRatio !== '') {
 
 if (enableAuth !== undefined && enableAuth !== '' && !['true', 'false'].includes(enableAuth)) {
   errors.push('VITE_ENABLE_AUTH must be true or false when set.');
+}
+
+if (
+  authSessionStorage !== undefined &&
+  authSessionStorage !== '' &&
+  !['session', 'local'].includes(authSessionStorage)
+) {
+  errors.push('VITE_AUTH_SESSION_STORAGE must be session or local when set.');
 }
 
 if (

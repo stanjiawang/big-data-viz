@@ -17,6 +17,7 @@ declare const __APP_AUTH_REQUIRED_ROLES__: string | undefined;
 declare const __APP_AUTH_REQUIRE_TENANT__: string | undefined;
 declare const __APP_AUTH_TENANT_ID__: string | undefined;
 declare const __APP_AUTH_PROVIDER__: string | undefined;
+declare const __APP_AUTH_SESSION_STORAGE__: string | undefined;
 declare const __APP_AUTH_OIDC_AUTHORIZE_URL__: string | undefined;
 declare const __APP_AUTH_OIDC_TOKEN_URL__: string | undefined;
 declare const __APP_AUTH_OIDC_CLIENT_ID__: string | undefined;

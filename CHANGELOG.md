@@ -10,6 +10,8 @@ All notable changes to this project are tracked in this file.
 - Incident document automation and reliability policy validation.
 - Accessibility e2e gate using Playwright + axe-core (`pnpm run test:e2e:a11y`).
 - Runtime language switcher and locale catalogs (`en`, `zh-CN`).
+- Phase 4 security roadmap spec (`docs/roadmap/phase-04-security-governance.md`).
+- Deploy-ready security header profiles for Cloudflare-style hosts (`public/_headers`) and Vercel (`vercel.json`).
 
 ### Changed
 
@@ -17,6 +19,8 @@ All notable changes to this project are tracked in this file.
 - API payload schema contracts now include strict schema versioning.
 - i18n runtime migrated to `react-intl` while preserving existing translation hook usage.
 - Dashboard semantics improved for accessibility (skip link, labeled regions/dialogs, keyboard-focusable scroll areas, improved contrast).
+- Auth session persistence now defaults to safer `sessionStorage` via `VITE_AUTH_SESSION_STORAGE=session`, with migration-safe fallback reads.
+- Auth/session header resolution is centralized in auth client storage logic.
 
 ## Release Procedure
 

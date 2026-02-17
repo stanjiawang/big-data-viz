@@ -7,10 +7,11 @@ import { RequireAuth } from '@/auth/RequireAuth';
 describe('RequireAuth', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    window.sessionStorage.clear();
   });
 
   function setSession(roles: string[], tenantId?: string) {
-    window.localStorage.setItem(
+    window.sessionStorage.setItem(
       AUTH_SESSION_STORAGE_KEY,
       JSON.stringify({
         accessToken: 'test-token',

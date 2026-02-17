@@ -96,6 +96,10 @@ Success Metrics:
 - Zero high/critical dependency vulnerabilities on default branch.
 - Security review checklist green for every release candidate.
 
+Spec:
+
+- `docs/roadmap/phase-04-security-governance.md`
+
 ### Phase 5: Platform Extensibility
 
 Objective:
@@ -136,4 +140,4 @@ Success Metrics:
 
 ## Immediate Next Step
 
-- Start Phase 1, Slice 1: Persisted dashboard state contract and test coverage hardening.
+- Start Phase 4, Slice 3: dependency and SBOM governance automation in CI.

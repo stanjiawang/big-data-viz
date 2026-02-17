@@ -48,18 +48,44 @@ type OidcTokenResponse = {
   token_type?: string;
 };
 
-function readSession(): AuthSession | null {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return null;
-  }
-
-  const raw = window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY);
-  if (!raw) {
+function resolveStorage(kind: 'session' | 'local'): Storage | null {
+  if (typeof window === 'undefined') {
     return null;
   }
 
   try {
-    const parsed = JSON.parse(raw) as AuthSession;
+    return kind === 'session' ? window.sessionStorage : window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+function resolveSessionStorage(config: RuntimeConfig) {
+  return resolveStorage(config.authSessionStorage) ?? resolveStorage('local');
+}
+
+function resolveTransactionStorage() {
+  return resolveStorage('session') ?? resolveStorage('local');
+}
+
+export function readAuthSession(config = getRuntimeConfig()): AuthSession | null {
+  const sessionStorage = resolveSessionStorage(config);
+  if (!sessionStorage) {
+    return null;
+  }
+
+  const raw = sessionStorage.getItem(AUTH_SESSION_STORAGE_KEY);
+  const fallbackRaw =
+    config.authSessionStorage === 'session' && !raw
+      ? resolveStorage('local')?.getItem(AUTH_SESSION_STORAGE_KEY)
+      : null;
+  const payload = raw ?? fallbackRaw;
+  if (!payload) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(payload) as AuthSession;
     if (!parsed?.accessToken || !parsed?.user?.id || !parsed?.expiresAt) {
       return null;
     }
@@ -69,25 +95,33 @@ function readSession(): AuthSession | null {
   }
 }
 
-function writeSession(session: AuthSession | null) {
-  if (typeof window === 'undefined' || !window.localStorage) {
+function writeSession(config: RuntimeConfig, session: AuthSession | null) {
+  const sessionStorage = resolveSessionStorage(config);
+  if (!sessionStorage) {
     return;
   }
 
   if (!session) {
-    window.localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
+    sessionStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
+    if (config.authSessionStorage === 'session') {
+      resolveStorage('local')?.removeItem(AUTH_SESSION_STORAGE_KEY);
+    }
     return;
   }
 
-  window.localStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(session));
+  sessionStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(session));
+  if (config.authSessionStorage === 'session') {
+    resolveStorage('local')?.removeItem(AUTH_SESSION_STORAGE_KEY);
+  }
 }
 
 function readOidcTransaction(): OidcTransaction | null {
-  if (typeof window === 'undefined' || !window.localStorage) {
+  const storage = resolveTransactionStorage();
+  if (!storage) {
     return null;
   }
 
-  const raw = window.localStorage.getItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY);
+  const raw = storage.getItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY);
   if (!raw) {
     return null;
   }
@@ -104,16 +138,21 @@ function readOidcTransaction(): OidcTransaction | null {
 }
 
 function writeOidcTransaction(transaction: OidcTransaction | null) {
-  if (typeof window === 'undefined' || !window.localStorage) {
+  const storage = resolveTransactionStorage();
+  if (!storage) {
     return;
   }
 
   if (!transaction) {
-    window.localStorage.removeItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY);
+    storage.removeItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY);
+    resolveStorage('local')?.removeItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY);
     return;
   }
 
-  window.localStorage.setItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY, JSON.stringify(transaction));
+  storage.setItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY, JSON.stringify(transaction));
+  if (storage !== resolveStorage('local')) {
+    resolveStorage('local')?.removeItem(AUTH_OIDC_TRANSACTION_STORAGE_KEY);
+  }
 }
 
 function resolveTenantId() {
@@ -344,7 +383,7 @@ function resolveMockAccount(credentials?: AuthSignInInput): MockAccount {
   return account;
 }
 
-export function createMockAuthClient(): AuthClient {
+export function createMockAuthClient(config: RuntimeConfig): AuthClient {
   const listeners = new Set<SessionListener>();
 
   const emit = (session: AuthSession | null) => {
@@ -355,7 +394,7 @@ export function createMockAuthClient(): AuthClient {
 
   const onStorage = (event: StorageEvent) => {
     if (event.key === AUTH_SESSION_STORAGE_KEY) {
-      emit(readSession());
+      emit(readAuthSession(config));
     }
   };
 
@@ -365,13 +404,13 @@ export function createMockAuthClient(): AuthClient {
 
   return {
     async getSession() {
-      const session = readSession();
+      const session = readAuthSession(config);
       if (!session) {
         return null;
       }
 
       if (session.expiresAt <= Date.now()) {
-        writeSession(null);
+        writeSession(config, null);
         return null;
       }
 
@@ -380,11 +419,11 @@ export function createMockAuthClient(): AuthClient {
     async signIn(credentials?: AuthSignInInput) {
       const account = resolveMockAccount(credentials);
       const session = createMockSession(account);
-      writeSession(session);
+      writeSession(config, session);
       emit(session);
     },
     async signOut() {
-      writeSession(null);
+      writeSession(config, null);
       emit(null);
     },
     subscribe(listener: SessionListener) {
@@ -407,7 +446,7 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
 
   const onStorage = (event: StorageEvent) => {
     if (event.key === AUTH_SESSION_STORAGE_KEY) {
-      emit(readSession());
+      emit(readAuthSession(config));
     }
   };
 
@@ -461,7 +500,7 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
   };
 
   const signOut = async () => {
-    writeSession(null);
+    writeSession(config, null);
     writeOidcTransaction(null);
     emit(null);
 
@@ -482,7 +521,7 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
   };
 
   const getSession = async () => {
-    const session = readSession();
+    const session = readAuthSession(config);
     if (session && !isSessionExpired(session, SESSION_REFRESH_SKEW_MS)) {
       return session;
     }
@@ -491,7 +530,7 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
       try {
         const tokenResponse = await exchangeRefreshToken(config, session.refreshToken);
         const refreshedSession = buildOidcSessionFromTokens(config, tokenResponse, session);
-        writeSession(refreshedSession);
+        writeSession(config, refreshedSession);
         emit(refreshedSession);
         emitTelemetry('info', 'auth.session.refresh_succeeded', {
           provider: 'oidc',
@@ -499,7 +538,7 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
         });
         return refreshedSession;
       } catch (error) {
-        writeSession(null);
+        writeSession(config, null);
         writeOidcTransaction(null);
         emit(null);
         reportError('auth.session.refresh_failed', error, {
@@ -510,7 +549,7 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
     }
 
     if (session && isSessionExpired(session)) {
-      writeSession(null);
+      writeSession(config, null);
     }
 
     if (typeof window === 'undefined') {
@@ -595,7 +634,7 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
     }
 
     const nextSession = buildOidcSessionFromTokens(config, tokenResponse);
-    writeSession(nextSession);
+    writeSession(config, nextSession);
     writeOidcTransaction(null);
     sanitizeOidcCallbackParams();
     emit(nextSession);
@@ -628,5 +667,5 @@ export function createAuthClient(config = getRuntimeConfig()): AuthClient {
     return createOidcAuthClient(config);
   }
 
-  return createMockAuthClient();
+  return createMockAuthClient(config);
 }

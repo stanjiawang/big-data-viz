@@ -46,10 +46,12 @@ The app uses environment-driven runtime config and a resilient API client (timeo
 - `VITE_ENABLE_MSW`: `true` or `false`, enables mock API worker in development
 - `VITE_ENABLE_AUTH`: `true` or `false`, enables auth gate
 - `VITE_AUTH_PROVIDER`: `mock` (default) or `oidc`
+- `VITE_AUTH_SESSION_STORAGE`: `session` (default, safer) or `local`
 - OIDC minimum config: `VITE_AUTH_OIDC_AUTHORIZE_URL`, `VITE_AUTH_OIDC_TOKEN_URL`, `VITE_AUTH_OIDC_CLIENT_ID`
 
 When `VITE_AUTH_PROVIDER=oidc`, the client supports PKCE login callbacks and refresh-token renewal.
 If token renewal fails, the session is cleared and the user is prompted to sign in again.
+By default, auth session data is persisted in `sessionStorage` to reduce token persistence risk.
 
 Mock sign-in account (when `VITE_AUTH_PROVIDER=mock`):
 
@@ -77,6 +79,15 @@ pnpm run test:e2e:a11y
 `test:e2e` runs the non-auth functional suite.
 `test:e2e:auth` runs auth-enabled end-to-end sign-in/sign-out flows.
 `test:e2e:a11y` runs only the axe-core accessibility specs.
+
+## Deployment Security Baseline
+
+This repo ships deploy-ready security header profiles for static hosts:
+
+- Cloudflare Pages/Netlify-style headers: `/public/_headers`
+- Vercel headers config: `/vercel.json`
+
+These include CSP, frame-ancestor blocking, content-type hardening, and browser policy headers.
 
 ## Mock Data
 

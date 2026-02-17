@@ -42,6 +42,7 @@ export default defineConfig(({ mode }) => {
       __APP_AUTH_REQUIRE_TENANT__: defineLiteral(env.VITE_AUTH_REQUIRE_TENANT),
       __APP_AUTH_TENANT_ID__: defineLiteral(env.VITE_AUTH_TENANT_ID),
       __APP_AUTH_PROVIDER__: defineLiteral(env.VITE_AUTH_PROVIDER),
+      __APP_AUTH_SESSION_STORAGE__: defineLiteral(env.VITE_AUTH_SESSION_STORAGE),
       __APP_AUTH_OIDC_AUTHORIZE_URL__: defineLiteral(env.VITE_AUTH_OIDC_AUTHORIZE_URL),
       __APP_AUTH_OIDC_TOKEN_URL__: defineLiteral(env.VITE_AUTH_OIDC_TOKEN_URL),
       __APP_AUTH_OIDC_CLIENT_ID__: defineLiteral(env.VITE_AUTH_OIDC_CLIENT_ID),
