@@ -8,6 +8,7 @@
     "dev:demo": "vite --mode demo",
     "build": "tsc && vite build",
     "build:demo": "tsc && vite build --mode demo",
+    "demo:verify": "node scripts/verify-demo-package.mjs",
     "preview": "vite preview",
     "incident:new": "node scripts/new-incident.mjs",
     "typecheck": "tsc --noEmit",

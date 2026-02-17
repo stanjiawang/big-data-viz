@@ -29,6 +29,8 @@ Demo profile local run:
 14. `pnpm run test:e2e:auth`
 15. `pnpm run test:e2e:a11y`
 16. `pnpm run quality:dashboard`
+17. `pnpm run build:demo`
+18. `pnpm run demo:verify`
 
 ## Common Failures
 
@@ -84,3 +86,4 @@ Demo profile local run:
 ## Deployment
 
 - Guide: `docs/deploy.md`
+- Interview demo handoff: `docs/demo-handoff.md`

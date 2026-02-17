@@ -30,3 +30,9 @@ Ship a public-ready demo posture with repeatable deployment and safe runtime def
 - Demo build can be produced with `pnpm run build:demo` with no config edits.
 - New contributors can deploy with docs only in under 15 minutes.
 - CI remains green while demo profile is enabled.
+
+## Delivery Notes
+
+- Slice 1 delivered demo runtime profile (`standard`/`demo`) and deployment docs.
+- Slice 2 delivered CI quality dashboard artifact generation and publication.
+- Slice 3 delivered demo handoff guide and scripted demo package verification.

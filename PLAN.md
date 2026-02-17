@@ -144,4 +144,4 @@ Spec:
 
 ## Immediate Next Step
 
-- Start Phase 6, Slice 3: demo packaging handoff and release-note finalization.
+- Phase 6 complete. Monitor CI artifacts and deploy demo profile from `main`.

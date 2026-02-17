@@ -91,6 +91,7 @@ pnpm run dev
 pnpm run dev:demo
 pnpm run build
 pnpm run build:demo
+pnpm run demo:verify
 pnpm run preview
 pnpm run lint
 pnpm run typecheck
@@ -118,6 +119,7 @@ pnpm run test:e2e:a11y
 
 - Deploy guide (Vercel + Cloudflare Pages): `docs/deploy.md`
 - Quality dashboard artifact guide: `docs/quality-dashboard.md`
+- Interview handoff guide: `docs/demo-handoff.md`
 
 ## Deployment Security Baseline
 
