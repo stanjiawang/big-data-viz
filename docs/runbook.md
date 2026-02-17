@@ -6,6 +6,11 @@
 2. `cp .env.example .env`
 3. `pnpm run dev`
 
+Demo profile local run:
+
+- `pnpm run dev:demo`
+- or `cp .env.demo .env` then `pnpm run dev`
+
 ## Required Checks Before Merge
 
 1. `pnpm run lint`
@@ -30,6 +35,7 @@
 
 - Run `pnpm run check:env`
 - Verify `.env` values match `.env.example`
+- For public demo posture, set `VITE_RUNTIME_PROFILE=demo`
 
 ### Unit tests failing due watchman in restricted environments
 
@@ -73,3 +79,7 @@
 - Release checklist: `docs/release-checklist.md`
 - Rollback checklist: `docs/rollback-checklist.md`
 - Governance validator: `pnpm run test:release-governance`
+
+## Deployment
+
+- Guide: `docs/deploy.md`

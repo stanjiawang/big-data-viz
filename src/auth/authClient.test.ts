@@ -3,6 +3,7 @@ import type { RuntimeConfig } from '@/config/runtimeConfig';
 
 function createRuntimeConfig(overrides: Partial<RuntimeConfig> = {}): RuntimeConfig {
   return {
+    runtimeProfile: 'standard',
     mode: 'test',
     apiBaseUrl: '',
     apiTimeoutMs: 10_000,

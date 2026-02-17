@@ -13,6 +13,8 @@ All notable changes to this project are tracked in this file.
 - Phase 4 security roadmap spec (`docs/roadmap/phase-04-security-governance.md`).
 - Deploy-ready security header profiles for Cloudflare-style hosts (`public/_headers`) and Vercel (`vercel.json`).
 - Dependency policy gate (`test:dependency-policy`) and SBOM generator (`sbom:generate`) for CI governance.
+- Phase 6 productionization spec (`docs/roadmap/phase-06-productionization.md`) and deployment guide (`docs/deploy.md`) for Vercel + Cloudflare Pages.
+- Demo runtime profile support (`VITE_RUNTIME_PROFILE=demo`) with dedicated scripts (`pnpm run dev:demo`, `pnpm run build:demo`).
 
 ### Changed
 
@@ -23,6 +25,7 @@ All notable changes to this project are tracked in this file.
 - Auth session persistence now defaults to safer `sessionStorage` via `VITE_AUTH_SESSION_STORAGE=session`, with migration-safe fallback reads.
 - Auth/session header resolution is centralized in auth client storage logic.
 - CI now uploads CycloneDX SBOM artifacts and enforces dependency policy before merge.
+- Runtime config now includes an explicit `runtimeProfile` contract (`standard` | `demo`) and demo-safe fallback defaults.
 
 ## Release Procedure
 

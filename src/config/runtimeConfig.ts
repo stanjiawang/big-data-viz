@@ -5,6 +5,7 @@ const DEFAULT_RETRY_MAX_DELAY_MS = 2_000;
 const DEFAULT_RETRY_JITTER_RATIO = 0.2;
 
 export type RuntimeConfig = {
+  runtimeProfile: 'standard' | 'demo';
   mode: string;
   apiBaseUrl: string;
   apiTimeoutMs: number;
@@ -43,6 +44,19 @@ function resolveMode() {
     ?.NODE_ENV;
 
   return nodeEnv ?? 'production';
+}
+
+function parseRuntimeProfile(
+  value: string | undefined,
+  fallback: 'standard' | 'demo' = 'standard',
+): 'standard' | 'demo' {
+  if (value === 'demo') {
+    return 'demo';
+  }
+  if (value === 'standard') {
+    return 'standard';
+  }
+  return fallback;
 }
 
 function parseTimeoutMs(value: string | number | undefined, fallback: number) {
@@ -150,6 +164,13 @@ function parseAuthSessionStorage(value: string | undefined): 'session' | 'local'
 
 export function getRuntimeConfig(): RuntimeConfig {
   const mode = resolveMode();
+  const runtimeProfile = parseRuntimeProfile(
+    typeof __APP_RUNTIME_PROFILE__ !== 'undefined'
+      ? __APP_RUNTIME_PROFILE__
+      : (globalThis as { process?: { env?: { VITE_RUNTIME_PROFILE?: string } } }).process?.env
+          ?.VITE_RUNTIME_PROFILE,
+  );
+  const isDemoProfile = runtimeProfile === 'demo';
 
   const apiBaseUrl = normalizeBaseUrl(
     typeof __APP_API_BASE_URL__ !== 'undefined' ? __APP_API_BASE_URL__ : undefined,
@@ -188,7 +209,7 @@ export function getRuntimeConfig(): RuntimeConfig {
 
   const enableMocking = parseBoolean(
     typeof __APP_ENABLE_MSW__ !== 'undefined' ? __APP_ENABLE_MSW__ : undefined,
-    mode === 'development',
+    isDemoProfile || mode === 'development',
   );
 
   const enableAuth = parseBoolean(
@@ -278,6 +299,7 @@ export function getRuntimeConfig(): RuntimeConfig {
   );
 
   return {
+    runtimeProfile,
     mode,
     apiBaseUrl,
     apiTimeoutMs,
@@ -290,7 +312,8 @@ export function getRuntimeConfig(): RuntimeConfig {
     enableTelemetry,
     appRelease,
     appCommitSha,
-    authRequiredRoles,
+    authRequiredRoles:
+      authRequiredRoles.length > 0 ? authRequiredRoles : isDemoProfile ? ['viewer'] : [],
     authRequireTenant,
     authTenantId,
     authProvider,

@@ -1,6 +1,7 @@
 const errors = [];
 
 const enableMsw = process.env.VITE_ENABLE_MSW;
+const runtimeProfile = process.env.VITE_RUNTIME_PROFILE;
 const apiBaseUrl = process.env.VITE_API_BASE_URL;
 const timeout = process.env.VITE_API_TIMEOUT_MS;
 const retryCount = process.env.VITE_API_RETRY_COUNT;
@@ -15,6 +16,14 @@ const authRequiredRoles = process.env.VITE_AUTH_REQUIRED_ROLES;
 const authRequireTenant = process.env.VITE_AUTH_REQUIRE_TENANT;
 const authTenantId = process.env.VITE_AUTH_TENANT_ID;
 const authSessionStorage = process.env.VITE_AUTH_SESSION_STORAGE;
+
+if (
+  runtimeProfile !== undefined &&
+  runtimeProfile !== '' &&
+  !['standard', 'demo'].includes(runtimeProfile)
+) {
+  errors.push('VITE_RUNTIME_PROFILE must be standard or demo when set.');
+}
 
 const mocksEnabled = enableMsw === 'true';
 

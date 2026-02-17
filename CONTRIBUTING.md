@@ -7,6 +7,8 @@ Thanks for contributing!
 ```bash
 pnpm install
 pnpm run dev
+# or demo mode
+pnpm run dev:demo
 ```
 
 ## Code Quality

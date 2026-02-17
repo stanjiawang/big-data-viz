@@ -132,6 +132,10 @@ Success Metrics:
 
 - Green CI + successful deploy from main in < 15 minutes.
 
+Spec:
+
+- `docs/roadmap/phase-06-productionization.md`
+
 ## Execution Rules
 
 - Deliver each phase in vertical slices: `UI + state + tests + docs + telemetry` in one PR.
@@ -140,4 +144,4 @@ Success Metrics:
 
 ## Immediate Next Step
 
-- Start Phase 5, Slice 1: pluggable visualization registry and module contract.
+- Start Phase 6, Slice 1: one-click deployment docs and demo-mode runtime profile.

@@ -27,6 +27,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       __APP_MODE__: JSON.stringify(mode),
+      __APP_RUNTIME_PROFILE__: defineLiteral(env.VITE_RUNTIME_PROFILE),
       __APP_API_BASE_URL__: defineLiteral(env.VITE_API_BASE_URL),
       __APP_API_TIMEOUT_MS__: defineLiteral(env.VITE_API_TIMEOUT_MS),
       __APP_API_RETRY_COUNT__: defineLiteral(env.VITE_API_RETRY_COUNT),

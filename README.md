@@ -55,11 +55,18 @@ pnpm run dev
 
 Open: http://localhost:5173
 
+Demo profile:
+
+```bash
+pnpm run dev:demo
+```
+
 ## Runtime Configuration
 
 The app uses environment-driven runtime config and a resilient API client (timeout + retry + typed errors).
 
 - `VITE_API_BASE_URL`: API origin, for example `https://api.company.com`
+- `VITE_RUNTIME_PROFILE`: `standard` (default) or `demo`
 - `VITE_API_TIMEOUT_MS`: request timeout in milliseconds
 - `VITE_API_RETRY_COUNT`: retry count for retriable failures
 - `VITE_ENABLE_MSW`: `true` or `false`, enables mock API worker in development
@@ -81,7 +88,9 @@ Mock sign-in account (when `VITE_AUTH_PROVIDER=mock`):
 
 ```bash
 pnpm run dev
+pnpm run dev:demo
 pnpm run build
+pnpm run build:demo
 pnpm run preview
 pnpm run lint
 pnpm run typecheck
@@ -102,6 +111,10 @@ pnpm run test:e2e:a11y
 `test:e2e:a11y` runs only the axe-core accessibility specs.
 `test:dependency-policy` fails on high/critical dependency vulnerabilities.
 `sbom:generate` writes CycloneDX SBOM output to `artifacts/sbom.cdx.json`.
+
+## Deployment
+
+- Deploy guide (Vercel + Cloudflare Pages): `docs/deploy.md`
 
 ## Deployment Security Baseline
 
