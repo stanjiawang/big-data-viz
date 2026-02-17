@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { AUTH_SESSION_STORAGE_KEY } from '@/auth/authClient';
 import { API_SCHEMA_VERSION } from '@/lib/contracts';
@@ -162,18 +163,20 @@ describe('DashboardPage', () => {
     return render(
       <QueryClientProvider client={queryClient}>
         <AuthProvider enabled={enableAuth}>
-          <DashboardPage />
+          <MemoryRouter initialEntries={['/']}>
+            <DashboardPage />
+          </MemoryRouter>
         </AuthProvider>
       </QueryClientProvider>,
     );
   }
 
-  it('renders header and badges', () => {
+  it('renders header and badges', async () => {
     renderPage();
-    expect(screen.getByText('Big Data Viz Lab')).toBeInTheDocument();
-    expect(screen.getByText('Dataset Size: 1M')).toBeInTheDocument();
-    expect(screen.getByText('Labels: all')).toBeInTheDocument();
-    expect(screen.getByText('Source: all')).toBeInTheDocument();
+    expect(await screen.findByText('Big Data Viz Lab')).toBeInTheDocument();
+    expect(await screen.findByText('Dataset Size: 1M')).toBeInTheDocument();
+    expect(await screen.findByText('Labels: all')).toBeInTheDocument();
+    expect(await screen.findByText('Source: all')).toBeInTheDocument();
   });
 
   it('enables compare mode in non-auth mode', async () => {

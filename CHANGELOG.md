@@ -17,6 +17,7 @@ All notable changes to this project are tracked in this file.
 - Demo runtime profile support (`VITE_RUNTIME_PROFILE=demo`) with dedicated scripts (`pnpm run dev:demo`, `pnpm run build:demo`).
 - CI quality dashboard artifacts (`quality-dashboard`) with consolidated coverage, bundle perf, render benchmark, and accessibility gate status.
 - Demo handoff packaging docs and verifier script (`docs/demo-handoff.md`, `pnpm run demo:verify`).
+- Dashboard routing introduced with lazy-loaded overview/detail route modules and scoped query invalidation for realtime refresh.
 
 ### Changed
 

@@ -1,138 +1,46 @@
-import { useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/auth/useAuth';
-import { canAccessFeature } from '@/config/featureAccess';
-import { getRuntimeConfig } from '@/config/runtimeConfig';
-import {
-  DEFAULT_WEIGHT_MAX,
-  DEFAULT_WEIGHT_MIN,
-  useDashboardState,
-} from '@/features/dashboard/state/useDashboardState';
-import { useRealtimeStream } from '@/features/realtime/useRealtimeStream';
-import { DashboardDetailView } from '@/features/dashboard/ui/DashboardDetailView';
-import { DashboardOverviewView } from '@/features/dashboard/ui/DashboardOverviewView';
+import { lazy, Suspense, useEffect } from 'react';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import type { DetailView } from '@/features/dashboard/sections';
+
+const DashboardOverviewRoute = lazy(async () => {
+  const module = await import('@/features/dashboard/routes/DashboardOverviewRoute');
+  return { default: module.DashboardOverviewRoute };
+});
+
+const DashboardDetailRoute = lazy(async () => {
+  const module = await import('@/features/dashboard/routes/DashboardDetailRoute');
+  return { default: module.DashboardDetailRoute };
+});
+
+const DETAIL_VIEWS: DetailView[] = ['summary', 'timeSeries', 'embedding', 'graph', 'd3', 'table'];
 
 export function DashboardPage() {
-  const summaryCardRef = useRef<HTMLElement | null>(null);
-  const summaryVisualizationRef = useRef<HTMLDivElement | null>(null);
-  const runtimeConfig = getRuntimeConfig();
-  const auth = useAuth();
-  const queryClient = useQueryClient();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const {
-    datasetSize,
-    setDatasetSize,
-    detailView,
-    setDetailView,
-    filters,
-    setFilters,
-    isFilterOpen,
-    setIsFilterOpen,
-    compareEnabled,
-    setCompareEnabled,
-    compareDatasetSize,
-    setCompareDatasetSize,
-    realtimeEnabled,
-    setRealtimeEnabled,
-    realtimePaused,
-    setRealtimePaused,
-    savedViews,
-    activeSavedViewId,
-    setActiveSavedViewId,
-    snapshots,
-    activeSnapshotId,
-    setActiveSnapshotId,
-    annotations,
-    activeAnnotationContext,
-    setActiveAnnotationContext,
-    applySavedView,
-    saveCurrentAsNewView,
-    captureSnapshot,
-    replaySnapshot,
-    deleteActiveSnapshot,
-    clearSnapshots,
-    createAnnotation,
-    deleteAnnotation,
-    clearAnnotationsForContext,
-    updateActiveSavedView,
-    deleteActiveSavedView,
-  } = useDashboardState();
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      return;
+    }
 
-  const canUseCompareMode = canAccessFeature(
-    auth.session,
-    'compare_mode',
-    runtimeConfig.enableAuth,
-  );
-  const effectiveCompareEnabled = compareEnabled && canUseCompareMode;
+    const params = new URLSearchParams(location.search);
+    const legacyDetail = params.get('detail');
+    if (!legacyDetail || !DETAIL_VIEWS.includes(legacyDetail as DetailView)) {
+      return;
+    }
 
-  const realtime = useRealtimeStream({
-    enabled: realtimeEnabled,
-    paused: realtimePaused,
-    onTick: () => void queryClient.invalidateQueries(),
-  });
-
-  if (detailView) {
-    return (
-      <DashboardDetailView
-        detailView={detailView}
-        datasetSize={datasetSize}
-        compareDatasetSize={compareDatasetSize}
-        compareEnabled={effectiveCompareEnabled}
-        filters={filters}
-        onBackToDashboard={() => setDetailView(null)}
-        summaryCardRef={summaryCardRef}
-        summaryVisualizationRef={summaryVisualizationRef}
-      />
-    );
-  }
+    params.delete('detail');
+    const nextSearch = params.toString();
+    navigate(`/detail/${legacyDetail}${nextSearch ? `?${nextSearch}` : ''}`, { replace: true });
+  }, [location.pathname, location.search, navigate]);
 
   return (
-    <DashboardOverviewView
-      runtimeEnableAuth={runtimeConfig.enableAuth}
-      isAuthenticated={auth.isAuthenticated}
-      onSignOut={auth.signOut}
-      datasetSize={datasetSize}
-      setDatasetSize={setDatasetSize}
-      filters={filters}
-      setFilters={setFilters}
-      compareEnabled={compareEnabled}
-      setCompareEnabled={setCompareEnabled}
-      compareDatasetSize={compareDatasetSize}
-      setCompareDatasetSize={setCompareDatasetSize}
-      canUseCompareMode={canUseCompareMode}
-      realtimeEnabled={realtimeEnabled}
-      setRealtimeEnabled={setRealtimeEnabled}
-      realtimePaused={realtimePaused}
-      setRealtimePaused={setRealtimePaused}
-      realtimeStatus={realtime.status}
-      savedViews={savedViews}
-      activeSavedViewId={activeSavedViewId}
-      setActiveSavedViewId={setActiveSavedViewId}
-      snapshots={snapshots}
-      activeSnapshotId={activeSnapshotId}
-      setActiveSnapshotId={setActiveSnapshotId}
-      annotations={annotations}
-      activeAnnotationContext={activeAnnotationContext}
-      setActiveAnnotationContext={setActiveAnnotationContext}
-      onApplySavedView={applySavedView}
-      onSaveCurrentAsNewView={saveCurrentAsNewView}
-      onCaptureSnapshot={captureSnapshot}
-      onReplaySnapshot={replaySnapshot}
-      onDeleteActiveSnapshot={deleteActiveSnapshot}
-      onClearSnapshots={clearSnapshots}
-      onCreateAnnotation={createAnnotation}
-      onDeleteAnnotation={deleteAnnotation}
-      onClearAnnotationsForContext={clearAnnotationsForContext}
-      onUpdateActiveSavedView={updateActiveSavedView}
-      onDeleteActiveSavedView={deleteActiveSavedView}
-      onOpenDetail={setDetailView}
-      isFilterOpen={isFilterOpen}
-      onOpenFilters={() => setIsFilterOpen(true)}
-      onCloseFilters={() => setIsFilterOpen(false)}
-      summaryCardRef={summaryCardRef}
-      summaryVisualizationRef={summaryVisualizationRef}
-      defaultWeightMin={DEFAULT_WEIGHT_MIN}
-      defaultWeightMax={DEFAULT_WEIGHT_MAX}
-    />
+    <Suspense fallback={<main id="app-main" className="mx-auto max-w-[1480px] px-4 py-8" />}>
+      <Routes>
+        <Route path="/" element={<DashboardOverviewRoute />} />
+        <Route path="/detail/:detailView" element={<DashboardDetailRoute />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 }
