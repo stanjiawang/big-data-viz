@@ -140,4 +140,4 @@ Success Metrics:
 
 ## Immediate Next Step
 
-- Start Phase 4, Slice 3: dependency and SBOM governance automation in CI.
+- Start Phase 5, Slice 1: pluggable visualization registry and module contract.

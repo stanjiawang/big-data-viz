@@ -12,6 +12,7 @@ All notable changes to this project are tracked in this file.
 - Runtime language switcher and locale catalogs (`en`, `zh-CN`).
 - Phase 4 security roadmap spec (`docs/roadmap/phase-04-security-governance.md`).
 - Deploy-ready security header profiles for Cloudflare-style hosts (`public/_headers`) and Vercel (`vercel.json`).
+- Dependency policy gate (`test:dependency-policy`) and SBOM generator (`sbom:generate`) for CI governance.
 
 ### Changed
 
@@ -21,6 +22,7 @@ All notable changes to this project are tracked in this file.
 - Dashboard semantics improved for accessibility (skip link, labeled regions/dialogs, keyboard-focusable scroll areas, improved contrast).
 - Auth session persistence now defaults to safer `sessionStorage` via `VITE_AUTH_SESSION_STORAGE=session`, with migration-safe fallback reads.
 - Auth/session header resolution is centralized in auth client storage logic.
+- CI now uploads CycloneDX SBOM artifacts and enforces dependency policy before merge.
 
 ## Release Procedure
 

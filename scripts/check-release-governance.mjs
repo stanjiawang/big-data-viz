@@ -60,6 +60,8 @@ async function run() {
       'Version and scope are finalized',
       'Changelog entry is updated',
       'Reliability, performance, and contract gates passed',
+      'Dependency policy gate passed',
+      'SBOM artifact generated and attached',
       'Rollback plan and owner confirmed',
       'Post-release monitoring window scheduled',
       'Auth rollout checklist completed for the target environment',

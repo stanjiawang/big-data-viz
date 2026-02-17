@@ -27,11 +27,14 @@
     "prepare": "husky",
     "check:env": "node scripts/check-env.mjs",
     "test:security-headers": "node scripts/check-security-headers.mjs",
+    "test:dependency-policy": "node scripts/check-dependency-policy.mjs",
+    "sbom:generate": "node scripts/generate-sbom.mjs",
     "test:render-perf": "playwright test tests/render-performance.spec.ts --workers=1",
     "test:e2e:a11y": "playwright test tests/a11y.spec.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
+    "@cyclonedx/cyclonedx-npm": "^4.1.2",
     "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.58.1",
     "@swc/core": "^1.9.2",

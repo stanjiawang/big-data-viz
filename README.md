@@ -72,6 +72,8 @@ pnpm test
 pnpm test:e2e
 pnpm run test:render-perf
 pnpm run test:perf
+pnpm run test:dependency-policy
+pnpm run sbom:generate
 pnpm run test:e2e:auth
 pnpm run test:e2e:a11y
 ```
@@ -79,6 +81,8 @@ pnpm run test:e2e:a11y
 `test:e2e` runs the non-auth functional suite.
 `test:e2e:auth` runs auth-enabled end-to-end sign-in/sign-out flows.
 `test:e2e:a11y` runs only the axe-core accessibility specs.
+`test:dependency-policy` fails on high/critical dependency vulnerabilities.
+`sbom:generate` writes CycloneDX SBOM output to `artifacts/sbom.cdx.json`.
 
 ## Deployment Security Baseline
 

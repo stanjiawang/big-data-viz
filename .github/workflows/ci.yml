@@ -37,6 +37,8 @@ jobs:
         run: pnpm run check:env
       - name: Security headers policy
         run: pnpm run test:security-headers
+      - name: Dependency policy
+        run: pnpm run test:dependency-policy
       - name: Lint
         run: pnpm run lint
       - name: Typecheck
@@ -59,6 +61,14 @@ jobs:
         run: pnpm run test:reliability
       - name: Release governance
         run: pnpm run test:release-governance
+      - name: Generate SBOM
+        run: pnpm run sbom:generate
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: artifacts/sbom.cdx.json
+          if-no-files-found: error
       - name: Unit tests
         run: pnpm run test:coverage
       - name: E2E tests
