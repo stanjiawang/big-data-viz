@@ -5,11 +5,14 @@ import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import type { DetailView } from '@/features/dashboard/sections';
 import { SectionCardActions } from '@/features/dashboard/sections/shared';
 import { ChartsSection, SummarySection, TableSection } from '@/features/dashboard/ui/lazySections';
+import { getChartDetailTitleKey, isChartDetailView } from '@/features/visualizations/chartRegistry';
+import type { MessageKey } from '@/i18n/messages';
 import { useI18n } from '@/i18n/useI18n';
 import type { MockFilters } from '@/lib/types';
 
 const ACTION_BUTTON_CLASS = UI_BUTTON_GHOST_SM;
 type DatasetSizeOption = (typeof DATASET_SIZES)[number];
+type TranslateFn = (_key: MessageKey) => string;
 
 type DashboardDetailViewProps = {
   detailView: DetailView;
@@ -21,6 +24,16 @@ type DashboardDetailViewProps = {
   summaryCardRef: RefObject<HTMLElement | null>;
   summaryVisualizationRef: RefObject<HTMLDivElement | null>;
 };
+
+function getDetailTitle(detailView: DetailView, t: TranslateFn) {
+  if (detailView === 'summary') {
+    return t('sectionSummaryTitle');
+  }
+  if (detailView === 'table') {
+    return t('sectionTableTitle');
+  }
+  return t(getChartDetailTitleKey(detailView));
+}
 
 export function DashboardDetailView({
   detailView,
@@ -34,15 +47,6 @@ export function DashboardDetailView({
 }: DashboardDetailViewProps) {
   const { t } = useI18n();
 
-  const detailLabelByView: Record<DetailView, string> = {
-    summary: t('sectionSummaryTitle'),
-    timeSeries: t('sectionTimeSeriesTitle'),
-    embedding: t('sectionEmbeddingTitle'),
-    graph: t('sectionGraphTitle'),
-    d3: t('sectionD3Title'),
-    table: t('sectionTableTitle'),
-  };
-
   return (
     <main
       id="app-main"
@@ -51,7 +55,7 @@ export function DashboardDetailView({
       <section className="space-y-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
         <div className="flex min-h-10 flex-wrap items-center justify-between gap-3">
           <h2 className={UI_LABEL_CLASS}>
-            {t('dashboardDetailedView')}: {detailLabelByView[detailView]}
+            {t('dashboardDetailedView')}: {getDetailTitle(detailView, t)}
           </h2>
           <div className="flex flex-wrap items-center justify-end gap-2 lg:flex-nowrap">
             <button
@@ -99,47 +103,14 @@ export function DashboardDetailView({
         </Card>
       ) : null}
 
-      {detailView === 'timeSeries' ? (
+      {isChartDetailView(detailView) ? (
         <ChartsSection
           datasetSize={datasetSize}
           compareDatasetSize={compareDatasetSize}
           compareEnabled={compareEnabled}
           filters={filters}
           expanded
-          focusView="timeSeries"
-        />
-      ) : null}
-
-      {detailView === 'embedding' ? (
-        <ChartsSection
-          datasetSize={datasetSize}
-          compareDatasetSize={compareDatasetSize}
-          compareEnabled={compareEnabled}
-          filters={filters}
-          expanded
-          focusView="embedding"
-        />
-      ) : null}
-
-      {detailView === 'graph' ? (
-        <ChartsSection
-          datasetSize={datasetSize}
-          compareDatasetSize={compareDatasetSize}
-          compareEnabled={compareEnabled}
-          filters={filters}
-          expanded
-          focusView="graph"
-        />
-      ) : null}
-
-      {detailView === 'd3' ? (
-        <ChartsSection
-          datasetSize={datasetSize}
-          compareDatasetSize={compareDatasetSize}
-          compareEnabled={compareEnabled}
-          filters={filters}
-          expanded
-          focusView="d3"
+          focusView={detailView}
         />
       ) : null}
 

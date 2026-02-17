@@ -1,5 +1,7 @@
 import {
   clearChartDefinitionRegistry,
+  getChartDetailTitleKey,
+  isChartDetailView,
   registerChartDefinition,
   resolveChartDefinitions,
   unregisterChartDefinition,
@@ -59,5 +61,11 @@ describe('chartRegistry', () => {
     const graph = resolved.find((definition) => definition.id === 'graph');
 
     expect(graph?.getTitle()).toBe('Relationship Graph');
+  });
+
+  it('identifies chart detail views and resolves title keys', () => {
+    expect(isChartDetailView('timeSeries')).toBe(true);
+    expect(isChartDetailView('table')).toBe(false);
+    expect(getChartDetailTitleKey('d3')).toBe('sectionD3Title');
   });
 });

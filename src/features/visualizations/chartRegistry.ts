@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import type { DetailView } from '@/features/dashboard/sections/types';
+import type { MessageKey } from '@/i18n/messages';
 
 export type ChartDetailView = Extract<DetailView, 'timeSeries' | 'embedding' | 'graph' | 'd3'>;
 
@@ -11,6 +12,13 @@ export type ChartDefinition = {
 };
 
 const extensionRegistry = new Map<ChartDefinition['id'], ChartDefinition>();
+const CHART_DETAIL_VIEWS = ['timeSeries', 'embedding', 'graph', 'd3'] as const;
+const CHART_DETAIL_TITLE_KEYS: Record<ChartDetailView, MessageKey> = {
+  timeSeries: 'sectionTimeSeriesTitle',
+  embedding: 'sectionEmbeddingTitle',
+  graph: 'sectionGraphTitle',
+  d3: 'sectionD3Title',
+};
 
 export function registerChartDefinition(definition: ChartDefinition) {
   extensionRegistry.set(definition.id, definition);
@@ -22,6 +30,14 @@ export function unregisterChartDefinition(id: ChartDefinition['id']) {
 
 export function clearChartDefinitionRegistry() {
   extensionRegistry.clear();
+}
+
+export function isChartDetailView(view: DetailView): view is ChartDetailView {
+  return (CHART_DETAIL_VIEWS as readonly string[]).includes(view);
+}
+
+export function getChartDetailTitleKey(view: ChartDetailView): MessageKey {
+  return CHART_DETAIL_TITLE_KEYS[view];
 }
 
 function compareByOrderThenId(left: ChartDefinition, right: ChartDefinition) {
