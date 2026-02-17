@@ -9,6 +9,8 @@ import {
   TableSection,
 } from '@/features/dashboard/sections';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
+import { clearChartDefinitionRegistry } from '@/features/visualizations/chartRegistry';
+import { registerGraphOverrideExtension } from '@/features/visualizations/chartExtensionExample';
 
 jest.mock('@/features/charts/BarChart', () => ({
   BarChart: ({ title, onItemClick }: { title: string; onItemClick?: (_name: string) => void }) => (
@@ -87,6 +89,10 @@ describe('dashboard/sections', () => {
     filters,
   };
 
+  afterEach(() => {
+    clearChartDefinitionRegistry();
+  });
+
   it('renders KPI section', () => {
     render(<KpiSection {...baseProps} />);
     expect(screen.getByText('Total Records')).toBeInTheDocument();
@@ -117,6 +123,19 @@ describe('dashboard/sections', () => {
     expect(screen.getByText('EmbeddingCloud')).toBeInTheDocument();
     expect(screen.getByText('RelationshipGraph')).toBeInTheDocument();
     expect(screen.getByText('D3EmbeddingScatter')).toBeInTheDocument();
+  });
+
+  it('supports extension override substitution for chart cards', () => {
+    registerGraphOverrideExtension({
+      getTitle: () => 'Custom Graph',
+      render: () => <div>CustomGraphCard</div>,
+      order: 1,
+    });
+
+    render(<ChartsSection {...baseProps} />);
+
+    expect(screen.getByText('CustomGraphCard')).toBeInTheDocument();
+    expect(screen.queryByText('RelationshipGraph')).not.toBeInTheDocument();
   });
 
   it('renders table section', () => {

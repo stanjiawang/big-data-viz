@@ -3,6 +3,7 @@ import {
   getChartDetailTitleKey,
   isChartDetailView,
   registerChartDefinition,
+  registerChartDefinitions,
   resolveChartDefinitions,
   unregisterChartDefinition,
   type ChartDefinition,
@@ -67,5 +68,16 @@ describe('chartRegistry', () => {
     expect(isChartDetailView('timeSeries')).toBe(true);
     expect(isChartDetailView('table')).toBe(false);
     expect(getChartDetailTitleKey('d3')).toBe('sectionD3Title');
+  });
+
+  it('registers multiple definitions in one call', () => {
+    registerChartDefinitions([
+      createDefinition('timeSeries', 5, 'Time Series Override'),
+      createDefinition('d3', 6, 'D3 Override'),
+    ]);
+
+    const resolved = resolveChartDefinitions(core);
+    expect(resolved[0]?.getTitle()).toBe('Time Series Override');
+    expect(resolved[1]?.getTitle()).toBe('D3 Override');
   });
 });

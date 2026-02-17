@@ -24,6 +24,12 @@ export function registerChartDefinition(definition: ChartDefinition) {
   extensionRegistry.set(definition.id, definition);
 }
 
+export function registerChartDefinitions(definitions: readonly ChartDefinition[]) {
+  definitions.forEach((definition) => {
+    registerChartDefinition(definition);
+  });
+}
+
 export function unregisterChartDefinition(id: ChartDefinition['id']) {
   extensionRegistry.delete(id);
 }

@@ -26,6 +26,25 @@ Enterprise-ready workspace for large-scale AI training data analytics, built wit
 - Jest + React Testing Library
 - Playwright + @axe-core/playwright
 
+## Visualization Extension Contract
+
+Dashboard chart cards can be overridden through a typed registry API.
+
+- Core contract: `src/features/visualizations/chartRegistry.ts`
+- Example extension: `src/features/visualizations/chartExtensionExample.tsx`
+
+Example:
+
+```tsx
+import { registerGraphOverrideExtension } from '@/features/visualizations/chartExtensionExample';
+
+registerGraphOverrideExtension({
+  getTitle: () => 'Custom Graph',
+  render: () => <div>Custom graph implementation</div>,
+  order: 5,
+});
+```
+
 ## Getting Started
 
 ```bash
