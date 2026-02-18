@@ -40,7 +40,7 @@ export function Card({
       <div
         draggable={Boolean(dragHandle)}
         aria-label={dragHandle?.ariaLabel}
-        className={`ui-card-head min-h-20 rounded-xl border px-4 py-3 ${
+        className={`ui-card-head rounded-xl border px-4 py-3 ${
           dragHandle?.isDragging
             ? 'cursor-grabbing border-blue-300'
             : dragHandle
@@ -64,28 +64,32 @@ export function Card({
           dragHandle?.onDragEnd();
         }}
       >
-        <div className="flex flex-col items-start justify-between gap-2.5 sm:flex-row sm:gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 space-y-1.5">
-            <h3
-              id={headingId}
-              className="text-sm font-semibold uppercase tracking-[0.1em] text-slate-600"
-            >
-              {title}
-            </h3>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <h3
+                id={headingId}
+                className="text-sm font-semibold uppercase tracking-[0.1em] text-slate-600"
+              >
+                {title}
+              </h3>
+              {subtitle ? (
+                <span className={`${UI_TEXT_MUTED_SM} text-xs uppercase tracking-[0.07em]`}>
+                  {subtitle}
+                </span>
+              ) : null}
+            </div>
             {description ? (
-              <p className={`${UI_TEXT_SUBTITLE} min-h-6 text-[1.03rem] leading-snug`}>
+              <p className={`${UI_TEXT_SUBTITLE} max-w-[68ch] text-[1.02rem] leading-snug`}>
                 {description}
               </p>
             ) : null}
-            {subtitle ? (
-              <p className={`${UI_TEXT_MUTED_SM} min-h-5 text-xs uppercase tracking-[0.07em]`}>
-                {subtitle}
-              </p>
-            ) : null}
           </div>
-          <div className="flex w-full shrink-0 items-center justify-end gap-2 self-start pt-0.5 sm:w-auto">
-            {actions}
-          </div>
+          {actions ? (
+            <div className="w-full shrink-0 sm:w-auto" data-drag-ignore="true">
+              {actions}
+            </div>
+          ) : null}
         </div>
       </div>
       {children ? <div className={`mt-4 ${contentClassName ?? ''}`}>{children}</div> : null}

@@ -12,11 +12,8 @@ import { useMockData } from '@/features/data/queries/useMockData';
 
 const PAGE_SIZE = 200;
 const VECTOR_SIZE = 128;
-const DEFAULT_ROW_HEIGHT = 52;
-const COMPACT_ROW_HEIGHT = 24;
-const DEFAULT_COL_WIDTHS = [180, 220, 160, 150];
-const MIN_COL_WIDTH = 120;
-const MAX_COL_WIDTH = 360;
+const DEFAULT_ROW_HEIGHT = 46;
+const COMPACT_ROW_HEIGHT = 30;
 const TABLE_DENSITY_STORAGE_KEY = 'bdv_table_compact_density';
 
 type LargeDataTableProps = {
@@ -43,27 +40,28 @@ const TableRow = memo(function TableRow({
   const timestamp = record?.timestamp
     ? record.timestamp.replace('T', ' ').slice(0, 19)
     : loadingText;
-  const featurePreviewSize = isCompact ? 4 : 12;
+  const featurePreviewSize = isCompact ? 5 : 10;
+  const featurePreview = record
+    ? `${record.features
+        .slice(0, featurePreviewSize)
+        .map((value) => value.toFixed(2))
+        .join(', ')}${record.features.length > featurePreviewSize ? ' ...' : ''}`
+    : '...';
 
   return (
     <div className="absolute left-0 right-0" style={style}>
       <div
-        className={`grid h-full items-center gap-2 border-b border-slate-100 px-4 transition-colors hover:bg-slate-50 ${
-          isCompact ? 'text-xs' : 'text-sm'
+        className={`grid h-full items-center gap-2 border-b border-slate-100 px-4 transition-colors odd:bg-white even:bg-slate-50/45 hover:bg-slate-100/70 ${
+          isCompact ? 'text-[11px]' : 'text-sm'
         }`}
         style={{ gridTemplateColumns }}
       >
-        <span className="font-mono text-xs text-slate-500">{record?.id ?? '...'}</span>
-        <span className="text-xs text-slate-500">{timestamp}</span>
-        <span className="text-xs text-slate-600">{record?.source ?? '—'}</span>
-        <span className="text-xs text-slate-600">{record?.label ?? '—'}</span>
-        <span className="text-xs text-slate-500">
-          {record
-            ? record.features
-                .slice(0, featurePreviewSize)
-                .map((value) => value.toFixed(2))
-                .join(', ')
-            : '...'}
+        <span className="truncate font-mono text-xs text-slate-500">{record?.id ?? '...'}</span>
+        <span className="truncate text-xs text-slate-500">{timestamp}</span>
+        <span className="truncate text-xs text-slate-600">{record?.source ?? '—'}</span>
+        <span className="truncate text-xs text-slate-600">{record?.label ?? '—'}</span>
+        <span className="truncate font-mono text-xs text-slate-500" title={featurePreview}>
+          {featurePreview}
         </span>
       </div>
     </div>
@@ -74,19 +72,13 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
   const queryClient = useQueryClient();
   const { locale, t } = useI18n();
   const parentRef = useRef<HTMLDivElement | null>(null);
-  const resizeState = useRef<{
-    index: number;
-    startX: number;
-    startWidth: number;
-  } | null>(null);
 
   const [isCompact, setIsCompact] = useState(
     () => window.localStorage.getItem(TABLE_DENSITY_STORAGE_KEY) === '1',
   );
-  const [columnWidths, setColumnWidths] = useState(DEFAULT_COL_WIDTHS);
 
   const rowHeight = isCompact ? COMPACT_ROW_HEIGHT : DEFAULT_ROW_HEIGHT;
-  const gridTemplateColumns = `${columnWidths[0]}px ${columnWidths[1]}px ${columnWidths[2]}px ${columnWidths[3]}px minmax(280px, 1fr)`;
+  const gridTemplateColumns = '14% 24% 14% 12% 36%';
   const tableHeaders =
     locale === 'zh-CN'
       ? (['ID', '时间戳', '来源', '标签'] as const)
@@ -195,32 +187,6 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
   }, [queryClient, total, filters, virtualizer]);
 
   useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!resizeState.current) return;
-      const { index, startX, startWidth } = resizeState.current;
-      const delta = event.clientX - startX;
-      setColumnWidths((prev) => {
-        const next = [...prev];
-        const nextWidth = Math.min(MAX_COL_WIDTH, Math.max(MIN_COL_WIDTH, startWidth + delta));
-        next[index] = nextWidth;
-        return next;
-      });
-    };
-
-    const handleMouseUp = () => {
-      resizeState.current = null;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, []);
-
-  useEffect(() => {
     window.localStorage.setItem(TABLE_DENSITY_STORAGE_KEY, isCompact ? '1' : '0');
   }, [isCompact]);
 
@@ -246,9 +212,9 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
       role="region"
       aria-label={t('sectionTableTitle')}
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 bg-slate-50/65 px-4 py-2.5 text-xs text-slate-500">
+      <div className="grid gap-2 border-b border-slate-200/80 bg-slate-50/70 px-4 py-3 text-xs text-slate-500 sm:grid-cols-[1fr_auto_auto] sm:items-center">
         <span className={UI_LABEL_CLASS}>{t('tableControls')}</span>
-        <span className={`${UI_STATUS_PILL} order-3 w-full gap-2 sm:order-none sm:w-44`}>
+        <span className={`${UI_STATUS_PILL} w-full gap-2 sm:w-44`}>
           <span
             aria-hidden="true"
             className={`h-1.5 w-1.5 rounded-full ${isCompact ? 'bg-blue-500' : 'bg-slate-400'}`}
@@ -257,7 +223,7 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
         </span>
         <button
           type="button"
-          className={`${UI_BUTTON_GHOST_SM} w-full min-w-0 sm:w-44 sm:min-w-44`}
+          className={`${UI_BUTTON_GHOST_SM} h-9 w-full min-w-0 sm:w-44 sm:min-w-44`}
           aria-pressed={isCompact}
           aria-label={isCompact ? t('tableSwitchToComfortable') : t('tableSwitchToCompact')}
           onClick={() => setIsCompact((current) => !current)}
@@ -267,28 +233,17 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
       </div>
 
       <div ref={exportTargetRef} className="h-80 overflow-hidden">
-        <div ref={parentRef} className="h-full overflow-auto" tabIndex={0}>
+        <div ref={parentRef} className="h-full overflow-y-auto overflow-x-hidden" tabIndex={0}>
           <div
             className="sticky top-0 z-10 grid h-11 items-center gap-2 border-b border-slate-200 bg-slate-100/95 px-4 text-xs font-semibold uppercase tracking-[0.1em] text-slate-600 shadow-[0_2px_8px_rgb(15_23_42/7%)] backdrop-blur-sm"
             style={{ gridTemplateColumns }}
           >
-            {tableHeaders.map((label, index) => (
+            {tableHeaders.map((label) => (
               <div key={label} className="relative flex items-center">
-                <span>{label}</span>
-                <span
-                  role="presentation"
-                  className="absolute -right-1 top-0 h-full w-2 cursor-col-resize"
-                  onMouseDown={(event) => {
-                    resizeState.current = {
-                      index,
-                      startX: event.clientX,
-                      startWidth: columnWidths[index],
-                    };
-                  }}
-                />
+                <span className="truncate">{label}</span>
               </div>
             ))}
-            <span>{t('tableEmbeddingPreview')}</span>
+            <span className="truncate">{t('tableEmbeddingPreview')}</span>
           </div>
 
           <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
