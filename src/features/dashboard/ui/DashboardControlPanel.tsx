@@ -160,134 +160,145 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
 
   return (
     <section className="rounded-2xl border border-slate-200/90 bg-white/90 px-5 py-4 text-xs text-slate-500 shadow-[0_8px_24px_rgb(15_23_42/7%)] backdrop-blur-[1px]">
-      <div className="flex min-h-10 flex-col gap-3 border-b border-slate-200/80 pb-3 md:flex-row md:flex-wrap md:items-center lg:flex-nowrap">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={effectiveCompareEnabled}
-            onChange={(event) => setCompareEnabled(event.target.checked)}
-            disabled={!canUseCompareMode}
-            aria-describedby={!canUseCompareMode ? 'compare-mode-note' : undefined}
-          />
-          {t('dashboardCompareMode')}
-        </label>
-        {!canUseCompareMode ? (
-          <span
-            id="compare-mode-note"
-            className="text-xs font-semibold uppercase tracking-wide text-amber-600"
-          >
-            {t('dashboardCompareRoleRequired')}
-          </span>
-        ) : null}
-        <span className="hidden h-4 w-px bg-slate-300/80 md:inline" />
-        <div className="flex flex-wrap items-center gap-2">
-          <span className={UI_LABEL_CLASS}>{t('dashboardCompareDataset')}</span>
-          <ThemedSelect
-            ariaLabel={t('dashboardCompareDataset')}
-            className="w-28"
-            triggerClassName="h-9 px-2 text-xs"
-            value={String(compareDatasetSize.value)}
-            onChange={(nextValue) => {
-              const nextSize = DATASET_SIZES.find((option) => option.value === Number(nextValue));
-              if (nextSize) {
-                setCompareDatasetSize(nextSize);
-              }
-            }}
-            options={DATASET_SIZES.map((option) => ({
-              label: option.label,
-              value: String(option.value),
-            }))}
-            disabled={!effectiveCompareEnabled}
-          />
-        </div>
-        <span className="hidden h-4 w-px bg-slate-300/80 md:inline" />
-        <div className="flex flex-wrap items-center gap-2">
-          <span className={UI_LABEL_CLASS}>{t('realtimeMode')}</span>
-          <span
-            className={`inline-flex h-8 w-24 items-center justify-center rounded-full border px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${realtimeStatusClass}`}
-          >
-            {realtimeStatusLabel}
-          </span>
-          <button
-            type="button"
-            className={`${ACTION_BUTTON_CLASS} h-8 min-w-[8.75rem] px-2 text-[11px]`}
-            onClick={() => {
-              setRealtimeEnabled((current) => {
-                const next = !current;
-                if (next) {
-                  setRealtimePaused(false);
-                }
-                return next;
-              });
-            }}
-          >
-            {realtimeEnabled ? t('realtimeDisable') : t('realtimeEnable')}
-          </button>
-          <button
-            type="button"
-            className={`${ACTION_BUTTON_CLASS} h-8 min-w-[7.5rem] px-2 text-[11px]`}
-            disabled={!realtimeEnabled}
-            onClick={() => setRealtimePaused((current) => !current)}
-          >
-            {realtimePaused ? t('realtimeResume') : t('realtimePause')}
-          </button>
-        </div>
-        <div className="flex w-full flex-wrap items-center gap-2 md:ml-auto md:w-auto lg:flex-nowrap">
-          <button
-            type="button"
-            className={`${ACTION_BUTTON_CLASS} w-full min-w-0 md:w-auto md:min-w-36`}
-            onClick={onRefreshData}
-          >
-            {t('dashboardRefreshData')}
-          </button>
-          <button
-            type="button"
-            onClick={onOpenFilters}
-            className={`${ACTION_BUTTON_CLASS} w-full min-w-0 md:w-auto md:min-w-36 lg:hidden`}
-          >
-            {t('dashboardFilters')}
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-3 flex flex-wrap items-center gap-2 border-b border-slate-200/80 pb-3">
-        <span className={UI_LABEL_CLASS}>{t('dashboardActiveFilters')}</span>
-        <span className={`${UI_CHIP_INTERACTIVE} border-blue-200 bg-blue-50 text-blue-700`}>
-          {interactionMode === 'linked'
-            ? t('dashboardInteractionModeLinked')
-            : t('dashboardInteractionModeIsolated')}
-        </span>
-        <button
-          type="button"
-          className={`${ACTION_BUTTON_CLASS} h-8 px-2 text-[11px]`}
-          onClick={() =>
-            setInteractionMode((current) => (current === 'linked' ? 'isolated' : 'linked'))
-          }
-        >
-          {interactionMode === 'linked'
-            ? t('dashboardInteractionSetIsolated')
-            : t('dashboardInteractionSetLinked')}
-        </button>
-        {activeFilterChips.length > 0 ? (
-          activeFilterChips.map((chip) => (
-            <span key={chip} className={UI_CHIP_INTERACTIVE}>
-              {chip}
+      <div className="space-y-3 border-b border-slate-200/80 pb-3">
+        <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-3">
+          <label className="flex items-center gap-2 text-sm text-slate-600">
+            <input
+              type="checkbox"
+              checked={effectiveCompareEnabled}
+              onChange={(event) => setCompareEnabled(event.target.checked)}
+              disabled={!canUseCompareMode}
+              aria-describedby={!canUseCompareMode ? 'compare-mode-note' : undefined}
+            />
+            {t('dashboardCompareMode')}
+          </label>
+          {!canUseCompareMode ? (
+            <span
+              id="compare-mode-note"
+              className="mt-2 inline-block text-xs font-semibold uppercase tracking-wide text-amber-600"
+            >
+              {t('dashboardCompareRoleRequired')}
             </span>
-          ))
-        ) : (
-          <span className="text-xs text-slate-600">{t('dashboardNoActiveFilters')}</span>
-        )}
-        <button
-          type="button"
-          className={`${ACTION_BUTTON_CLASS} ml-auto h-8 px-2 text-[11px]`}
-          onClick={onClearCrossFilters}
-          disabled={activeFilterChips.length === 0 || interactionMode !== 'linked'}
-        >
-          {t('dashboardClearCrossFilters')}
-        </button>
+          ) : null}
+          <label className="mt-3 flex flex-col gap-1">
+            <span className={UI_LABEL_CLASS}>{t('dashboardCompareDataset')}</span>
+            <ThemedSelect
+              ariaLabel={t('dashboardCompareDataset')}
+              className="w-full"
+              triggerClassName="h-9 px-2 text-xs"
+              value={String(compareDatasetSize.value)}
+              onChange={(nextValue) => {
+                const nextSize = DATASET_SIZES.find((option) => option.value === Number(nextValue));
+                if (nextSize) {
+                  setCompareDatasetSize(nextSize);
+                }
+              }}
+              options={DATASET_SIZES.map((option) => ({
+                label: option.label,
+                value: String(option.value),
+              }))}
+              disabled={!effectiveCompareEnabled}
+            />
+          </label>
+        </div>
+
+        <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className={UI_LABEL_CLASS}>{t('realtimeMode')}</span>
+            <span
+              className={`inline-flex h-8 min-w-24 items-center justify-center rounded-full border px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${realtimeStatusClass}`}
+            >
+              {realtimeStatusLabel}
+            </span>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              className={`${ACTION_BUTTON_CLASS} h-8 min-w-0 px-2 text-[11px]`}
+              onClick={() => {
+                setRealtimeEnabled((current) => {
+                  const next = !current;
+                  if (next) {
+                    setRealtimePaused(false);
+                  }
+                  return next;
+                });
+              }}
+            >
+              {realtimeEnabled ? t('realtimeDisable') : t('realtimeEnable')}
+            </button>
+            <button
+              type="button"
+              className={`${ACTION_BUTTON_CLASS} h-8 min-w-0 px-2 text-[11px]`}
+              disabled={!realtimeEnabled}
+              onClick={() => setRealtimePaused((current) => !current)}
+            >
+              {realtimePaused ? t('realtimeResume') : t('realtimePause')}
+            </button>
+          </div>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              className={`${ACTION_BUTTON_CLASS} h-9 w-full min-w-0`}
+              onClick={onRefreshData}
+            >
+              {t('dashboardRefreshData')}
+            </button>
+            <button
+              type="button"
+              onClick={onOpenFilters}
+              className={`${ACTION_BUTTON_CLASS} h-9 w-full min-w-0 lg:hidden`}
+            >
+              {t('dashboardFilters')}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-3 grid gap-3 xl:grid-cols-[minmax(240px,300px)_1fr] xl:items-end">
+      <div className="mt-3 space-y-2 border-b border-slate-200/80 pb-3">
+        <div className="flex items-center justify-between gap-2">
+          <span className={UI_LABEL_CLASS}>{t('dashboardActiveFilters')}</span>
+          <button
+            type="button"
+            className={`${ACTION_BUTTON_CLASS} h-8 min-w-0 px-2 text-[11px]`}
+            onClick={onClearCrossFilters}
+            disabled={activeFilterChips.length === 0 || interactionMode !== 'linked'}
+          >
+            {t('dashboardClearCrossFilters')}
+          </button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={`${UI_CHIP_INTERACTIVE} border-blue-200 bg-blue-50 text-blue-700`}>
+            {interactionMode === 'linked'
+              ? t('dashboardInteractionModeLinked')
+              : t('dashboardInteractionModeIsolated')}
+          </span>
+          <button
+            type="button"
+            className={`${ACTION_BUTTON_CLASS} h-8 min-w-0 px-2 text-[11px]`}
+            onClick={() =>
+              setInteractionMode((current) => (current === 'linked' ? 'isolated' : 'linked'))
+            }
+          >
+            {interactionMode === 'linked'
+              ? t('dashboardInteractionSetIsolated')
+              : t('dashboardInteractionSetLinked')}
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {activeFilterChips.length > 0 ? (
+            activeFilterChips.map((chip) => (
+              <span key={chip} className={UI_CHIP_INTERACTIVE}>
+                {chip}
+              </span>
+            ))
+          ) : (
+            <span className="text-xs text-slate-600">{t('dashboardNoActiveFilters')}</span>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-3 space-y-2">
         <label className="flex flex-col gap-1">
           <span className={UI_LABEL_CLASS}>{t('dashboardSavedViews')}</span>
           <ThemedSelect
@@ -300,27 +311,26 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
             ]}
           />
         </label>
-
-        <div className="grid gap-2 md:grid-cols-[minmax(170px,220px)_repeat(5,minmax(0,1fr))] md:items-end">
-          <label className="flex flex-col gap-1">
-            <span className={UI_LABEL_CLASS}>{t('dashboardSavedViewName')}</span>
-            <input
-              value={newViewName}
-              onChange={(event) => setNewViewName(event.target.value)}
-              placeholder={t('dashboardSavedViewNamePlaceholder')}
-              className={`${UI_INPUT_MD} h-9 px-2 text-xs`}
-            />
-          </label>
+        <label className="flex flex-col gap-1">
+          <span className={UI_LABEL_CLASS}>{t('dashboardSavedViewName')}</span>
+          <input
+            value={newViewName}
+            onChange={(event) => setNewViewName(event.target.value)}
+            placeholder={t('dashboardSavedViewNamePlaceholder')}
+            className={`${UI_INPUT_MD} h-9 px-2 text-xs`}
+          />
+        </label>
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
-            className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+            className={`${ACTION_BUTTON_CLASS} h-9 min-w-0 px-2`}
             onClick={handleSaveCurrentAsView}
           >
             {t('dashboardSaveView')}
           </button>
           <button
             type="button"
-            className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+            className={`${ACTION_BUTTON_CLASS} h-9 min-w-0 px-2`}
             disabled={!activeSavedViewId}
             onClick={handleApplySavedView}
           >
@@ -328,7 +338,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           </button>
           <button
             type="button"
-            className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+            className={`${ACTION_BUTTON_CLASS} h-9 min-w-0 px-2`}
             disabled={!activeSavedViewId}
             onClick={onUpdateActiveSavedView}
           >
@@ -336,25 +346,25 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           </button>
           <button
             type="button"
-            className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+            className={`${ACTION_BUTTON_CLASS} h-9 min-w-0 px-2`}
             disabled={!activeSavedViewId}
             onClick={onDeleteActiveSavedView}
           >
             {t('dashboardDeleteView')}
           </button>
-          <button
-            type="button"
-            className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
-            onClick={() => {
-              void copyShareLink();
-            }}
-          >
-            {t('dashboardCopyLink')}
-          </button>
         </div>
+        <button
+          type="button"
+          className={`${ACTION_BUTTON_CLASS} h-9 w-full min-w-0 px-2`}
+          onClick={() => {
+            void copyShareLink();
+          }}
+        >
+          {t('dashboardCopyLink')}
+        </button>
       </div>
-      <div className="mt-1 flex min-h-4 justify-end">
-        <span className={`${UI_LABEL_CLASS} inline-block w-16 text-right`} aria-live="polite">
+      <div className="mt-1 min-h-4">
+        <span className={`${UI_LABEL_CLASS} inline-block`} aria-live="polite">
           {copyStatus === 'done'
             ? t('dashboardCopyLinkDone')
             : copyStatus === 'failed'
@@ -363,7 +373,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
         </span>
       </div>
 
-      <div className="mt-3 grid gap-2 border-t border-slate-200/80 pt-3 md:grid-cols-[minmax(240px,300px)_repeat(4,minmax(0,1fr))] md:items-end">
+      <div className="mt-3 space-y-2 border-t border-slate-200/80 pt-3">
         <label className="flex flex-col gap-1">
           <span className={UI_LABEL_CLASS}>{t('snapshotTimelineTitle')}</span>
           <ThemedSelect
@@ -376,40 +386,41 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
             ]}
           />
         </label>
-
-        <button
-          type="button"
-          className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
-          onClick={() => {
-            onCaptureSnapshot();
-          }}
-        >
-          {t('snapshotCapture')}
-        </button>
-        <button
-          type="button"
-          className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
-          disabled={!activeSnapshotId}
-          onClick={handleReplaySnapshot}
-        >
-          {t('snapshotReplay')}
-        </button>
-        <button
-          type="button"
-          className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
-          disabled={!activeSnapshotId}
-          onClick={onDeleteActiveSnapshot}
-        >
-          {t('snapshotDelete')}
-        </button>
-        <button
-          type="button"
-          className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
-          disabled={snapshots.length === 0}
-          onClick={onClearSnapshots}
-        >
-          {t('snapshotClear')}
-        </button>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            className={`${ACTION_BUTTON_CLASS} h-9 min-w-0 px-2`}
+            onClick={() => {
+              onCaptureSnapshot();
+            }}
+          >
+            {t('snapshotCapture')}
+          </button>
+          <button
+            type="button"
+            className={`${ACTION_BUTTON_CLASS} h-9 min-w-0 px-2`}
+            disabled={!activeSnapshotId}
+            onClick={handleReplaySnapshot}
+          >
+            {t('snapshotReplay')}
+          </button>
+          <button
+            type="button"
+            className={`${ACTION_BUTTON_CLASS} h-9 min-w-0 px-2`}
+            disabled={!activeSnapshotId}
+            onClick={onDeleteActiveSnapshot}
+          >
+            {t('snapshotDelete')}
+          </button>
+          <button
+            type="button"
+            className={`${ACTION_BUTTON_CLASS} h-9 min-w-0 px-2`}
+            disabled={snapshots.length === 0}
+            onClick={onClearSnapshots}
+          >
+            {t('snapshotClear')}
+          </button>
+        </div>
       </div>
 
       <div className="mt-3 border-t border-slate-200/80 pt-3">

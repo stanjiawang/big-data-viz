@@ -75,7 +75,7 @@ export function AnnotationPanel({
         <p className={UI_TEXT_MUTED_SM}>{t('annotationDescription')}</p>
       </header>
 
-      <div className="grid gap-2 xl:grid-cols-[minmax(220px,280px)_1fr_auto] xl:items-end">
+      <div className="grid gap-2">
         <label className="flex flex-col gap-1">
           <span className={UI_LABEL_CLASS}>{t('annotationContext')}</span>
           <ThemedSelect
@@ -104,13 +104,17 @@ export function AnnotationPanel({
           />
         </label>
 
-        <div className="flex flex-wrap items-center gap-2 xl:justify-end">
-          <button type="button" className={`${UI_BUTTON_GHOST_SM} h-9 px-2`} onClick={handleSubmit}>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            className={`${UI_BUTTON_GHOST_SM} h-9 min-w-0 px-2`}
+            onClick={handleSubmit}
+          >
             {t('annotationAdd')}
           </button>
           <button
             type="button"
-            className={`${UI_BUTTON_GHOST_SM} h-9 px-2`}
+            className={`${UI_BUTTON_GHOST_SM} h-9 min-w-0 px-2`}
             disabled={scopedAnnotations.length === 0}
             onClick={() => {
               onClearContext(activeContext);

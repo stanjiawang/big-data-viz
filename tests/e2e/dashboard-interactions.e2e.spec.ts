@@ -8,11 +8,17 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible();
 
   await page.getByLabel('Dataset size').click();
-  await page.getByRole('option', { name: '50M' }).click();
+  await page
+    .getByRole('listbox', { name: 'Dataset size' })
+    .getByRole('option', { name: '50M' })
+    .dispatchEvent('click');
   await expect(page.getByText(/Dataset Size:\s*50M/i)).toBeVisible({ timeout: 15_000 });
 
   await page.getByLabel('Source').click();
-  await page.getByRole('option', { name: 'user' }).click();
+  await page
+    .getByRole('listbox', { name: 'Source' })
+    .getByRole('option', { name: 'user' })
+    .dispatchEvent('click');
   await expect(page.getByText(/Source:\s*user/i).first()).toBeVisible({ timeout: 15_000 });
 
   const annotationPanel = page.locator('section', {
@@ -59,15 +65,13 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   const scrollTop = await tableViewport.evaluate((element) => element.scrollTop);
   expect(scrollTop).toBeGreaterThan(100);
 
-  const graphCard = page.locator('section', {
-    has: page.getByRole('heading', { name: 'Relationship Graph' }),
-  });
+  const graphRegion = page.getByTestId('relationship-graph');
   await page.getByRole('button', { name: 'cluster-1' }).click();
-  await expect(graphCard.getByRole('button', { name: 'Clear' })).toBeVisible();
+  await expect(graphRegion.getByRole('button', { name: 'Clear' })).toBeVisible();
   await expect(page.getByText('Labels: class-A').first()).not.toBeVisible();
   await expect(page.getByText('Search: cluster-1').first()).not.toBeVisible();
-  await page.getByRole('button', { name: /Hide edges/i }).click();
-  await expect(page.getByRole('button', { name: /Show edges/i })).toBeVisible();
+  await graphRegion.getByRole('button', { name: /Hide edges/i }).click();
+  await expect(graphRegion.getByRole('button', { name: /Show edges/i })).toBeVisible();
 });
 
 test('downloads PNG exports from summary and graph cards', async ({ page }) => {

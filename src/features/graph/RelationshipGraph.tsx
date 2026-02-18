@@ -335,11 +335,12 @@ export function RelationshipGraph({
               <div className={UI_LABEL_CLASS}>Clusters</div>
               <div className="grid grid-cols-2 gap-2.5">
                 {clusters.map((cluster) => {
-                  const active = selectedClusters.has(cluster);
+                  const active = selectedClusters.size === 0 || selectedClusters.has(cluster);
                   return (
                     <button
                       key={cluster}
                       type="button"
+                      aria-pressed={active}
                       className={`${active ? UI_CHIP_ACTIVE : UI_CHIP_INTERACTIVE} h-9 w-full px-3`}
                       onClick={() => {
                         setSelectedNode(null);
