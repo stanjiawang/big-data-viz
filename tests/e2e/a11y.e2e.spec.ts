@@ -46,3 +46,10 @@ test('mobile filters dialog meets axe serious/critical baseline', async ({ page 
 
   await expectNoSeriousOrCriticalA11yIssues(page, '[role="dialog"]');
 });
+
+test('detail view meets axe serious/critical baseline', async ({ page }) => {
+  await page.goto('/detail/graph');
+  await expect(page.getByRole('heading', { name: /Detailed View:/i })).toBeVisible();
+
+  await expectNoSeriousOrCriticalA11yIssues(page, '#app-main');
+});

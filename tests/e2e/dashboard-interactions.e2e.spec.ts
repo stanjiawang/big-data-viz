@@ -58,7 +58,7 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   await expect(page.getByText('Compact density')).toBeVisible();
   await expect(page.getByText('Embedding preview')).toBeVisible();
 
-  const tableViewport = tableCard.locator('div.h-full.overflow-auto').first();
+  const tableViewport = tableCard.locator('div.h-full.overflow-y-auto.overflow-x-hidden').first();
   await tableViewport.evaluate((element) => {
     element.scrollTop = 500;
   });
