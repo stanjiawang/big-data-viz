@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import { UI_INPUT_MD, UI_LABEL_CLASS, UI_SELECT_MD } from '@/components/ui/styleTokens';
 import { useI18n } from '@/i18n/useI18n';
 import type { MockFilters } from '@/lib/types';
@@ -48,7 +56,7 @@ export function FiltersPanel({
     [],
   );
 
-  const commitSearchInput = () => {
+  const commitSearchInput = useCallback(() => {
     if (searchCommitTimer.current !== null) {
       window.clearTimeout(searchCommitTimer.current);
       searchCommitTimer.current = null;
@@ -62,7 +70,96 @@ export function FiltersPanel({
         search: searchInputValue,
       };
     });
-  };
+  }, [searchInputValue, setFilters]);
+
+  const commitSearchValue = useCallback(
+    (nextValue: string) => {
+      setFilters((current) => {
+        if ((current.search ?? '') === nextValue) {
+          return current;
+        }
+        return {
+          ...current,
+          search: nextValue,
+        };
+      });
+    },
+    [setFilters],
+  );
+
+  const handleDatasetSizeChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      const nextSize = DATASET_SIZES.find((option) => option.value === Number(event.target.value));
+      if (nextSize) {
+        setDatasetSize(nextSize);
+      }
+    },
+    [setDatasetSize],
+  );
+
+  const handleSourceChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      setFilters((current) => ({
+        ...current,
+        source: event.target.value as MockFilters['source'],
+      }));
+    },
+    [setFilters],
+  );
+
+  const handleSearchChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const nextValue = event.target.value;
+      setSearchInputValue(nextValue);
+      if (searchCommitTimer.current !== null) {
+        window.clearTimeout(searchCommitTimer.current);
+      }
+      searchCommitTimer.current = window.setTimeout(() => {
+        commitSearchValue(nextValue);
+      }, 250);
+    },
+    [commitSearchValue],
+  );
+
+  const handleWeightMinChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const nextValue = Number(event.target.value);
+      setFilters((current) => ({
+        ...current,
+        weightMin: Math.abs(nextValue - defaultWeightMin) < 0.0001 ? undefined : nextValue,
+      }));
+    },
+    [defaultWeightMin, setFilters],
+  );
+
+  const handleWeightMaxChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const nextValue = Number(event.target.value);
+      setFilters((current) => ({
+        ...current,
+        weightMax: Math.abs(nextValue - defaultWeightMax) < 0.0001 ? undefined : nextValue,
+      }));
+    },
+    [defaultWeightMax, setFilters],
+  );
+
+  const toggleLabel = useCallback(
+    (label: string) => {
+      setFilters((current) => {
+        const nextLabels = new Set(current.labels ?? []);
+        if (nextLabels.has(label)) {
+          nextLabels.delete(label);
+        } else {
+          nextLabels.add(label);
+        }
+        return {
+          ...current,
+          labels: Array.from(nextLabels),
+        };
+      });
+    },
+    [setFilters],
+  );
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -72,14 +169,7 @@ export function FiltersPanel({
           <select
             className={SELECT_CLASS}
             value={datasetSize.value}
-            onChange={(event) => {
-              const nextSize = DATASET_SIZES.find(
-                (option) => option.value === Number(event.target.value),
-              );
-              if (nextSize) {
-                setDatasetSize(nextSize);
-              }
-            }}
+            onChange={handleDatasetSizeChange}
           >
             {DATASET_SIZES.map((option) => (
               <option key={option.value} value={option.value}>
@@ -110,12 +200,7 @@ export function FiltersPanel({
           <select
             className={SELECT_CLASS}
             value={filters.source ?? 'all'}
-            onChange={(event) =>
-              setFilters((current) => ({
-                ...current,
-                source: event.target.value as MockFilters['source'],
-              }))
-            }
+            onChange={handleSourceChange}
           >
             {SOURCE_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -147,24 +232,7 @@ export function FiltersPanel({
           className={INPUT_CLASS}
           placeholder={t('filtersSearchPlaceholder')}
           value={searchInputValue}
-          onChange={(event) => {
-            const nextValue = event.target.value;
-            setSearchInputValue(nextValue);
-            if (searchCommitTimer.current !== null) {
-              window.clearTimeout(searchCommitTimer.current);
-            }
-            searchCommitTimer.current = window.setTimeout(() => {
-              setFilters((current) => {
-                if ((current.search ?? '') === nextValue) {
-                  return current;
-                }
-                return {
-                  ...current,
-                  search: nextValue,
-                };
-              });
-            }, 250);
-          }}
+          onChange={handleSearchChange}
           onBlur={commitSearchInput}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
@@ -183,13 +251,7 @@ export function FiltersPanel({
           max="5"
           className={INPUT_CLASS}
           value={weightMinValue}
-          onChange={(event) => {
-            const nextValue = Number(event.target.value);
-            setFilters((current) => ({
-              ...current,
-              weightMin: Math.abs(nextValue - defaultWeightMin) < 0.0001 ? undefined : nextValue,
-            }));
-          }}
+          onChange={handleWeightMinChange}
         />
       </label>
 
@@ -202,13 +264,7 @@ export function FiltersPanel({
           max="5"
           className={INPUT_CLASS}
           value={weightMaxValue}
-          onChange={(event) => {
-            const nextValue = Number(event.target.value);
-            setFilters((current) => ({
-              ...current,
-              weightMax: Math.abs(nextValue - defaultWeightMax) < 0.0001 ? undefined : nextValue,
-            }));
-          }}
+          onChange={handleWeightMaxChange}
         />
       </label>
 
@@ -222,24 +278,7 @@ export function FiltersPanel({
                 key={label}
                 className="inline-flex h-9 items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-2 text-xs font-semibold uppercase tracking-wide text-slate-600"
               >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => {
-                    setFilters((current) => {
-                      const nextLabels = new Set(current.labels ?? []);
-                      if (nextLabels.has(label)) {
-                        nextLabels.delete(label);
-                      } else {
-                        nextLabels.add(label);
-                      }
-                      return {
-                        ...current,
-                        labels: Array.from(nextLabels),
-                      };
-                    });
-                  }}
-                />
+                <input type="checkbox" checked={checked} onChange={() => toggleLabel(label)} />
                 {label}
               </label>
             );

@@ -33,6 +33,7 @@ All notable changes to this project are tracked in this file.
 - Dashboard overview rendering is split with memoized data-section boundaries so control-panel interactions avoid unnecessary KPI/chart/table rerenders.
 - Dashboard control workflows (saved views, snapshots, annotations, share link) are isolated in a memoized control panel to keep parent render scope minimal.
 - Dashboard data sections now consume deferred filter values to keep control interactions responsive while heavy KPI/chart/table updates render at lower priority.
+- Filter mutation paths in `FiltersPanel` are now centralized in stable callbacks (search/source/weights/labels) to reduce inline render churn and keep update semantics consistent.
 
 ## Release Procedure
 
