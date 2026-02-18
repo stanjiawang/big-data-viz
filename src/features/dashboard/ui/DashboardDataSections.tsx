@@ -60,7 +60,7 @@ export const DashboardDataSections = memo(function DashboardDataSections({
   const topCardReorder = useDragReorder(TOP_CARD_IDS, 'bdv_overview_top_cards_order');
 
   return (
-    <>
+    <div className="space-y-6">
       <AsyncBoundary
         fallback={<KpiSkeletonGrid />}
         errorTitle={t('dashboardMetricsFailedTitle')}
@@ -193,6 +193,6 @@ export const DashboardDataSections = memo(function DashboardDataSections({
           draggable
         />
       </AsyncBoundary>
-    </>
+    </div>
   );
 });

@@ -40,7 +40,7 @@ export function Card({
       <div
         draggable={Boolean(dragHandle)}
         aria-label={dragHandle?.ariaLabel}
-        className={`ui-card-head min-h-24 rounded-xl border px-4 py-3 ${
+        className={`ui-card-head min-h-20 rounded-xl border px-4 py-3 ${
           dragHandle?.isDragging
             ? 'cursor-grabbing border-blue-300'
             : dragHandle
@@ -64,7 +64,7 @@ export function Card({
           dragHandle?.onDragEnd();
         }}
       >
-        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
+        <div className="flex flex-col items-start justify-between gap-2.5 sm:flex-row sm:gap-4">
           <div className="min-w-0 space-y-1.5">
             <h3
               id={headingId}

@@ -62,9 +62,9 @@ export function SummarySection({
   const barYMaxValue = barYMax === '' ? undefined : Number(barYMax);
 
   return (
-    <div className="space-y-4">
-      <div ref={visualizationRef} className="space-y-4">
-        <div className="rounded-xl border border-slate-200/90 bg-white/90 p-3">
+    <div className="space-y-3">
+      <div ref={visualizationRef} className="space-y-3">
+        <div className="rounded-xl border border-slate-200/90 bg-white/90 p-4">
           <AsyncBoundary fallback={<div className={expanded ? 'h-[280px]' : 'h-[200px]'} />}>
             <LazyPieChart
               title={t('chartLabelDistribution')}
@@ -79,7 +79,7 @@ export function SummarySection({
             />
           </AsyncBoundary>
         </div>
-        <div className="rounded-xl border border-slate-200/90 bg-white/90 p-3">
+        <div className="rounded-xl border border-slate-200/90 bg-white/90 p-4">
           <AsyncBoundary fallback={<div className={expanded ? 'h-[280px]' : 'h-[200px]'} />}>
             <LazyBarChart
               title={t('chartSourceVolume')}
@@ -99,8 +99,8 @@ export function SummarySection({
           </AsyncBoundary>
         </div>
       </div>
-      <div className="rounded-xl border border-slate-200/90 bg-white/90 p-3">
-        <div className="mt-3 border-t border-slate-200/80 pt-3">
+      <div className="rounded-xl border border-slate-200/90 bg-white/90 p-4">
+        <div className="border-t border-slate-200/80 pt-3">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <RangeSummary xStart={barXStart} xEnd={barXEnd} yMin={barYMin} yMax={barYMax} />
             <button

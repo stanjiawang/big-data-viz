@@ -279,7 +279,7 @@ export function RelationshipGraph({
       style={{ height }}
       data-testid="relationship-graph"
     >
-      <div className="grid min-h-0 flex-1 gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_220px]">
+      <div className="grid min-h-0 flex-1 gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_220px]">
         <div
           ref={exportTargetRef}
           className="relative min-h-0 overflow-hidden rounded-lg bg-slate-50"
@@ -329,7 +329,7 @@ export function RelationshipGraph({
           </div>
         </div>
 
-        <aside className="flex min-h-0 flex-col gap-4 rounded-xl border border-slate-200/80 bg-slate-50/70 p-3">
+        <aside className="flex min-h-0 flex-col gap-3 rounded-xl border border-slate-200/80 bg-slate-50/70 p-3">
           {clusters.length > 0 ? (
             <div className="shrink-0 space-y-2">
               <div className={UI_LABEL_CLASS}>Clusters</div>
