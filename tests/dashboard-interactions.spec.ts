@@ -11,7 +11,7 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   await expect(page.getByText(/Dataset Size:\s*50M/i)).toBeVisible({ timeout: 15_000 });
 
   await page.getByLabel('Source').selectOption('user');
-  await expect(page.getByText(/Source:\s*user/i)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText(/Source:\s*user/i).first()).toBeVisible({ timeout: 15_000 });
 
   const annotationPanel = page.locator('section', {
     has: page.getByRole('heading', { name: 'Annotations' }),
@@ -100,4 +100,31 @@ test('downloads PNG exports from summary and graph cards', async ({ page }) => {
       { timeout: 15_000 },
     )
     .toBe('relationship-graph.png');
+});
+
+test('keeps realtime control state stable when refreshing data', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible();
+
+  const refreshButton = page.getByRole('button', { name: 'Refresh data' });
+
+  // Off mode: refresh should not toggle realtime mode.
+  await expect(page.getByRole('button', { name: 'Enable live' })).toBeVisible();
+  await refreshButton.click();
+  await expect(page.getByRole('button', { name: 'Enable live' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Pause' })).toBeDisabled();
+
+  // Live mode: refresh should keep stream live.
+  await page.getByRole('button', { name: 'Enable live' }).click();
+  await expect(page.getByRole('button', { name: 'Disable live' })).toBeVisible();
+  await refreshButton.click();
+  await expect(page.getByRole('button', { name: 'Disable live' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Pause' })).toBeEnabled();
+
+  // Paused mode: refresh should not auto-resume realtime.
+  await page.getByRole('button', { name: 'Pause' }).click();
+  await expect(page.getByRole('button', { name: 'Resume' })).toBeVisible();
+  await refreshButton.click();
+  await expect(page.getByRole('button', { name: 'Resume' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Disable live' })).toBeVisible();
 });

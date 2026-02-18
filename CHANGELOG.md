@@ -40,6 +40,7 @@ All notable changes to this project are tracked in this file.
 - Added unit coverage to assert the dashboard “Refresh data” action uses scoped dashboard query invalidation helper behavior.
 - Added auth-enabled e2e regression for large-dataset bootstrap across overview and direct graph detail routes, matching render-perf sign-in readiness expectations.
 - ESLint now ignores generated Playwright/CI artifact directories (`test-results`, `playwright-report`, `coverage`, `artifacts`) to prevent lint/e2e race regressions.
+- Added e2e coverage for `Refresh data` behavior across realtime off/live/paused states, and tightened text locators in dashboard interaction tests to avoid strict-mode ambiguity.
 
 ## Release Procedure
 
