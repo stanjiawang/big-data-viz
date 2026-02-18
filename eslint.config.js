@@ -63,4 +63,37 @@ export default [
       'no-unused-vars': 'off',
     },
   },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/features/dashboard/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/features/dashboard/constants/*'],
+              message: 'Import dashboard constants from "@/features/dashboard" instead.',
+            },
+            {
+              group: ['@/features/dashboard/routes/*'],
+              message: 'Import dashboard routes from "@/features/dashboard" instead.',
+            },
+            {
+              group: ['@/features/dashboard/sections/*'],
+              message: 'Import dashboard section types from "@/features/dashboard" instead.',
+            },
+            {
+              group: ['@/features/dashboard/state/*'],
+              message: 'Import dashboard state APIs from "@/features/dashboard" instead.',
+            },
+            {
+              group: ['@/features/dashboard/ui/*'],
+              message: 'Import dashboard UI APIs from "@/features/dashboard" instead.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];

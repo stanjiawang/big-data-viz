@@ -94,6 +94,7 @@ pnpm run build:demo
 pnpm run demo:verify
 pnpm run preview
 pnpm run lint
+pnpm run check:structure
 pnpm run typecheck
 pnpm run format
 pnpm run stylelint
@@ -111,6 +112,7 @@ pnpm run test:e2e:a11y
 `test:e2e` runs the non-auth functional suite.
 `test:e2e:auth` runs auth-enabled end-to-end sign-in/sign-out flows.
 `test:e2e:a11y` runs only the axe-core accessibility specs.
+`check:structure` enforces feature naming/layout conventions and e2e filename conventions.
 `test:dependency-policy` fails on high/critical dependency vulnerabilities.
 `sbom:generate` writes CycloneDX SBOM output to `artifacts/sbom.cdx.json`.
 `quality:dashboard` writes consolidated CI quality artifacts under `artifacts/`.

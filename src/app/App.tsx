@@ -3,7 +3,7 @@ import { AuthProvider } from '@/auth/AuthProvider';
 import { RequireAuth } from '@/auth/RequireAuth';
 import { AppProviders } from '@/app/providers/AppProviders';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
-import { DashboardPage } from '@/features/dashboard/DashboardPage';
+import { DashboardPage } from '@/features/dashboard';
 import { useI18n } from '@/i18n/useI18n';
 
 function AppContent() {

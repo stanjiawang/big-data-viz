@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import type { DetailView } from '@/features/dashboard/sections/types';
+import type { DetailView } from '@/features/dashboard';
 import type { MessageKey } from '@/i18n/messages';
 
 export type ChartDetailView = Extract<DetailView, 'timeSeries' | 'embedding' | 'graph' | 'd3'>;

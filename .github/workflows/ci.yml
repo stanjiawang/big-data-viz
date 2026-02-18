@@ -41,6 +41,8 @@ jobs:
         run: pnpm run test:dependency-policy
       - name: Lint
         run: pnpm run lint
+      - name: Structure conventions
+        run: pnpm run check:structure
       - name: Typecheck
         run: pnpm run typecheck
       - name: Stylelint

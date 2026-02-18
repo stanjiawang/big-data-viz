@@ -3,12 +3,12 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-
 import type { DetailView } from '@/features/dashboard/sections';
 
 const DashboardOverviewRoute = lazy(async () => {
-  const module = await import('@/features/dashboard/routes/DashboardOverviewRoute');
+  const module = await import('@/features/dashboard/routes');
   return { default: module.DashboardOverviewRoute };
 });
 
 const DashboardDetailRoute = lazy(async () => {
-  const module = await import('@/features/dashboard/routes/DashboardDetailRoute');
+  const module = await import('@/features/dashboard/routes');
   return { default: module.DashboardDetailRoute };
 });
 

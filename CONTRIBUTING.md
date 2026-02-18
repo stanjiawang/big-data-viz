@@ -17,6 +17,7 @@ Before opening a PR:
 
 ```bash
 pnpm run lint
+pnpm run check:structure
 pnpm run typecheck
 pnpm run format
 pnpm run stylelint
