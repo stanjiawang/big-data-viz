@@ -35,6 +35,7 @@ All notable changes to this project are tracked in this file.
 - Dashboard data sections now consume deferred filter values to keep control interactions responsive while heavy KPI/chart/table updates render at lower priority.
 - Filter mutation paths in `FiltersPanel` are now centralized in stable callbacks (search/source/weights/labels) to reduce inline render churn and keep update semantics consistent.
 - Dashboard data sections are decoupled from global `isFetching` changes so background refetches do not trigger unnecessary chart/table subtree rerenders.
+- Dashboard refresh/realtime invalidation now targets dashboard query key prefixes only (`mock-data`, `timeseries`, `graph`) via a shared helper instead of global query invalidation.
 
 ## Release Procedure
 

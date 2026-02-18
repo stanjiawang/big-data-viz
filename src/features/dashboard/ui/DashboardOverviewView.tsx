@@ -11,6 +11,7 @@ import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
+import { invalidateDashboardQueries } from '@/features/dashboard/constants/queryInvalidation';
 import type {
   CrossFilterPatch,
   DashboardAnnotationContext,
@@ -218,7 +219,7 @@ export function DashboardOverviewView({
   }, [setFilters]);
 
   const refreshData = useCallback(() => {
-    void queryClient.invalidateQueries();
+    void invalidateDashboardQueries(queryClient);
   }, [queryClient]);
 
   return (

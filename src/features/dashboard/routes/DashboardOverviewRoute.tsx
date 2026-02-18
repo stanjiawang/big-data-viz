@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/auth/useAuth';
 import { canAccessFeature } from '@/config/featureAccess';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
+import { invalidateDashboardQueries } from '@/features/dashboard/constants/queryInvalidation';
 import {
   DEFAULT_WEIGHT_MAX,
   DEFAULT_WEIGHT_MIN,
@@ -19,8 +20,6 @@ import {
 import type { DetailView } from '@/features/dashboard/sections';
 import { useRealtimeStream } from '@/features/realtime/useRealtimeStream';
 import { DashboardOverviewView } from '@/features/dashboard/ui/DashboardOverviewView';
-
-const DASHBOARD_QUERY_KEYS = [['mock-data'], ['timeseries'], ['graph']] as const;
 
 export function DashboardOverviewRoute() {
   const navigate = useNavigate();
@@ -64,9 +63,7 @@ export function DashboardOverviewRoute() {
     enabled: realtimeEnabled,
     paused: realtimePaused,
     onTick: () => {
-      DASHBOARD_QUERY_KEYS.forEach((queryKey) => {
-        void queryClient.invalidateQueries({ queryKey });
-      });
+      void invalidateDashboardQueries(queryClient);
     },
   });
 
