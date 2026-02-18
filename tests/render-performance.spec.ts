@@ -9,6 +9,8 @@ const GRAPH_BUDGET_MS = Number(process.env.PERF_MAX_GRAPH_RENDER_MS ?? 3200);
 const PAGE_READY_TIMEOUT_MS = Number(process.env.PERF_PAGE_READY_TIMEOUT_MS ?? 25_000);
 const GRAPH_READY_TIMEOUT_MS = Number(process.env.PERF_GRAPH_READY_TIMEOUT_MS ?? 30_000);
 const SAMPLE_MAX_ATTEMPTS = Number(process.env.PERF_SAMPLE_MAX_ATTEMPTS ?? 3);
+const PERF_AUTH_EMAIL = process.env.PERF_AUTH_EMAIL ?? 'analyst@example.com';
+const PERF_AUTH_PASSWORD = process.env.PERF_AUTH_PASSWORD ?? 'DemoPass!123';
 const RENDER_BENCHMARK_ARTIFACT_PATH = path.resolve(
   process.cwd(),
   'artifacts/render-benchmark.json',
@@ -36,6 +38,14 @@ async function gotoDashboardAndWait(
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle');
+
+      const signInHeading = page.getByRole('heading', { name: /sign in required|需要登录/i });
+      if (await signInHeading.isVisible().catch(() => false)) {
+        await page.getByLabel(/email|邮箱/i).fill(PERF_AUTH_EMAIL);
+        await page.getByLabel(/password|密码/i).fill(PERF_AUTH_PASSWORD);
+        await page.getByRole('button', { name: /sign in|登录/i }).click();
+      }
+
       await expect(page.locator('#app-main')).toBeVisible({
         timeout: PAGE_READY_TIMEOUT_MS,
       });
@@ -59,7 +69,7 @@ async function measureTableRenderMs(page: import('@playwright/test').Page, url: 
 }
 
 async function measureGraphRenderMs(page: import('@playwright/test').Page, url: string) {
-  await gotoDashboardAndWait(page, `${url}&detail=graph`);
+  await gotoDashboardAndWait(page, `/detail/graph?${url.replace('/?', '')}`);
   const renderStart = Date.now();
   await expect(page.locator('[data-testid="relationship-graph"]')).toBeVisible({
     timeout: GRAPH_READY_TIMEOUT_MS,
