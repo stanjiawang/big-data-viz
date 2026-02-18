@@ -5,7 +5,9 @@ test('dashboard interactive controls work across detail, table, and graph sectio
 }) => {
   await page.goto('/');
 
-  await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: /Big Data Viz Lab|大数据可视化实验室/ }),
+  ).toBeVisible();
 
   await page.getByLabel('Dataset size').click();
   await page
@@ -49,7 +51,9 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   await page.getByRole('button', { name: 'Open detail' }).first().click();
   await expect(page.getByText('Detailed View: Summary')).toBeVisible();
   await page.getByRole('button', { name: 'Back to dashboard' }).click();
-  await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: /Big Data Viz Lab|大数据可视化实验室/ }),
+  ).toBeVisible();
 
   const tableCard = page.locator('section', {
     has: page.getByRole('heading', { name: 'Large Table' }),
@@ -76,7 +80,9 @@ test('dashboard interactive controls work across detail, table, and graph sectio
 
 test('downloads PNG exports from summary and graph cards', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: /Big Data Viz Lab|大数据可视化实验室/ }),
+  ).toBeVisible();
 
   await page.evaluate(() => {
     (window as Window & { __lastExportedImage?: string }).__lastExportedImage = undefined;
@@ -113,7 +119,9 @@ test('downloads PNG exports from summary and graph cards', async ({ page }) => {
 
 test('keeps realtime control state stable when refreshing data', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: /Big Data Viz Lab|大数据可视化实验室/ }),
+  ).toBeVisible();
 
   const refreshButton = page.getByRole('button', { name: 'Refresh data' });
 
