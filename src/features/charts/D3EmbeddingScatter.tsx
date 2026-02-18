@@ -218,48 +218,50 @@ export function D3EmbeddingScatter({
       className="relative flex h-full flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-white/90"
       style={{ height }}
     >
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200/80 px-3 py-3">
-        <span className={`${UI_LABEL_CLASS} mr-1`}>
-          {t('d3ZoomLabel')}: {zoomLevel.toFixed(1)}x
-        </span>
-        {labels.map((label) => {
-          const active = !hiddenLabels.has(label);
-          return (
-            <button
-              key={label}
-              type="button"
-              className={active ? UI_CHIP_ACTIVE : UI_CHIP_INTERACTIVE}
-              onClick={() =>
-                setHiddenLabels((current) => {
-                  const next = new Set(current);
-                  if (active) {
-                    next.add(label);
-                  } else {
-                    next.delete(label);
+      <div className="grid gap-3 border-b border-slate-200/80 px-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className={`${UI_LABEL_CLASS} mr-1`}>
+            {t('d3ZoomLabel')}: {zoomLevel.toFixed(1)}x
+          </span>
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            {labels.map((label) => {
+              const active = !hiddenLabels.has(label);
+              return (
+                <button
+                  key={label}
+                  type="button"
+                  className={active ? UI_CHIP_ACTIVE : UI_CHIP_INTERACTIVE}
+                  onClick={() =>
+                    setHiddenLabels((current) => {
+                      const next = new Set(current);
+                      if (active) {
+                        next.add(label);
+                      } else {
+                        next.delete(label);
+                      }
+                      return next;
+                    })
                   }
-                  return next;
-                })
-              }
-            >
-              {label}
-            </button>
-          );
-        })}
-        <div className="w-full sm:ml-auto sm:w-auto">
-          <button
-            type="button"
-            className={`${UI_CHIP_INTERACTIVE} h-9 w-full sm:min-w-36 sm:w-auto`}
-            onClick={() => {
-              setHiddenLabels(new Set());
-              setPointScale(1);
-              setPointOpacity(0.72);
-              setZoomLevel(1);
-              setResetNonce((current) => current + 1);
-            }}
-          >
-            {t('d3ResetView')}
-          </button>
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </div>
+        <button
+          type="button"
+          className={`${UI_CHIP_INTERACTIVE} h-9 w-full justify-center sm:w-auto sm:min-w-36`}
+          onClick={() => {
+            setHiddenLabels(new Set());
+            setPointScale(1);
+            setPointOpacity(0.72);
+            setZoomLevel(1);
+            setResetNonce((current) => current + 1);
+          }}
+        >
+          {t('d3ResetView')}
+        </button>
       </div>
 
       <div ref={exportTargetRef} className="relative min-h-0 flex-1">

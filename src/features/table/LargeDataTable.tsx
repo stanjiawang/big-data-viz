@@ -40,13 +40,17 @@ const TableRow = memo(function TableRow({
   const timestamp = record?.timestamp
     ? record.timestamp.replace('T', ' ').slice(0, 19)
     : loadingText;
-  const featurePreviewSize = isCompact ? 5 : 10;
+  const featurePreviewSize = isCompact ? 4 : 6;
   const featurePreview = record
     ? `${record.features
         .slice(0, featurePreviewSize)
         .map((value) => value.toFixed(2))
-        .join(', ')}${record.features.length > featurePreviewSize ? ' ...' : ''}`
-    : '...';
+        .join(', ')}${
+        record.features.length > featurePreviewSize
+          ? ` | +${record.features.length - featurePreviewSize} dims`
+          : ''
+      }`
+    : '—';
 
   return (
     <div className="absolute left-0 right-0" style={style}>
@@ -60,7 +64,10 @@ const TableRow = memo(function TableRow({
         <span className="truncate text-xs text-slate-500">{timestamp}</span>
         <span className="truncate text-xs text-slate-600">{record?.source ?? '—'}</span>
         <span className="truncate text-xs text-slate-600">{record?.label ?? '—'}</span>
-        <span className="truncate font-mono text-xs text-slate-500" title={featurePreview}>
+        <span
+          className="truncate font-mono text-[11px] tracking-[0.02em] text-slate-500/90"
+          title={featurePreview}
+        >
           {featurePreview}
         </span>
       </div>
@@ -78,7 +85,7 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
   );
 
   const rowHeight = isCompact ? COMPACT_ROW_HEIGHT : DEFAULT_ROW_HEIGHT;
-  const gridTemplateColumns = '14% 24% 14% 12% 36%';
+  const gridTemplateColumns = '13% 20% 12% 10% 45%';
   const tableHeaders =
     locale === 'zh-CN'
       ? (['ID', '时间戳', '来源', '标签'] as const)
