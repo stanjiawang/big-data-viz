@@ -16,17 +16,24 @@ pnpm run dev:demo
 Before opening a PR:
 
 ```bash
+pnpm run check:env
 pnpm run lint
 pnpm run check:structure
 pnpm run typecheck
-pnpm run format
+pnpm run format:check
 pnpm run stylelint
-pnpm test
+pnpm run test:contracts
+pnpm run test:coverage
 pnpm test:e2e
 pnpm run test:e2e:auth
 pnpm run test:e2e:a11y
 pnpm run test:perf
 pnpm run test:render-perf
+pnpm run test:security-headers
+pnpm run test:dependency-policy
+pnpm run test:reliability
+pnpm run test:release-governance
+pnpm run sbom:generate
 pnpm run quality:dashboard
 pnpm run build:demo
 pnpm run demo:verify

@@ -7,6 +7,7 @@ This project uses a 3-layer planning model:
 - `PLAN.md`: executive phase roadmap and sequencing.
 - `docs/roadmap/phase-XX-*.md`: implementable phase specs.
 - `docs/adr/ADR-XXX-*.md`: major architecture decisions.
+- `docs/README.md`: docs index and ownership conventions.
 
 ## Current State
 
@@ -116,6 +117,10 @@ Success Metrics:
 
 - New visualization module integration < 1 day engineering effort.
 
+Spec:
+
+- `docs/roadmap/phase-05-extensibility.md`
+
 ### Phase 6: Productionization and Interview Demo Packaging
 
 Objective:
@@ -144,4 +149,5 @@ Spec:
 
 ## Immediate Next Step
 
-- Phase 6 complete. Monitor CI artifacts and deploy demo profile from `main`.
+- Keep CI stability high while iterating UX and dashboard interaction quality.
+- Continue roadmap delivery as vertical slices with tests and docs in the same PR.

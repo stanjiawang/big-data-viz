@@ -42,6 +42,10 @@ All notable changes to this project are tracked in this file.
 - ESLint now ignores generated Playwright/CI artifact directories (`test-results`, `playwright-report`, `coverage`, `artifacts`) to prevent lint/e2e race regressions.
 - Added e2e coverage for `Refresh data` behavior across realtime off/live/paused states, and tightened text locators in dashboard interaction tests to avoid strict-mode ambiguity.
 - Dashboard feature file layout was normalized for naming/structure consistency: shared dashboard UI files moved under `features/dashboard/ui`, generic section helpers renamed to explicit PascalCase modules (`SectionShared`, `LazySections`, `LazyVisualizations`), and imports/tests updated accordingly.
+- Documentation set was audited and normalized:
+  - removed redundant legacy backlog doc (`docs/enterprise-upgrade-backlog.md`)
+  - added docs index (`docs/README.md`) and missing Phase 05 roadmap spec (`docs/roadmap/phase-05-extensibility.md`)
+  - aligned `README.md`, `CONTRIBUTING.md`, `PLAN.md`, `docs/runbook.md`, `docs/architecture.md`, and `docs/quality-dashboard.md` with current scripts/CI/runtime behavior.
 
 ## Release Procedure
 

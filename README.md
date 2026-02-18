@@ -97,12 +97,17 @@ pnpm run lint
 pnpm run check:structure
 pnpm run typecheck
 pnpm run format
+pnpm run format:check
 pnpm run stylelint
 pnpm test
+pnpm run test:coverage
 pnpm test:e2e
 pnpm run test:render-perf
 pnpm run test:perf
 pnpm run test:dependency-policy
+pnpm run test:security-headers
+pnpm run test:reliability
+pnpm run test:release-governance
 pnpm run sbom:generate
 pnpm run quality:dashboard
 pnpm run test:e2e:auth
@@ -122,6 +127,7 @@ pnpm run test:e2e:a11y
 - Deploy guide (Vercel + Cloudflare Pages): `docs/deploy.md`
 - Quality dashboard artifact guide: `docs/quality-dashboard.md`
 - Interview handoff guide: `docs/demo-handoff.md`
+- Full docs index: `docs/README.md`
 
 ## Deployment Security Baseline
 

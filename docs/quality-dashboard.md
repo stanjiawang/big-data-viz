@@ -17,8 +17,10 @@ CI runs:
 1. `pnpm run test:perf`
 2. `pnpm run test:render-perf`
 3. `pnpm run test:coverage`
-4. `pnpm run test:e2e:a11y`
-5. `pnpm run quality:dashboard`
+4. `pnpm run test:e2e`
+5. `pnpm run test:e2e:auth`
+6. `pnpm run test:e2e:a11y`
+7. `pnpm run quality:dashboard`
 
 The generator script consolidates coverage + perf + render benchmark metrics into a single report:
 

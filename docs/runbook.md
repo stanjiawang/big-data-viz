@@ -16,22 +16,23 @@ Demo profile local run:
 1. `pnpm run lint`
 2. `pnpm run check:structure`
 3. `pnpm run typecheck`
-4. `pnpm run stylelint`
-5. `pnpm run test:security-headers`
-6. `pnpm run test:dependency-policy`
-7. `pnpm run sbom:generate`
-8. `pnpm run test:contracts`
-9. `pnpm run test:perf`
-10. `pnpm run test:render-perf`
-11. `pnpm run test:reliability`
-12. `pnpm run test:release-governance`
-13. `pnpm test`
-14. `pnpm test:e2e`
-15. `pnpm run test:e2e:auth`
-16. `pnpm run test:e2e:a11y`
-17. `pnpm run quality:dashboard`
-18. `pnpm run build:demo`
-19. `pnpm run demo:verify`
+4. `pnpm run format:check`
+5. `pnpm run stylelint`
+6. `pnpm run test:security-headers`
+7. `pnpm run test:dependency-policy`
+8. `pnpm run sbom:generate`
+9. `pnpm run test:contracts`
+10. `pnpm run test:perf`
+11. `pnpm run test:render-perf`
+12. `pnpm run test:reliability`
+13. `pnpm run test:release-governance`
+14. `pnpm run test:coverage`
+15. `pnpm test:e2e`
+16. `pnpm run test:e2e:auth`
+17. `pnpm run test:e2e:a11y`
+18. `pnpm run quality:dashboard`
+19. `pnpm run build:demo`
+20. `pnpm run demo:verify`
 
 ## Common Failures
 
@@ -88,3 +89,4 @@ Demo profile local run:
 
 - Guide: `docs/deploy.md`
 - Interview demo handoff: `docs/demo-handoff.md`
+- Docs index: `docs/README.md`
