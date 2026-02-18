@@ -35,17 +35,17 @@ export function Card({
     <section
       ref={sectionRef}
       aria-labelledby={headingId}
-      className={`rounded-2xl border border-slate-200/90 bg-white/90 p-5 shadow-[0_6px_20px_rgb(15_23_42/6%)] backdrop-blur-[1px] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_26px_rgb(15_23_42/9%)] ${className ?? ''}`}
+      className={`ui-card-shell rounded-2xl border p-5 shadow-[0_6px_20px_rgb(15_23_42/6%)] backdrop-blur-[1px] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_26px_rgb(15_23_42/9%)] ${className ?? ''}`}
     >
       <div
         draggable={Boolean(dragHandle)}
         aria-label={dragHandle?.ariaLabel}
-        className={`min-h-24 rounded-xl border px-4 py-3 ${
+        className={`ui-card-head min-h-24 rounded-xl border px-4 py-3 ${
           dragHandle?.isDragging
-            ? 'cursor-grabbing border-blue-300 bg-linear-to-r from-blue-50 to-cyan-50'
+            ? 'cursor-grabbing border-blue-300'
             : dragHandle
-              ? 'cursor-grab border-slate-200/90 bg-linear-to-r from-slate-50 to-slate-100/80'
-              : 'border-slate-200/80 bg-linear-to-r from-slate-50 to-slate-100/75'
+              ? 'cursor-grab'
+              : ''
         }`}
         onDragStart={(event) => {
           if (!dragHandle) return;
