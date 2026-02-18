@@ -32,6 +32,7 @@ All notable changes to this project are tracked in this file.
 - Dashboard sections now lazy-load heavy visualization and table modules behind section-local async boundaries to reduce initial bundle pressure and isolate rendering costs.
 - Dashboard overview rendering is split with memoized data-section boundaries so control-panel interactions avoid unnecessary KPI/chart/table rerenders.
 - Dashboard control workflows (saved views, snapshots, annotations, share link) are isolated in a memoized control panel to keep parent render scope minimal.
+- Dashboard data sections now consume deferred filter values to keep control interactions responsive while heavy KPI/chart/table updates render at lower priority.
 
 ## Release Procedure
 

@@ -28,6 +28,7 @@ type DashboardDataSectionsProps = {
   datasetSize: DatasetSizeOption;
   setDatasetSize: Dispatch<SetStateAction<DatasetSizeOption>>;
   filters: MockFilters;
+  queryFilters: MockFilters;
   setFilters: Dispatch<SetStateAction<MockFilters>>;
   compareDatasetSize: DatasetSizeOption;
   effectiveCompareEnabled: boolean;
@@ -48,6 +49,7 @@ export const DashboardDataSections = memo(function DashboardDataSections({
   datasetSize,
   setDatasetSize,
   filters,
+  queryFilters,
   setFilters,
   compareDatasetSize,
   effectiveCompareEnabled,
@@ -77,7 +79,7 @@ export const DashboardDataSections = memo(function DashboardDataSections({
           datasetSize={datasetSize}
           compareDatasetSize={compareDatasetSize}
           compareEnabled={effectiveCompareEnabled}
-          filters={filters}
+          filters={queryFilters}
         />
       </AsyncBoundary>
 
@@ -164,7 +166,7 @@ export const DashboardDataSections = memo(function DashboardDataSections({
                     datasetSize={datasetSize}
                     compareDatasetSize={compareDatasetSize}
                     compareEnabled={effectiveCompareEnabled}
-                    filters={filters}
+                    filters={queryFilters}
                     onCrossFilter={onCrossFilter}
                     visualizationRef={summaryVisualizationRef}
                   />
@@ -184,7 +186,7 @@ export const DashboardDataSections = memo(function DashboardDataSections({
           datasetSize={datasetSize}
           compareDatasetSize={compareDatasetSize}
           compareEnabled={effectiveCompareEnabled}
-          filters={filters}
+          filters={queryFilters}
           onCrossFilter={onCrossFilter}
           onOpenDetail={onOpenDetail}
           onAnnotate={setActiveAnnotationContext}
@@ -201,7 +203,7 @@ export const DashboardDataSections = memo(function DashboardDataSections({
           datasetSize={datasetSize}
           compareDatasetSize={compareDatasetSize}
           compareEnabled={effectiveCompareEnabled}
-          filters={filters}
+          filters={queryFilters}
           onOpenDetail={onOpenDetail}
           onAnnotate={setActiveAnnotationContext}
           draggable

@@ -1,4 +1,10 @@
-import { useCallback, type Dispatch, type RefObject, type SetStateAction } from 'react';
+import {
+  useCallback,
+  useDeferredValue,
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+} from 'react';
 import { useIsFetching, useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -124,6 +130,7 @@ export function DashboardOverviewView({
   const queryClient = useQueryClient();
   const isFetching = useIsFetching() > 0;
   const effectiveCompareEnabled = compareEnabled && canUseCompareMode;
+  const deferredFilters = useDeferredValue(filters);
 
   const selectedLabels = filters.labels ?? [];
   const weightMinValue = filters.weightMin ?? defaultWeightMin;
@@ -296,6 +303,7 @@ export function DashboardOverviewView({
         datasetSize={datasetSize}
         setDatasetSize={setDatasetSize}
         filters={filters}
+        queryFilters={deferredFilters}
         setFilters={setFilters}
         compareDatasetSize={compareDatasetSize}
         effectiveCompareEnabled={effectiveCompareEnabled}
