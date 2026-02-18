@@ -10,6 +10,7 @@ import {
   DEFAULT_WEIGHT_MIN,
   useDashboardAnnotationsState,
   useDashboardActions,
+  useDashboardInteractionModeState,
   useDashboardCompareState,
   useDashboardFilterPanelState,
   useDashboardNavigationState,
@@ -35,6 +36,7 @@ export function DashboardOverviewRoute() {
     useDashboardCompareState();
   const { realtimeEnabled, setRealtimeEnabled, realtimePaused, setRealtimePaused } =
     useDashboardRealtimeState();
+  const { interactionMode, setInteractionMode } = useDashboardInteractionModeState();
   const { savedViews, activeSavedViewId, setActiveSavedViewId } = useDashboardSavedViewsState();
   const { snapshots, activeSnapshotId, setActiveSnapshotId } = useDashboardSnapshotsState();
   const { annotations, activeAnnotationContext, setActiveAnnotationContext } =
@@ -94,6 +96,8 @@ export function DashboardOverviewRoute() {
       realtimePaused={realtimePaused}
       setRealtimePaused={setRealtimePaused}
       realtimeStatus={realtime.status}
+      interactionMode={interactionMode}
+      setInteractionMode={setInteractionMode}
       savedViews={savedViews}
       activeSavedViewId={activeSavedViewId}
       setActiveSavedViewId={setActiveSavedViewId}

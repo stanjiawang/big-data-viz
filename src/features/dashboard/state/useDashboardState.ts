@@ -18,6 +18,9 @@ const REALTIME_ENABLED_STORAGE_KEY = 'bdv_realtime_enabled';
 const REALTIME_PAUSED_STORAGE_KEY = 'bdv_realtime_paused';
 const SNAPSHOTS_STORAGE_KEY = 'bdv_snapshot_timeline';
 const ANNOTATIONS_STORAGE_KEY = 'bdv_dashboard_annotations';
+const INTERACTION_MODE_STORAGE_KEY = 'bdv_interaction_mode';
+
+export type DashboardInteractionMode = 'isolated' | 'linked';
 
 export type DashboardSavedState = {
   datasetSizeValue: number;
@@ -109,6 +112,10 @@ export function resolveInitialRealtimeEnabled() {
 
 export function resolveInitialRealtimePaused() {
   return safeReadStorage(REALTIME_PAUSED_STORAGE_KEY) === '1';
+}
+
+export function resolveInitialInteractionMode(): DashboardInteractionMode {
+  return safeReadStorage(INTERACTION_MODE_STORAGE_KEY) === 'linked' ? 'linked' : 'isolated';
 }
 
 export function resolveSavedViews() {
@@ -285,6 +292,7 @@ type DashboardStoreState = {
   compareDatasetSize: (typeof DATASET_SIZES)[number];
   realtimeEnabled: boolean;
   realtimePaused: boolean;
+  interactionMode: DashboardInteractionMode;
   savedViews: DashboardSavedView[];
   activeSavedViewId: string | null;
   snapshots: DashboardSnapshot[];
@@ -299,6 +307,7 @@ type DashboardStoreState = {
   setCompareDatasetSize: (_next: SetStateAction<(typeof DATASET_SIZES)[number]>) => void;
   setRealtimeEnabled: (_next: SetStateAction<boolean>) => void;
   setRealtimePaused: (_next: SetStateAction<boolean>) => void;
+  setInteractionMode: (_next: SetStateAction<DashboardInteractionMode>) => void;
   setSavedViews: (_next: SetStateAction<DashboardSavedView[]>) => void;
   setActiveSavedViewId: (_next: SetStateAction<string | null>) => void;
   setSnapshots: (_next: SetStateAction<DashboardSnapshot[]>) => void;
@@ -318,6 +327,7 @@ const useDashboardStore = create<DashboardStoreState>((set) => ({
   compareDatasetSize: initialUrlState.compareDatasetSize ?? resolveInitialCompareDatasetSize(),
   realtimeEnabled: resolveInitialRealtimeEnabled(),
   realtimePaused: resolveInitialRealtimePaused(),
+  interactionMode: resolveInitialInteractionMode(),
   savedViews: resolveSavedViews(),
   activeSavedViewId: null,
   snapshots: resolveSnapshots(),
@@ -356,6 +366,12 @@ const useDashboardStore = create<DashboardStoreState>((set) => ({
     set((state) => ({
       realtimePaused: applyStateAction(state.realtimePaused, next),
     })),
+  setInteractionMode: (next) =>
+    set((state) => {
+      const interactionMode = applyStateAction(state.interactionMode, next);
+      safeWriteStorage(INTERACTION_MODE_STORAGE_KEY, interactionMode);
+      return { interactionMode };
+    }),
   setSavedViews: (next) =>
     set((state) => ({
       savedViews: applyStateAction(state.savedViews, next),
@@ -733,6 +749,15 @@ export function useDashboardRealtimeState() {
       setRealtimeEnabled: state.setRealtimeEnabled,
       realtimePaused: state.realtimePaused,
       setRealtimePaused: state.setRealtimePaused,
+    })),
+  );
+}
+
+export function useDashboardInteractionModeState() {
+  return useDashboardStore(
+    useShallow((state) => ({
+      interactionMode: state.interactionMode,
+      setInteractionMode: state.setInteractionMode,
     })),
   );
 }

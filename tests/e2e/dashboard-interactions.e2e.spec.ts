@@ -28,7 +28,8 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   const snapshotTimeline = page.getByLabel('Snapshot timeline');
   await snapshotTimeline.click();
   await expect(page.getByRole('option', { name: 'Snapshot 1' })).toBeVisible();
-  await page.getByRole('button', { name: 'Clear all' }).click();
+  await page.getByRole('button', { name: 'Clear timeline' }).click();
+  await page.getByRole('button', { name: 'Capture snapshot' }).click();
   await snapshotTimeline.click();
   await page.getByRole('option', { name: 'Snapshot 1' }).click();
   await page.getByRole('button', { name: 'Replay snapshot' }).click();
@@ -63,8 +64,8 @@ test('dashboard interactive controls work across detail, table, and graph sectio
   });
   await page.getByRole('button', { name: 'cluster-1' }).click();
   await expect(graphCard.getByRole('button', { name: 'Clear' })).toBeVisible();
-  await expect(page.getByText('Labels: class-A').first()).toBeVisible();
-  await expect(page.getByText('Search: cluster-1').first()).toBeVisible();
+  await expect(page.getByText('Labels: class-A').first()).not.toBeVisible();
+  await expect(page.getByText('Search: cluster-1').first()).not.toBeVisible();
   await page.getByRole('button', { name: /Hide edges/i }).click();
   await expect(page.getByRole('button', { name: /Show edges/i })).toBeVisible();
 });

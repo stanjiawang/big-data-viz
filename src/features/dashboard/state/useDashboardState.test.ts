@@ -3,6 +3,7 @@ import {
   resolveAnnotations,
   resolveInitialCompareDatasetSize,
   resolveInitialCompareEnabled,
+  resolveInitialInteractionMode,
   resolveInitialRealtimeEnabled,
   resolveInitialRealtimePaused,
   resolveSnapshots,
@@ -29,6 +30,11 @@ describe('useDashboardState storage resolvers', () => {
     expect(resolveInitialRealtimePaused()).toBe(true);
   });
 
+  it('reads interaction mode from storage', () => {
+    window.localStorage.setItem('bdv_interaction_mode', 'linked');
+    expect(resolveInitialInteractionMode()).toBe('linked');
+  });
+
   it('falls back when storage access throws', () => {
     jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('blocked');
@@ -38,6 +44,7 @@ describe('useDashboardState storage resolvers', () => {
     expect(resolveInitialCompareDatasetSize()).toEqual(DATASET_SIZES[2]);
     expect(resolveInitialRealtimeEnabled()).toBe(false);
     expect(resolveInitialRealtimePaused()).toBe(false);
+    expect(resolveInitialInteractionMode()).toBe('isolated');
     expect(resolveSavedViews()).toEqual([]);
     expect(resolveSnapshots()).toEqual([]);
     expect(resolveAnnotations()).toEqual([]);

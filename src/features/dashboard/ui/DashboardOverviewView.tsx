@@ -20,6 +20,7 @@ import type { RealtimeStatus } from '@/features/realtime/useRealtimeStream';
 import type {
   DashboardSavedView,
   DashboardAnnotation,
+  DashboardInteractionMode,
   DashboardSnapshot,
 } from '@/features/dashboard/state/useDashboardState';
 import { DashboardHeaderBadges } from '@/features/dashboard/ui/DashboardHeaderBadges';
@@ -50,6 +51,8 @@ type DashboardOverviewViewProps = {
   realtimePaused: boolean;
   setRealtimePaused: Dispatch<SetStateAction<boolean>>;
   realtimeStatus: RealtimeStatus;
+  interactionMode: DashboardInteractionMode;
+  setInteractionMode: Dispatch<SetStateAction<DashboardInteractionMode>>;
   savedViews: DashboardSavedView[];
   activeSavedViewId: string | null;
   setActiveSavedViewId: Dispatch<SetStateAction<string | null>>;
@@ -98,6 +101,8 @@ export function DashboardOverviewView({
   realtimePaused,
   setRealtimePaused,
   realtimeStatus,
+  interactionMode,
+  setInteractionMode,
   savedViews,
   activeSavedViewId,
   setActiveSavedViewId,
@@ -176,6 +181,9 @@ export function DashboardOverviewView({
 
   const applyCrossFilter = useCallback(
     (patch: CrossFilterPatch) => {
+      if (interactionMode !== 'linked') {
+        return;
+      }
       setFilters((current) => {
         const nextLabels = patch.labels ?? current.labels;
         const nextLabel =
@@ -188,10 +196,13 @@ export function DashboardOverviewView({
         };
       });
     },
-    [setFilters],
+    [interactionMode, setFilters],
   );
 
   const clearCrossFilters = useCallback(() => {
+    if (interactionMode !== 'linked') {
+      return;
+    }
     setFilters((current) => ({
       ...current,
       label: undefined,
@@ -199,7 +210,7 @@ export function DashboardOverviewView({
       source: 'all',
       search: '',
     }));
-  }, [setFilters]);
+  }, [interactionMode, setFilters]);
 
   const refreshData = useCallback(() => {
     void invalidateDashboardQueries(queryClient);
@@ -250,6 +261,8 @@ export function DashboardOverviewView({
         realtimeStatus={realtimeStatus}
         realtimeStatusLabel={realtimeStatusLabel}
         realtimeStatusClass={realtimeStatusClass}
+        interactionMode={interactionMode}
+        setInteractionMode={setInteractionMode}
         onRefreshData={refreshData}
         onOpenFilters={onOpenFilters}
         activeFilterChips={activeFilterChips}

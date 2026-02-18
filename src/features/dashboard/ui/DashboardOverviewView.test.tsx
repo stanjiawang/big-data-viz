@@ -62,6 +62,8 @@ function renderView(overrides: Partial<ComponentProps<typeof DashboardOverviewVi
     realtimePaused: false,
     setRealtimePaused: jest.fn(),
     realtimeStatus: 'off',
+    interactionMode: 'isolated',
+    setInteractionMode: jest.fn(),
     savedViews: [],
     activeSavedViewId: null,
     setActiveSavedViewId: jest.fn(),
@@ -151,6 +153,7 @@ describe('DashboardOverviewView', () => {
   it('clears cross-filters from active filter chips', async () => {
     const user = userEvent.setup();
     const props = renderView({
+      interactionMode: 'linked',
       filters: {
         labels: ['class-A'],
         source: 'sensor',

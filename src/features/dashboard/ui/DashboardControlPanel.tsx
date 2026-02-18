@@ -12,6 +12,7 @@ import { buildDashboardSearchParams } from '@/features/dashboard/state/urlState'
 import type { DashboardAnnotationContext } from '@/features/dashboard/sections/types';
 import type {
   DashboardAnnotation,
+  DashboardInteractionMode,
   DashboardSavedView,
   DashboardSnapshot,
 } from '@/features/dashboard/state/useDashboardState';
@@ -36,6 +37,8 @@ type DashboardControlPanelProps = {
   realtimeStatus: RealtimeStatus;
   realtimeStatusLabel: string;
   realtimeStatusClass: string;
+  interactionMode: DashboardInteractionMode;
+  setInteractionMode: Dispatch<SetStateAction<DashboardInteractionMode>>;
   onRefreshData: () => void;
   onOpenFilters: () => void;
   activeFilterChips: string[];
@@ -78,6 +81,8 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
   realtimeStatus,
   realtimeStatusLabel,
   realtimeStatusClass,
+  interactionMode,
+  setInteractionMode,
   onRefreshData,
   onOpenFilters,
   activeFilterChips,
@@ -247,6 +252,22 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
 
       <div className="mt-3 flex flex-wrap items-center gap-2 border-b border-slate-200/80 pb-3">
         <span className={UI_LABEL_CLASS}>{t('dashboardActiveFilters')}</span>
+        <span className={`${UI_CHIP_INTERACTIVE} border-blue-200 bg-blue-50 text-blue-700`}>
+          {interactionMode === 'linked'
+            ? t('dashboardInteractionModeLinked')
+            : t('dashboardInteractionModeIsolated')}
+        </span>
+        <button
+          type="button"
+          className={`${ACTION_BUTTON_CLASS} h-8 px-2 text-[11px]`}
+          onClick={() =>
+            setInteractionMode((current) => (current === 'linked' ? 'isolated' : 'linked'))
+          }
+        >
+          {interactionMode === 'linked'
+            ? t('dashboardInteractionSetIsolated')
+            : t('dashboardInteractionSetLinked')}
+        </button>
         {activeFilterChips.length > 0 ? (
           activeFilterChips.map((chip) => (
             <span key={chip} className={UI_CHIP_INTERACTIVE}>
@@ -260,7 +281,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           type="button"
           className={`${ACTION_BUTTON_CLASS} ml-auto h-8 px-2 text-[11px]`}
           onClick={onClearCrossFilters}
-          disabled={activeFilterChips.length === 0}
+          disabled={activeFilterChips.length === 0 || interactionMode !== 'linked'}
         >
           {t('dashboardClearCrossFilters')}
         </button>
