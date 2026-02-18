@@ -218,13 +218,13 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
         <div className="flex flex-wrap items-center gap-2">
           <span className={UI_LABEL_CLASS}>{t('realtimeMode')}</span>
           <span
-            className={`inline-flex h-8 items-center rounded-full border px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${realtimeStatusClass}`}
+            className={`inline-flex h-8 w-24 items-center justify-center rounded-full border px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${realtimeStatusClass}`}
           >
             {realtimeStatusLabel}
           </span>
           <button
             type="button"
-            className={`${ACTION_BUTTON_CLASS} h-8 px-2 text-[11px]`}
+            className={`${ACTION_BUTTON_CLASS} h-8 min-w-[8.75rem] px-2 text-[11px]`}
             onClick={() => {
               setRealtimeEnabled((current) => {
                 const next = !current;
@@ -239,7 +239,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           </button>
           <button
             type="button"
-            className={`${ACTION_BUTTON_CLASS} h-8 px-2 text-[11px]`}
+            className={`${ACTION_BUTTON_CLASS} h-8 min-w-[7.5rem] px-2 text-[11px]`}
             disabled={!realtimeEnabled}
             onClick={() => setRealtimePaused((current) => !current)}
           >
@@ -374,7 +374,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
         </div>
       </div>
       <div className="mt-1 flex min-h-4 justify-end">
-        <span className={UI_LABEL_CLASS} aria-live="polite">
+        <span className={`${UI_LABEL_CLASS} inline-block w-16 text-right`} aria-live="polite">
           {copyStatus === 'done'
             ? t('dashboardCopyLinkDone')
             : copyStatus === 'failed'

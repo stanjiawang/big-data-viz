@@ -24,7 +24,7 @@ export const UI_CHIP_ACTIVE =
   'inline-flex h-8 items-center justify-center rounded-full border border-blue-400/90 bg-blue-50 px-3 text-xs font-semibold uppercase tracking-[0.08em] text-blue-700 shadow-[0_4px_12px_rgb(37_99_235/16%)] whitespace-nowrap';
 
 export const UI_STATUS_PILL =
-  'inline-flex h-8 min-w-40 items-center justify-center rounded-full border border-slate-300/90 bg-slate-50 px-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-600';
+  'inline-flex h-7 min-w-40 items-center justify-center rounded-full border border-slate-200 bg-slate-100/70 px-3 text-[11px] font-medium normal-case tracking-[0.03em] text-slate-600';
 
 export const UI_INPUT_MD =
   'w-full rounded-xl border border-slate-300/85 bg-white/90 px-3 py-2 text-sm text-slate-700 shadow-[inset_0_1px_0_rgb(255_255_255/65%),0_1px_2px_rgb(15_23_42/5%)] transition focus-visible:border-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200';
