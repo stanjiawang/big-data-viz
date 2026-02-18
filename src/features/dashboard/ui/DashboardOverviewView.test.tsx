@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DashboardOverviewView } from '@/features/dashboard/ui/DashboardOverviewView';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
+import { invalidateDashboardQueries } from '@/features/dashboard/constants/queryInvalidation';
 
 jest.mock('@/components/ui/LanguageSwitcher', () => ({
   LanguageSwitcher: () => <div>LanguageSwitcherMock</div>,
@@ -35,6 +36,10 @@ jest.mock('@/features/dashboard/sections/shared', () => ({
       Open detail action
     </button>
   ),
+}));
+
+jest.mock('@/features/dashboard/constants/queryInvalidation', () => ({
+  invalidateDashboardQueries: jest.fn(),
 }));
 
 function renderView(overrides: Partial<ComponentProps<typeof DashboardOverviewView>> = {}) {
@@ -198,6 +203,14 @@ describe('DashboardOverviewView', () => {
 
     expect(props.onCaptureSnapshot).toHaveBeenCalledTimes(1);
     expect(props.onReplaySnapshot).toHaveBeenCalledWith('snapshot-1');
+  });
+
+  it('refreshes dashboard data using scoped query invalidation helper', async () => {
+    const user = userEvent.setup();
+    renderView();
+
+    await user.click(screen.getByRole('button', { name: 'Refresh data' }));
+    expect(invalidateDashboardQueries).toHaveBeenCalledTimes(1);
   });
 
   it('creates and clears context annotations', async () => {

@@ -37,6 +37,7 @@ All notable changes to this project are tracked in this file.
 - Dashboard data sections are decoupled from global `isFetching` changes so background refetches do not trigger unnecessary chart/table subtree rerenders.
 - Dashboard refresh/realtime invalidation now targets dashboard query key prefixes only (`mock-data`, `timeseries`, `graph`) via a shared helper instead of global query invalidation.
 - Render-performance e2e now has auth-aware bootstrap and direct graph detail-route measurement (`/detail/graph`) to reduce CI flakiness from auth-gate and legacy redirect timing.
+- Added unit coverage to assert the dashboard “Refresh data” action uses scoped dashboard query invalidation helper behavior.
 
 ## Release Procedure
 
