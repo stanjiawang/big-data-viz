@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/auth/useAuth';
@@ -70,10 +70,13 @@ export function DashboardOverviewRoute() {
     },
   });
 
-  const openDetail = (view: DetailView) => {
-    setDetailView(view);
-    navigate(`/detail/${view}`);
-  };
+  const openDetail = useCallback(
+    (view: DetailView) => {
+      setDetailView(view);
+      navigate(`/detail/${view}`);
+    },
+    [navigate, setDetailView],
+  );
 
   return (
     <DashboardOverviewView

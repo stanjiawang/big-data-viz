@@ -1,8 +1,6 @@
-import { useState, type Dispatch, type RefObject, type SetStateAction } from 'react';
+import { useCallback, useState, type Dispatch, type RefObject, type SetStateAction } from 'react';
 import { useIsFetching, useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
-import { Card } from '@/components/ui/Card';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import {
@@ -13,15 +11,7 @@ import {
   UI_SELECT_MD,
 } from '@/components/ui/styleTokens';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
-import {
-  ChartsRowSkeleton,
-  FiltersSkeleton,
-  KpiSkeletonGrid,
-  SummarySkeleton,
-  TableSkeleton,
-} from '@/features/dashboard/SectionSkeletons';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
-import { SectionCardActions } from '@/features/dashboard/sections/shared';
 import type {
   CrossFilterPatch,
   DashboardAnnotationContext,
@@ -35,16 +25,13 @@ import type {
 } from '@/features/dashboard/state/useDashboardState';
 import { buildDashboardSearchParams } from '@/features/dashboard/state/urlState';
 import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadges';
+import { DashboardDataSections } from '@/features/dashboard/ui/DashboardDataSections';
 import { AnnotationPanel } from '@/features/dashboard/ui/AnnotationPanel';
-import { KpiSection } from '@/features/dashboard/sections/KpiSection';
-import { ChartsSection, SummarySection, TableSection } from '@/features/dashboard/ui/lazySections';
-import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
+import type { DatasetSizeOption } from '@/features/dashboard/ui/types';
 import { useI18n } from '@/i18n/useI18n';
 import type { MockFilters } from '@/lib/types';
 
 const ACTION_BUTTON_CLASS = UI_BUTTON_GHOST_SM;
-const TOP_CARD_IDS = ['filters', 'summary'] as const;
-type DatasetSizeOption = (typeof DATASET_SIZES)[number];
 
 type DashboardOverviewViewProps = {
   runtimeEnableAuth: boolean;
@@ -145,7 +132,6 @@ export function DashboardOverviewView({
   const queryClient = useQueryClient();
   const isFetching = useIsFetching() > 0;
   const effectiveCompareEnabled = compareEnabled && canUseCompareMode;
-  const topCardReorder = useDragReorder(TOP_CARD_IDS, 'bdv_overview_top_cards_order');
   const [newViewName, setNewViewName] = useState('');
   const [copyStatus, setCopyStatus] = useState<'idle' | 'done' | 'failed'>('idle');
 
@@ -191,21 +177,21 @@ export function DashboardOverviewView({
     ...(filters.search ? [`${t('dashboardActiveSearch')}: ${filters.search}`] : []),
   ];
 
-  const focusSearchFilter = () => {
+  const focusSearchFilter = useCallback(() => {
     const searchInput = document.getElementById('filters-search-input') as HTMLInputElement | null;
     if (!searchInput) return;
     searchInput.focus();
     searchInput.select();
-  };
+  }, []);
 
-  const handleSearchBadgeClick = () => {
+  const handleSearchBadgeClick = useCallback(() => {
     if (window.matchMedia('(max-width: 1023px)').matches) {
       onOpenFilters();
       window.setTimeout(focusSearchFilter, 0);
       return;
     }
     focusSearchFilter();
-  };
+  }, [focusSearchFilter, onOpenFilters]);
 
   const handleApplySavedView = () => {
     if (!activeSavedViewId) {
@@ -230,21 +216,24 @@ export function DashboardOverviewView({
     onReplaySnapshot(activeSnapshotId);
   };
 
-  const applyCrossFilter = (patch: CrossFilterPatch) => {
-    setFilters((current) => {
-      const nextLabels = patch.labels ?? current.labels;
-      const nextLabel =
-        patch.label ?? (nextLabels && nextLabels.length > 0 ? nextLabels[0] : undefined);
-      return {
-        ...current,
-        ...patch,
-        label: nextLabel,
-        labels: nextLabels,
-      };
-    });
-  };
+  const applyCrossFilter = useCallback(
+    (patch: CrossFilterPatch) => {
+      setFilters((current) => {
+        const nextLabels = patch.labels ?? current.labels;
+        const nextLabel =
+          patch.label ?? (nextLabels && nextLabels.length > 0 ? nextLabels[0] : undefined);
+        return {
+          ...current,
+          ...patch,
+          label: nextLabel,
+          labels: nextLabels,
+        };
+      });
+    },
+    [setFilters],
+  );
 
-  const clearCrossFilters = () => {
+  const clearCrossFilters = useCallback(() => {
     setFilters((current) => ({
       ...current,
       label: undefined,
@@ -252,7 +241,7 @@ export function DashboardOverviewView({
       source: 'all',
       search: '',
     }));
-  };
+  }, [setFilters]);
 
   const copyShareLink = async () => {
     const params = buildDashboardSearchParams({
@@ -625,145 +614,25 @@ export function DashboardOverviewView({
         </div>
       </section>
 
-      <AsyncBoundary
-        fallback={<KpiSkeletonGrid />}
-        errorTitle={t('dashboardMetricsFailedTitle')}
-        errorMessage={t('dashboardMetricsFailedMessage')}
-      >
-        <KpiSection
-          datasetSize={datasetSize}
-          compareDatasetSize={compareDatasetSize}
-          compareEnabled={effectiveCompareEnabled}
-          filters={filters}
-        />
-      </AsyncBoundary>
-
-      <section className="grid gap-6 lg:grid-cols-12">
-        {topCardReorder.order.map((cardId) => {
-          if (cardId === 'filters') {
-            return (
-              <div
-                key={cardId}
-                className={`hidden lg:col-span-5 lg:block ${topCardReorder.overId === cardId && topCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
-                onDragOver={(event) => topCardReorder.onDragOver(event, cardId)}
-                onDrop={() => topCardReorder.onDrop(cardId)}
-              >
-                <Card
-                  title={t('dashboardFilters')}
-                  description={t('sectionFiltersDescription')}
-                  subtitle={t('techReactStateUrl')}
-                  dragHandle={{
-                    isDragging: topCardReorder.draggingId === cardId,
-                    onDragStart: (event) => {
-                      event.dataTransfer.effectAllowed = 'move';
-                      event.dataTransfer.setData('text/plain', cardId);
-                      topCardReorder.onDragStart(cardId);
-                    },
-                    onDragEnd: topCardReorder.onDragEnd,
-                  }}
-                >
-                  {isFetching ? (
-                    <FiltersSkeleton />
-                  ) : (
-                    <FiltersPanel
-                      datasetSize={datasetSize}
-                      setDatasetSize={setDatasetSize}
-                      filters={filters}
-                      setFilters={setFilters}
-                      selectedLabels={selectedLabels}
-                      weightMinValue={weightMinValue}
-                      weightMaxValue={weightMaxValue}
-                      defaultWeightMin={defaultWeightMin}
-                      defaultWeightMax={defaultWeightMax}
-                    />
-                  )}
-                </Card>
-              </div>
-            );
-          }
-
-          return (
-            <div
-              key={cardId}
-              className={`lg:col-span-7 ${topCardReorder.overId === cardId && topCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
-              onDragOver={(event) => topCardReorder.onDragOver(event, cardId)}
-              onDrop={() => topCardReorder.onDrop(cardId)}
-            >
-              <Card
-                sectionRef={summaryCardRef}
-                title={t('sectionSummaryTitle')}
-                description={t('sectionSummaryDescription')}
-                subtitle={t('techEchartsQuery')}
-                dragHandle={{
-                  isDragging: topCardReorder.draggingId === cardId,
-                  onDragStart: (event) => {
-                    event.dataTransfer.effectAllowed = 'move';
-                    event.dataTransfer.setData('text/plain', cardId);
-                    topCardReorder.onDragStart(cardId);
-                  },
-                  onDragEnd: topCardReorder.onDragEnd,
-                }}
-                actions={
-                  <SectionCardActions
-                    onOpenDetail={() => onOpenDetail('summary')}
-                    onAnnotate={() => setActiveAnnotationContext('summary')}
-                    exportTargetRef={summaryVisualizationRef}
-                    exportFileName="summary"
-                  />
-                }
-              >
-                <AsyncBoundary
-                  fallback={<SummarySkeleton />}
-                  errorTitle={t('dashboardSummaryFailedTitle')}
-                  errorMessage={t('dashboardSummaryFailedMessage')}
-                >
-                  <SummarySection
-                    datasetSize={datasetSize}
-                    compareDatasetSize={compareDatasetSize}
-                    compareEnabled={effectiveCompareEnabled}
-                    filters={filters}
-                    onCrossFilter={applyCrossFilter}
-                    visualizationRef={summaryVisualizationRef}
-                  />
-                </AsyncBoundary>
-              </Card>
-            </div>
-          );
-        })}
-      </section>
-
-      <AsyncBoundary
-        fallback={<ChartsRowSkeleton />}
-        errorTitle={t('dashboardChartsFailedTitle')}
-        errorMessage={t('dashboardChartsFailedMessage')}
-      >
-        <ChartsSection
-          datasetSize={datasetSize}
-          compareDatasetSize={compareDatasetSize}
-          compareEnabled={effectiveCompareEnabled}
-          filters={filters}
-          onCrossFilter={applyCrossFilter}
-          onOpenDetail={onOpenDetail}
-          onAnnotate={setActiveAnnotationContext}
-          draggable
-        />
-      </AsyncBoundary>
-
-      <AsyncBoundary
-        fallback={<TableSkeleton />}
-        errorTitle={t('dashboardTableFailedTitle')}
-        errorMessage={t('dashboardTableFailedMessage')}
-      >
-        <TableSection
-          datasetSize={datasetSize}
-          compareDatasetSize={compareDatasetSize}
-          compareEnabled={effectiveCompareEnabled}
-          filters={filters}
-          onOpenDetail={onOpenDetail}
-          onAnnotate={setActiveAnnotationContext}
-          draggable
-        />
-      </AsyncBoundary>
+      <DashboardDataSections
+        datasetSize={datasetSize}
+        setDatasetSize={setDatasetSize}
+        filters={filters}
+        setFilters={setFilters}
+        compareDatasetSize={compareDatasetSize}
+        effectiveCompareEnabled={effectiveCompareEnabled}
+        isFetching={isFetching}
+        selectedLabels={selectedLabels}
+        weightMinValue={weightMinValue}
+        weightMaxValue={weightMaxValue}
+        defaultWeightMin={defaultWeightMin}
+        defaultWeightMax={defaultWeightMax}
+        onCrossFilter={applyCrossFilter}
+        onOpenDetail={onOpenDetail}
+        setActiveAnnotationContext={setActiveAnnotationContext}
+        summaryCardRef={summaryCardRef}
+        summaryVisualizationRef={summaryVisualizationRef}
+      />
 
       {isFilterOpen ? (
         <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 p-4 lg:hidden">
