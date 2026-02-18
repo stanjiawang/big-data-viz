@@ -39,6 +39,7 @@ All notable changes to this project are tracked in this file.
 - Render-performance e2e now has auth-aware bootstrap and direct graph detail-route measurement (`/detail/graph`) to reduce CI flakiness from auth-gate and legacy redirect timing.
 - Added unit coverage to assert the dashboard “Refresh data” action uses scoped dashboard query invalidation helper behavior.
 - Added auth-enabled e2e regression for large-dataset bootstrap across overview and direct graph detail routes, matching render-perf sign-in readiness expectations.
+- ESLint now ignores generated Playwright/CI artifact directories (`test-results`, `playwright-report`, `coverage`, `artifacts`) to prevent lint/e2e race regressions.
 
 ## Release Procedure
 
