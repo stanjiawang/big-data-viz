@@ -22,7 +22,6 @@ export type DashboardSectionProps = {
   expanded?: boolean;
   onOpenDetail?: (_view: DetailView) => void;
   onCrossFilter?: (_patch: CrossFilterPatch) => void;
-  onAnnotate?: (_context: DashboardAnnotationContext) => void;
   focusView?: Extract<DetailView, 'timeSeries' | 'embedding' | 'graph' | 'd3'>;
   draggable?: boolean;
 };

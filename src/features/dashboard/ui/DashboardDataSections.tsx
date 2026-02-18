@@ -10,11 +10,7 @@ import {
 } from '@/features/dashboard/ui/SectionSkeletons';
 import { KpiSection } from '@/features/dashboard/sections/KpiSection';
 import { SectionCardActions } from '@/features/dashboard/sections/SectionShared';
-import type {
-  CrossFilterPatch,
-  DashboardAnnotationContext,
-  DetailView,
-} from '@/features/dashboard/sections/types';
+import type { CrossFilterPatch, DetailView } from '@/features/dashboard/sections/types';
 import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
 import { ChartsSection, SummarySection, TableSection } from '@/features/dashboard/ui/LazySections';
 import { useI18n } from '@/i18n/useI18n';
@@ -38,7 +34,6 @@ type DashboardDataSectionsProps = {
   defaultWeightMax: number;
   onCrossFilter: (_patch: CrossFilterPatch) => void;
   onOpenDetail: (_view: DetailView) => void;
-  setActiveAnnotationContext: Dispatch<SetStateAction<DashboardAnnotationContext>>;
   summaryCardRef: RefObject<HTMLElement | null>;
   summaryVisualizationRef: RefObject<HTMLDivElement | null>;
 };
@@ -58,7 +53,6 @@ export const DashboardDataSections = memo(function DashboardDataSections({
   defaultWeightMax,
   onCrossFilter,
   onOpenDetail,
-  setActiveAnnotationContext,
   summaryCardRef,
   summaryVisualizationRef,
 }: DashboardDataSectionsProps) {
@@ -144,7 +138,6 @@ export const DashboardDataSections = memo(function DashboardDataSections({
                 actions={
                   <SectionCardActions
                     onOpenDetail={() => onOpenDetail('summary')}
-                    onAnnotate={() => setActiveAnnotationContext('summary')}
                     exportTargetRef={summaryVisualizationRef}
                     exportFileName="summary"
                   />
@@ -182,7 +175,6 @@ export const DashboardDataSections = memo(function DashboardDataSections({
           filters={queryFilters}
           onCrossFilter={onCrossFilter}
           onOpenDetail={onOpenDetail}
-          onAnnotate={setActiveAnnotationContext}
           draggable
         />
       </AsyncBoundary>
@@ -198,7 +190,6 @@ export const DashboardDataSections = memo(function DashboardDataSections({
           compareEnabled={effectiveCompareEnabled}
           filters={queryFilters}
           onOpenDetail={onOpenDetail}
-          onAnnotate={setActiveAnnotationContext}
           draggable
         />
       </AsyncBoundary>

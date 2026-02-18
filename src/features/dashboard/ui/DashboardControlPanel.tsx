@@ -285,7 +285,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
         </button>
       </div>
 
-      <div className="mt-3 grid gap-3 xl:grid-cols-[minmax(240px,300px)_1fr_auto] xl:items-center">
+      <div className="mt-3 grid gap-3 xl:grid-cols-[minmax(240px,300px)_1fr] xl:items-end">
         <label className="flex flex-col gap-1">
           <span className={UI_LABEL_CLASS}>{t('dashboardSavedViews')}</span>
           <span className="relative block">
@@ -321,7 +321,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           </span>
         </label>
 
-        <div className="grid gap-2 md:grid-cols-[minmax(160px,220px)_repeat(4,minmax(0,1fr))] md:items-end">
+        <div className="grid gap-2 md:grid-cols-[minmax(170px,220px)_repeat(5,minmax(0,1fr))] md:items-end">
           <label className="flex flex-col gap-1">
             <span className={UI_LABEL_CLASS}>{t('dashboardSavedViewName')}</span>
             <input
@@ -362,9 +362,6 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           >
             {t('dashboardDeleteView')}
           </button>
-        </div>
-
-        <div className="flex items-center gap-2 xl:justify-end">
           <button
             type="button"
             className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
@@ -374,17 +371,19 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           >
             {t('dashboardCopyLink')}
           </button>
-          <span className={UI_LABEL_CLASS} aria-live="polite">
-            {copyStatus === 'done'
-              ? t('dashboardCopyLinkDone')
-              : copyStatus === 'failed'
-                ? t('dashboardCopyLinkFailed')
-                : ''}
-          </span>
         </div>
       </div>
+      <div className="mt-1 flex min-h-4 justify-end">
+        <span className={UI_LABEL_CLASS} aria-live="polite">
+          {copyStatus === 'done'
+            ? t('dashboardCopyLinkDone')
+            : copyStatus === 'failed'
+              ? t('dashboardCopyLinkFailed')
+              : ''}
+        </span>
+      </div>
 
-      <div className="mt-3 grid gap-3 border-t border-slate-200/80 pt-3 xl:grid-cols-[minmax(240px,300px)_1fr] xl:items-center">
+      <div className="mt-3 grid gap-2 border-t border-slate-200/80 pt-3 md:grid-cols-[minmax(240px,300px)_repeat(4,minmax(0,1fr))] md:items-end">
         <label className="flex flex-col gap-1">
           <span className={UI_LABEL_CLASS}>{t('snapshotTimelineTitle')}</span>
           <span className="relative block">
@@ -420,41 +419,39 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           </span>
         </label>
 
-        <div className="grid gap-2 md:grid-cols-4 md:items-end">
-          <button
-            type="button"
-            className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
-            onClick={() => {
-              onCaptureSnapshot();
-            }}
-          >
-            {t('snapshotCapture')}
-          </button>
-          <button
-            type="button"
-            className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
-            disabled={!activeSnapshotId}
-            onClick={handleReplaySnapshot}
-          >
-            {t('snapshotReplay')}
-          </button>
-          <button
-            type="button"
-            className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
-            disabled={!activeSnapshotId}
-            onClick={onDeleteActiveSnapshot}
-          >
-            {t('snapshotDelete')}
-          </button>
-          <button
-            type="button"
-            className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
-            disabled={snapshots.length === 0}
-            onClick={onClearSnapshots}
-          >
-            {t('snapshotClear')}
-          </button>
-        </div>
+        <button
+          type="button"
+          className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+          onClick={() => {
+            onCaptureSnapshot();
+          }}
+        >
+          {t('snapshotCapture')}
+        </button>
+        <button
+          type="button"
+          className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+          disabled={!activeSnapshotId}
+          onClick={handleReplaySnapshot}
+        >
+          {t('snapshotReplay')}
+        </button>
+        <button
+          type="button"
+          className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+          disabled={!activeSnapshotId}
+          onClick={onDeleteActiveSnapshot}
+        >
+          {t('snapshotDelete')}
+        </button>
+        <button
+          type="button"
+          className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
+          disabled={snapshots.length === 0}
+          onClick={onClearSnapshots}
+        >
+          {t('snapshotClear')}
+        </button>
       </div>
 
       <div className="mt-3 border-t border-slate-200/80 pt-3">

@@ -143,7 +143,6 @@ export function DashboardOverviewView({
     `${t('dashboardBadgeSource')}: ${filters.source ?? t('dashboardBadgeAll')}`,
     `${t('dashboardBadgeSearch')}: ${filters.search || t('dashboardBadgeEmpty')}`,
   ];
-  const searchBadgePrefix = `${t('dashboardBadgeSearch')}:`;
   const realtimeStatusLabel =
     realtimeStatus === 'live'
       ? t('realtimeStatusLive')
@@ -174,22 +173,6 @@ export function DashboardOverviewView({
       : []),
     ...(filters.search ? [`${t('dashboardActiveSearch')}: ${filters.search}`] : []),
   ];
-
-  const focusSearchFilter = useCallback(() => {
-    const searchInput = document.getElementById('filters-search-input') as HTMLInputElement | null;
-    if (!searchInput) return;
-    searchInput.focus();
-    searchInput.select();
-  }, []);
-
-  const handleSearchBadgeClick = useCallback(() => {
-    if (window.matchMedia('(max-width: 1023px)').matches) {
-      onOpenFilters();
-      window.setTimeout(focusSearchFilter, 0);
-      return;
-    }
-    focusSearchFilter();
-  }, [focusSearchFilter, onOpenFilters]);
 
   const applyCrossFilter = useCallback(
     (patch: CrossFilterPatch) => {
@@ -249,12 +232,7 @@ export function DashboardOverviewView({
           </div>
         </div>
         <div className="min-h-10 rounded-xl border border-slate-200/80 bg-slate-50/65 p-3">
-          <DashboardHeaderBadges
-            items={badgeItems}
-            isLoading={isFetching}
-            searchBadgePrefix={searchBadgePrefix}
-            onSearchBadgeClick={handleSearchBadgeClick}
-          />
+          <DashboardHeaderBadges items={badgeItems} isLoading={isFetching} />
         </div>
       </section>
 
@@ -315,7 +293,6 @@ export function DashboardOverviewView({
         defaultWeightMax={defaultWeightMax}
         onCrossFilter={applyCrossFilter}
         onOpenDetail={onOpenDetail}
-        setActiveAnnotationContext={setActiveAnnotationContext}
         summaryCardRef={summaryCardRef}
         summaryVisualizationRef={summaryVisualizationRef}
       />

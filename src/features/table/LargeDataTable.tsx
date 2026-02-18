@@ -14,7 +14,7 @@ const PAGE_SIZE = 200;
 const VECTOR_SIZE = 128;
 const DEFAULT_ROW_HEIGHT = 52;
 const COMPACT_ROW_HEIGHT = 24;
-const DEFAULT_COL_WIDTHS = [160, 200, 140, 140];
+const DEFAULT_COL_WIDTHS = [180, 220, 160, 150];
 const MIN_COL_WIDTH = 120;
 const MAX_COL_WIDTH = 360;
 const TABLE_DENSITY_STORAGE_KEY = 'bdv_table_compact_density';
@@ -43,7 +43,7 @@ const TableRow = memo(function TableRow({
   const timestamp = record?.timestamp
     ? record.timestamp.replace('T', ' ').slice(0, 19)
     : loadingText;
-  const featurePreviewSize = isCompact ? 2 : 6;
+  const featurePreviewSize = isCompact ? 4 : 12;
 
   return (
     <div className="absolute left-0 right-0" style={style}>
@@ -86,7 +86,7 @@ export function LargeDataTable({ total, filters, exportTargetRef }: LargeDataTab
   const [columnWidths, setColumnWidths] = useState(DEFAULT_COL_WIDTHS);
 
   const rowHeight = isCompact ? COMPACT_ROW_HEIGHT : DEFAULT_ROW_HEIGHT;
-  const gridTemplateColumns = `${columnWidths[0]}px ${columnWidths[1]}px ${columnWidths[2]}px ${columnWidths[3]}px minmax(220px, 1fr)`;
+  const gridTemplateColumns = `${columnWidths[0]}px ${columnWidths[1]}px ${columnWidths[2]}px ${columnWidths[3]}px minmax(280px, 1fr)`;
   const tableHeaders =
     locale === 'zh-CN'
       ? (['ID', '时间戳', '来源', '标签'] as const)

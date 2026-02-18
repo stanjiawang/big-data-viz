@@ -22,7 +22,7 @@ test('supports open-detail navigation across all dashboard feature cards', async
   await openAndReturn(page, 'Time Series', 'Time Series');
   await openAndReturn(page, 'Embedding Cloud', 'Embedding Cloud');
   await openAndReturn(page, 'Relationship Graph', 'Relationship Graph');
-  await openAndReturn(page, 'D3 Embedding Scatter', 'D3 Embedding Scatter');
+  await openAndReturn(page, 'D3 Scatter', 'D3 Scatter');
   await openAndReturn(page, 'Large Table', 'Large Table');
 });
 
@@ -30,11 +30,11 @@ test('allows D3 detail interactions including filters, zoom, and reset', async (
   await page.goto('/');
 
   const d3Card = page
-    .getByRole('heading', { name: 'D3 Embedding Scatter' })
+    .getByRole('heading', { name: 'D3 Scatter' })
     .locator('xpath=ancestor::section[1]');
   await d3Card.getByRole('button', { name: 'Open detail' }).first().click();
 
-  await expect(page.getByText('Detailed View: D3 Embedding Scatter')).toBeVisible();
+  await expect(page.getByText('Detailed View: D3 Scatter')).toBeVisible();
   await expect(page.getByTestId('d3-embedding-scatter')).toBeVisible();
 
   await page.getByRole('button', { name: 'class-A' }).click();
