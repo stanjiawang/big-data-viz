@@ -307,7 +307,6 @@ export function DashboardOverviewView({
         setFilters={setFilters}
         compareDatasetSize={compareDatasetSize}
         effectiveCompareEnabled={effectiveCompareEnabled}
-        isFetching={isFetching}
         selectedLabels={selectedLabels}
         weightMinValue={weightMinValue}
         weightMaxValue={weightMaxValue}

@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/Card';
 import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
 import {
   ChartsRowSkeleton,
-  FiltersSkeleton,
   KpiSkeletonGrid,
   SummarySkeleton,
   TableSkeleton,
@@ -32,7 +31,6 @@ type DashboardDataSectionsProps = {
   setFilters: Dispatch<SetStateAction<MockFilters>>;
   compareDatasetSize: DatasetSizeOption;
   effectiveCompareEnabled: boolean;
-  isFetching: boolean;
   selectedLabels: string[];
   weightMinValue: number;
   weightMaxValue: number;
@@ -53,7 +51,6 @@ export const DashboardDataSections = memo(function DashboardDataSections({
   setFilters,
   compareDatasetSize,
   effectiveCompareEnabled,
-  isFetching,
   selectedLabels,
   weightMinValue,
   weightMaxValue,
@@ -107,21 +104,17 @@ export const DashboardDataSections = memo(function DashboardDataSections({
                     onDragEnd: topCardReorder.onDragEnd,
                   }}
                 >
-                  {isFetching ? (
-                    <FiltersSkeleton />
-                  ) : (
-                    <FiltersPanel
-                      datasetSize={datasetSize}
-                      setDatasetSize={setDatasetSize}
-                      filters={filters}
-                      setFilters={setFilters}
-                      selectedLabels={selectedLabels}
-                      weightMinValue={weightMinValue}
-                      weightMaxValue={weightMaxValue}
-                      defaultWeightMin={defaultWeightMin}
-                      defaultWeightMax={defaultWeightMax}
-                    />
-                  )}
+                  <FiltersPanel
+                    datasetSize={datasetSize}
+                    setDatasetSize={setDatasetSize}
+                    filters={filters}
+                    setFilters={setFilters}
+                    selectedLabels={selectedLabels}
+                    weightMinValue={weightMinValue}
+                    weightMaxValue={weightMaxValue}
+                    defaultWeightMin={defaultWeightMin}
+                    defaultWeightMax={defaultWeightMax}
+                  />
                 </Card>
               </div>
             );
