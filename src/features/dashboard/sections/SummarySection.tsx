@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import type { RefObject } from 'react';
+import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { useI18n } from '@/i18n/useI18n';
-import { BarChart } from '@/features/charts/BarChart';
-import { PieChart } from '@/features/charts/PieChart';
 import { useMockDataSuspense } from '@/features/data/queries/useMockData';
 import { LABEL_OPTIONS, SOURCE_OPTIONS } from '@/features/dashboard/constants/filterOptions';
+import { LazyBarChart, LazyPieChart } from '@/features/dashboard/sections/lazyVisualizations';
 import { RangeSummary } from '@/features/dashboard/sections/shared';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
 
@@ -65,34 +65,38 @@ export function SummarySection({
     <div className="space-y-4">
       <div ref={visualizationRef} className="space-y-4">
         <div className="rounded-lg border border-slate-200 bg-white p-3">
-          <PieChart
-            title={t('chartLabelDistribution')}
-            data={labelDistribution}
-            height={expanded ? 280 : 200}
-            onItemClick={(label) => {
-              onCrossFilter?.({
-                label,
-                labels: [label],
-              });
-            }}
-          />
+          <AsyncBoundary fallback={<div className={expanded ? 'h-[280px]' : 'h-[200px]'} />}>
+            <LazyPieChart
+              title={t('chartLabelDistribution')}
+              data={labelDistribution}
+              height={expanded ? 280 : 200}
+              onItemClick={(label) => {
+                onCrossFilter?.({
+                  label,
+                  labels: [label],
+                });
+              }}
+            />
+          </AsyncBoundary>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-3">
-          <BarChart
-            title={t('chartSourceVolume')}
-            categories={sourceDistribution.categories}
-            values={sourceDistribution.values}
-            height={expanded ? 280 : 200}
-            xStartPercent={barXStart}
-            xEndPercent={barXEnd}
-            yMin={barYMinValue}
-            yMax={barYMaxValue}
-            onItemClick={(source) => {
-              onCrossFilter?.({
-                source: source as DashboardSectionProps['filters']['source'],
-              });
-            }}
-          />
+          <AsyncBoundary fallback={<div className={expanded ? 'h-[280px]' : 'h-[200px]'} />}>
+            <LazyBarChart
+              title={t('chartSourceVolume')}
+              categories={sourceDistribution.categories}
+              values={sourceDistribution.values}
+              height={expanded ? 280 : 200}
+              xStartPercent={barXStart}
+              xEndPercent={barXEnd}
+              yMin={barYMinValue}
+              yMax={barYMaxValue}
+              onItemClick={(source) => {
+                onCrossFilter?.({
+                  source: source as DashboardSectionProps['filters']['source'],
+                });
+              }}
+            />
+          </AsyncBoundary>
         </div>
       </div>
       <div className="rounded-lg border border-slate-200 bg-white p-3">

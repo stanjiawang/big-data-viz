@@ -1,8 +1,9 @@
 import type { DragEvent } from 'react';
 import { useRef } from 'react';
+import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
 import { Card } from '@/components/ui/Card';
 import { useI18n } from '@/i18n/useI18n';
-import { LargeDataTable } from '@/features/table/LargeDataTable';
+import { LazyLargeDataTable } from '@/features/dashboard/sections/lazyVisualizations';
 import { SectionCardActions } from '@/features/dashboard/sections/shared';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
 import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
@@ -53,11 +54,17 @@ export function TableSection({
             />
           }
         >
-          <LargeDataTable
-            total={datasetSize.value}
-            filters={filters}
-            exportTargetRef={primaryTableRef}
-          />
+          <AsyncBoundary
+            fallback={<div className="h-[420px]" />}
+            errorTitle={t('dashboardTableFailedTitle')}
+            errorMessage={t('dashboardTableFailedMessage')}
+          >
+            <LazyLargeDataTable
+              total={datasetSize.value}
+              filters={filters}
+              exportTargetRef={primaryTableRef}
+            />
+          </AsyncBoundary>
         </Card>
       ),
       compare: (
@@ -74,11 +81,17 @@ export function TableSection({
             />
           }
         >
-          <LargeDataTable
-            total={compareDatasetSize.value}
-            filters={filters}
-            exportTargetRef={compareTableRef}
-          />
+          <AsyncBoundary
+            fallback={<div className="h-[420px]" />}
+            errorTitle={t('dashboardTableFailedTitle')}
+            errorMessage={t('dashboardTableFailedMessage')}
+          >
+            <LazyLargeDataTable
+              total={compareDatasetSize.value}
+              filters={filters}
+              exportTargetRef={compareTableRef}
+            />
+          </AsyncBoundary>
         </Card>
       ),
     } as const;
@@ -113,11 +126,17 @@ export function TableSection({
         />
       }
     >
-      <LargeDataTable
-        total={datasetSize.value}
-        filters={filters}
-        exportTargetRef={primaryTableRef}
-      />
+      <AsyncBoundary
+        fallback={<div className="h-[420px]" />}
+        errorTitle={t('dashboardTableFailedTitle')}
+        errorMessage={t('dashboardTableFailedMessage')}
+      >
+        <LazyLargeDataTable
+          total={datasetSize.value}
+          filters={filters}
+          exportTargetRef={primaryTableRef}
+        />
+      </AsyncBoundary>
     </Card>
   );
 }

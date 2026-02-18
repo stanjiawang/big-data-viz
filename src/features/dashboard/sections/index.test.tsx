@@ -12,40 +12,34 @@ import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import { clearChartDefinitionRegistry } from '@/features/visualizations/chartRegistry';
 import { registerGraphOverrideExtension } from '@/features/visualizations/chartExtensionExample';
 
-jest.mock('@/features/charts/BarChart', () => ({
-  BarChart: ({ title, onItemClick }: { title: string; onItemClick?: (_name: string) => void }) => (
+jest.mock('@/features/dashboard/sections/lazyVisualizations', () => ({
+  LazyBarChart: ({
+    title,
+    onItemClick,
+  }: {
+    title: string;
+    onItemClick?: (_name: string) => void;
+  }) => (
     <button type="button" onClick={() => onItemClick?.('user')}>
       {title}
     </button>
   ),
-}));
-
-jest.mock('@/features/charts/PieChart', () => ({
-  PieChart: ({ title, onItemClick }: { title: string; onItemClick?: (_name: string) => void }) => (
+  LazyPieChart: ({
+    title,
+    onItemClick,
+  }: {
+    title: string;
+    onItemClick?: (_name: string) => void;
+  }) => (
     <button type="button" onClick={() => onItemClick?.('class-A')}>
       {title}
     </button>
   ),
-}));
-
-jest.mock('@/features/charts/TimeSeriesChart', () => ({
-  TimeSeriesChart: () => <div>TimeSeriesChart</div>,
-}));
-
-jest.mock('@/features/charts/D3EmbeddingScatter', () => ({
-  D3EmbeddingScatter: () => <div>D3EmbeddingScatter</div>,
-}));
-
-jest.mock('@/features/embeddings/EmbeddingCloud', () => ({
-  EmbeddingCloud: () => <div>EmbeddingCloud</div>,
-}));
-
-jest.mock('@/features/graph/RelationshipGraph', () => ({
-  RelationshipGraph: () => <div>RelationshipGraph</div>,
-}));
-
-jest.mock('@/features/table/LargeDataTable', () => ({
-  LargeDataTable: ({ total }: { total: number }) => <div>Table {total}</div>,
+  LazyTimeSeriesChart: () => <div>TimeSeriesChart</div>,
+  LazyD3EmbeddingScatter: () => <div>D3EmbeddingScatter</div>,
+  LazyEmbeddingCloud: () => <div>EmbeddingCloud</div>,
+  LazyRelationshipGraph: () => <div>RelationshipGraph</div>,
+  LazyLargeDataTable: ({ total }: { total: number }) => <div>Table {total}</div>,
 }));
 
 const mockChunk: DataChunk = {

@@ -29,6 +29,7 @@ All notable changes to this project are tracked in this file.
 - Auth/session header resolution is centralized in auth client storage logic.
 - CI now uploads CycloneDX SBOM artifacts and enforces dependency policy before merge.
 - Runtime config now includes an explicit `runtimeProfile` contract (`standard` | `demo`) and demo-safe fallback defaults.
+- Dashboard sections now lazy-load heavy visualization and table modules behind section-local async boundaries to reduce initial bundle pressure and isolate rendering costs.
 
 ## Release Procedure
 

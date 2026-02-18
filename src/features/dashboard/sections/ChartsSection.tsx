@@ -1,15 +1,18 @@
 import { useRef, useState, type DragEvent } from 'react';
 import { Card } from '@/components/ui/Card';
+import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { useI18n } from '@/i18n/useI18n';
-import { D3EmbeddingScatter } from '@/features/charts/D3EmbeddingScatter';
-import { TimeSeriesChart } from '@/features/charts/TimeSeriesChart';
 import { useGraphSuspense } from '@/features/data/queries/useGraph';
 import { useMockDataSuspense } from '@/features/data/queries/useMockData';
 import { useTimeSeriesSuspense } from '@/features/data/queries/useTimeSeries';
 import { LABEL_OPTIONS } from '@/features/dashboard/constants/filterOptions';
-import { EmbeddingCloud } from '@/features/embeddings/EmbeddingCloud';
-import { RelationshipGraph } from '@/features/graph/RelationshipGraph';
+import {
+  LazyD3EmbeddingScatter,
+  LazyEmbeddingCloud,
+  LazyRelationshipGraph,
+  LazyTimeSeriesChart,
+} from '@/features/dashboard/sections/lazyVisualizations';
 import { RangeSummary, SectionCardActions } from '@/features/dashboard/sections/shared';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
 import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
@@ -99,15 +102,21 @@ export function ChartsSection({
           }
         >
           <div className="space-y-3">
-            <TimeSeriesChart
-              data={timeSeries}
-              height={expanded ? 420 : 260}
-              xStartPercent={timeXStart}
-              xEndPercent={timeXEnd}
-              yMin={timeYMinValue}
-              yMax={timeYMaxValue}
-              exportTargetRef={timeSeriesImageRef}
-            />
+            <AsyncBoundary
+              fallback={<div className={`${expanded ? 'h-[420px]' : 'h-[260px]'}`} />}
+              errorTitle={t('dashboardChartsFailedTitle')}
+              errorMessage={t('dashboardChartsFailedMessage')}
+            >
+              <LazyTimeSeriesChart
+                data={timeSeries}
+                height={expanded ? 420 : 260}
+                xStartPercent={timeXStart}
+                xEndPercent={timeXEnd}
+                yMin={timeYMinValue}
+                yMax={timeYMaxValue}
+                exportTargetRef={timeSeriesImageRef}
+              />
+            </AsyncBoundary>
             <div className="border-t border-slate-100 pt-3">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <RangeSummary xStart={timeXStart} xEnd={timeXEnd} yMin={timeYMin} yMax={timeYMax} />
@@ -192,18 +201,24 @@ export function ChartsSection({
             />
           }
         >
-          <EmbeddingCloud
-            records={chunk?.records}
-            height={expanded ? 620 : 360}
-            exportTargetRef={embeddingImageRef}
-            onPointClick={(point) => {
-              onCrossFilter?.({
-                labels: [point.label],
-                label: point.label,
-                source: point.source,
-              });
-            }}
-          />
+          <AsyncBoundary
+            fallback={<div className={`${expanded ? 'h-[620px]' : 'h-[360px]'}`} />}
+            errorTitle={t('dashboardChartsFailedTitle')}
+            errorMessage={t('dashboardChartsFailedMessage')}
+          >
+            <LazyEmbeddingCloud
+              records={chunk?.records}
+              height={expanded ? 620 : 360}
+              exportTargetRef={embeddingImageRef}
+              onPointClick={(point) => {
+                onCrossFilter?.({
+                  labels: [point.label],
+                  label: point.label,
+                  source: point.source,
+                });
+              }}
+            />
+          </AsyncBoundary>
         </Card>
       ),
     },
@@ -228,24 +243,30 @@ export function ChartsSection({
             />
           }
         >
-          <RelationshipGraph
-            data={graph}
-            height={expanded ? 620 : 380}
-            exportTargetRef={graphImageRef}
-            onClusterSelect={(cluster) => {
-              const label = mapClusterToLabel(cluster);
-              onCrossFilter?.({
-                label,
-                labels: [label],
-                search: cluster,
-              });
-            }}
-            onNodeSelect={(nodeId) => {
-              onCrossFilter?.({
-                search: nodeId,
-              });
-            }}
-          />
+          <AsyncBoundary
+            fallback={<div className={`${expanded ? 'h-[620px]' : 'h-[380px]'}`} />}
+            errorTitle={t('dashboardChartsFailedTitle')}
+            errorMessage={t('dashboardChartsFailedMessage')}
+          >
+            <LazyRelationshipGraph
+              data={graph}
+              height={expanded ? 620 : 380}
+              exportTargetRef={graphImageRef}
+              onClusterSelect={(cluster) => {
+                const label = mapClusterToLabel(cluster);
+                onCrossFilter?.({
+                  label,
+                  labels: [label],
+                  search: cluster,
+                });
+              }}
+              onNodeSelect={(nodeId) => {
+                onCrossFilter?.({
+                  search: nodeId,
+                });
+              }}
+            />
+          </AsyncBoundary>
         </Card>
       ),
     },
@@ -270,17 +291,23 @@ export function ChartsSection({
             />
           }
         >
-          <D3EmbeddingScatter
-            records={chunk?.records}
-            height={expanded ? 620 : 380}
-            exportTargetRef={d3ImageRef}
-            onPointClick={(point) => {
-              onCrossFilter?.({
-                label: point.label,
-                labels: [point.label],
-              });
-            }}
-          />
+          <AsyncBoundary
+            fallback={<div className={`${expanded ? 'h-[620px]' : 'h-[380px]'}`} />}
+            errorTitle={t('dashboardChartsFailedTitle')}
+            errorMessage={t('dashboardChartsFailedMessage')}
+          >
+            <LazyD3EmbeddingScatter
+              records={chunk?.records}
+              height={expanded ? 620 : 380}
+              exportTargetRef={d3ImageRef}
+              onPointClick={(point) => {
+                onCrossFilter?.({
+                  label: point.label,
+                  labels: [point.label],
+                });
+              }}
+            />
+          </AsyncBoundary>
         </Card>
       ),
     },
