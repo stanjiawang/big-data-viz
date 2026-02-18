@@ -31,12 +31,12 @@ Enterprise-ready workspace for large-scale AI training data analytics, built wit
 Dashboard chart cards can be overridden through a typed registry API.
 
 - Core contract: `src/features/visualizations/chartRegistry.ts`
-- Example extension: `src/features/visualizations/chartExtensionExample.tsx`
+- Example extension: `src/features/visualizations/ChartExtensionExample.tsx`
 
 Example:
 
 ```tsx
-import { registerGraphOverrideExtension } from '@/features/visualizations/chartExtensionExample';
+import { registerGraphOverrideExtension } from '@/features/visualizations/ChartExtensionExample';
 
 registerGraphOverrideExtension({
   getTitle: () => 'Custom Graph',

@@ -4,13 +4,13 @@ const PORT = 4173;
 const skipRenderPerf = process.env.SKIP_RENDER_PERF === '1';
 const authSuite = process.env.PW_AUTH_SUITE === '1';
 const defaultProjectIgnore = [
-  '**/auth-enabled.spec.ts',
-  ...(skipRenderPerf ? ['**/render-performance.spec.ts'] : []),
+  '**/auth-enabled.e2e.spec.ts',
+  ...(skipRenderPerf ? ['**/render-performance.e2e.spec.ts'] : []),
 ];
 
 export default defineConfig({
   testDir: './tests',
-  testIgnore: skipRenderPerf ? ['**/render-performance.spec.ts'] : undefined,
+  testIgnore: skipRenderPerf ? ['**/render-performance.e2e.spec.ts'] : undefined,
   timeout: 30_000,
   fullyParallel: true,
   use: {
@@ -34,7 +34,7 @@ export default defineConfig({
     ? [
         {
           name: 'chromium-auth',
-          testMatch: ['**/auth-enabled.spec.ts'],
+          testMatch: ['**/auth-enabled.e2e.spec.ts'],
           use: { ...devices['Desktop Chrome'] },
         },
       ]

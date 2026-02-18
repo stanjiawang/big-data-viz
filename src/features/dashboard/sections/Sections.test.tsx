@@ -10,7 +10,7 @@ import {
 } from '@/features/dashboard/sections';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import { clearChartDefinitionRegistry } from '@/features/visualizations/chartRegistry';
-import { registerGraphOverrideExtension } from '@/features/visualizations/chartExtensionExample';
+import { registerGraphOverrideExtension } from '@/features/visualizations/ChartExtensionExample';
 
 jest.mock('@/features/dashboard/sections/LazyVisualizations', () => ({
   LazyBarChart: ({

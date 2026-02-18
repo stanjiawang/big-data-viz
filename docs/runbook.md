@@ -53,7 +53,7 @@ Demo profile local run:
 ### Render performance failures
 
 - Run `pnpm run test:render-perf` locally to reproduce.
-- If failure is mount/readiness related, check detail-mode and lazy-load timing in `tests/render-performance.spec.ts`.
+- If failure is mount/readiness related, check detail-mode and lazy-load timing in `tests/e2e/render-performance.e2e.spec.ts`.
 - If failure is budget related, inspect latest `test:perf` output before changing thresholds.
 
 ## Incident Triage (Frontend)
