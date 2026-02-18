@@ -1,7 +1,7 @@
 import { useRef, useState, type DragEvent } from 'react';
 import { Card } from '@/components/ui/Card';
 import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
-import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
+import { UI_BUTTON_GHOST_SM, UI_INPUT_MD, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { useI18n } from '@/i18n/useI18n';
 import { useGraphSuspense } from '@/features/data/queries/useGraph';
 import { useMockDataSuspense } from '@/features/data/queries/useMockData';
@@ -142,7 +142,7 @@ export function ChartsSection({
                     max={Math.max(0, timeXEnd - 1)}
                     value={timeXStart}
                     onChange={(event) => setTimeXStart(Number(event.target.value))}
-                    className="w-full"
+                    className="w-full accent-blue-600"
                   />
                 </label>
                 <label className="space-y-1 text-xs text-slate-600">
@@ -153,7 +153,7 @@ export function ChartsSection({
                     max={100}
                     value={timeXEnd}
                     onChange={(event) => setTimeXEnd(Number(event.target.value))}
-                    className="w-full"
+                    className="w-full accent-blue-600"
                   />
                 </label>
                 <label className="space-y-1 text-xs text-slate-600">
@@ -162,7 +162,7 @@ export function ChartsSection({
                     type="number"
                     value={timeYMin}
                     onChange={(event) => setTimeYMin(event.target.value)}
-                    className="w-full rounded-md border border-slate-300 px-2 py-1"
+                    className={`${UI_INPUT_MD} h-9 px-2 py-1`}
                   />
                 </label>
                 <label className="space-y-1 text-xs text-slate-600">
@@ -171,7 +171,7 @@ export function ChartsSection({
                     type="number"
                     value={timeYMax}
                     onChange={(event) => setTimeYMax(event.target.value)}
-                    className="w-full rounded-md border border-slate-300 px-2 py-1"
+                    className={`${UI_INPUT_MD} h-9 px-2 py-1`}
                   />
                 </label>
               </div>

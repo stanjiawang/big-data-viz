@@ -6,7 +6,7 @@ export function LanguageSwitcher() {
 
   return (
     <label
-      className={`${UI_BUTTON_GHOST_SM} h-9 w-full max-w-[12.5rem] justify-start gap-1.5 px-2 text-left normal-case sm:w-36`}
+      className={`${UI_BUTTON_GHOST_SM} h-10 w-full justify-start gap-2 px-2 normal-case sm:w-[10.5rem]`}
     >
       <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-slate-500">
         <path
@@ -20,7 +20,7 @@ export function LanguageSwitcher() {
       </svg>
       <span className="relative min-w-0 flex-1">
         <select
-          className="h-7 w-full appearance-none rounded-md border-0 bg-transparent px-1 pr-6 text-sm font-semibold text-slate-700 shadow-none transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
+          className="h-8 w-full appearance-none rounded-lg border-0 bg-transparent px-1 pr-5 text-sm font-semibold text-slate-700 shadow-none outline-none"
           aria-label={t('language')}
           value={locale}
           onChange={(event) => setLocale(event.target.value as typeof locale)}
@@ -31,7 +31,7 @@ export function LanguageSwitcher() {
         <svg
           aria-hidden="true"
           viewBox="0 0 20 20"
-          className="pointer-events-none absolute right-1.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500"
+          className="pointer-events-none absolute right-1 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500"
         >
           <path
             d="M5.25 7.75 10 12.25l4.75-4.5"

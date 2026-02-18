@@ -270,13 +270,13 @@ export function FiltersPanel({
 
       <fieldset className={`${LABEL_CLASS} sm:col-span-2`}>
         <legend>{t('filtersLabelsMultiSelect')}</legend>
-        <div className="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:grid-cols-3">
+        <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-slate-200/90 bg-slate-50/65 p-3 sm:grid-cols-3">
           {LABEL_OPTIONS.map((label) => {
             const checked = selectedLabels.includes(label);
             return (
               <label
                 key={label}
-                className="inline-flex h-9 items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-2 text-xs font-semibold uppercase tracking-wide text-slate-600"
+                className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-300/85 bg-white/85 px-2 text-xs font-semibold uppercase tracking-[0.08em] text-slate-600 transition hover:border-slate-400/90 hover:text-slate-900"
               >
                 <input type="checkbox" checked={checked} onChange={() => toggleLabel(label)} />
                 {label}

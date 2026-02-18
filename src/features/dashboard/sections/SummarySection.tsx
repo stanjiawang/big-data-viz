@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { RefObject } from 'react';
 import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
-import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
+import { UI_BUTTON_GHOST_SM, UI_INPUT_MD, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { useI18n } from '@/i18n/useI18n';
 import { useMockDataSuspense } from '@/features/data/queries/useMockData';
 import { LABEL_OPTIONS, SOURCE_OPTIONS } from '@/features/dashboard/constants/filterOptions';
@@ -64,7 +64,7 @@ export function SummarySection({
   return (
     <div className="space-y-4">
       <div ref={visualizationRef} className="space-y-4">
-        <div className="rounded-lg border border-slate-200 bg-white p-3">
+        <div className="rounded-xl border border-slate-200/90 bg-white/90 p-3">
           <AsyncBoundary fallback={<div className={expanded ? 'h-[280px]' : 'h-[200px]'} />}>
             <LazyPieChart
               title={t('chartLabelDistribution')}
@@ -79,7 +79,7 @@ export function SummarySection({
             />
           </AsyncBoundary>
         </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-3">
+        <div className="rounded-xl border border-slate-200/90 bg-white/90 p-3">
           <AsyncBoundary fallback={<div className={expanded ? 'h-[280px]' : 'h-[200px]'} />}>
             <LazyBarChart
               title={t('chartSourceVolume')}
@@ -99,8 +99,8 @@ export function SummarySection({
           </AsyncBoundary>
         </div>
       </div>
-      <div className="rounded-lg border border-slate-200 bg-white p-3">
-        <div className="mt-3 border-t border-slate-100 pt-3">
+      <div className="rounded-xl border border-slate-200/90 bg-white/90 p-3">
+        <div className="mt-3 border-t border-slate-200/80 pt-3">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <RangeSummary xStart={barXStart} xEnd={barXEnd} yMin={barYMin} yMax={barYMax} />
             <button
@@ -125,7 +125,7 @@ export function SummarySection({
                 max={Math.max(0, barXEnd - 1)}
                 value={barXStart}
                 onChange={(event) => setBarXStart(Number(event.target.value))}
-                className="w-full"
+                className="w-full accent-blue-600"
               />
             </label>
             <label className="space-y-1 text-xs text-slate-600">
@@ -136,7 +136,7 @@ export function SummarySection({
                 max={100}
                 value={barXEnd}
                 onChange={(event) => setBarXEnd(Number(event.target.value))}
-                className="w-full"
+                className="w-full accent-blue-600"
               />
             </label>
             <label className="space-y-1 text-xs text-slate-600">
@@ -145,7 +145,7 @@ export function SummarySection({
                 type="number"
                 value={barYMin}
                 onChange={(event) => setBarYMin(event.target.value)}
-                className="w-full rounded-md border border-slate-300 px-2 py-1"
+                className={`${UI_INPUT_MD} h-9 px-2 py-1`}
               />
             </label>
             <label className="space-y-1 text-xs text-slate-600">
@@ -154,7 +154,7 @@ export function SummarySection({
                 type="number"
                 value={barYMax}
                 onChange={(event) => setBarYMax(event.target.value)}
-                className="w-full rounded-md border border-slate-300 px-2 py-1"
+                className={`${UI_INPUT_MD} h-9 px-2 py-1`}
               />
             </label>
           </div>

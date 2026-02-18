@@ -33,21 +33,30 @@ export function PieChart({
   const option = useMemo<EChartsOption>(() => {
     return {
       animation: false,
+      textStyle: {
+        fontFamily: 'inherit',
+      },
       tooltip: {
         trigger: 'item',
       },
       legend: {
         bottom: 0,
+        icon: 'roundRect',
+        itemWidth: 10,
+        itemHeight: 10,
+        itemGap: 14,
         textStyle: {
           color: '#475569',
           fontSize: 11,
+          fontWeight: 500,
         },
       },
       series: [
         {
           name: title,
           type: 'pie',
-          radius: ['40%', '70%'],
+          radius: ['42%', '70%'],
+          center: ['50%', '43%'],
           avoidLabelOverlap: false,
           itemStyle: {
             borderRadius: 4,

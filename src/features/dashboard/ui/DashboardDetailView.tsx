@@ -50,9 +50,9 @@ export function DashboardDetailView({
   return (
     <main
       id="app-main"
-      className="mx-auto grid w-full max-w-[1480px] gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+      className="mx-auto grid w-full max-w-[1520px] gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
     >
-      <section className="space-y-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+      <section className="space-y-3 rounded-3xl border border-slate-200/90 bg-white/90 px-5 py-4 shadow-[0_12px_30px_rgb(15_23_42/8%)] backdrop-blur-[1px]">
         <div className="flex min-h-10 flex-wrap items-center justify-between gap-3">
           <h2 className={UI_LABEL_CLASS}>
             {t('dashboardDetailedView')}: {getDetailTitle(detailView, t)}
@@ -60,7 +60,7 @@ export function DashboardDetailView({
           <div className="flex flex-wrap items-center justify-end gap-2 lg:flex-nowrap">
             <button
               type="button"
-              className={`${ACTION_BUTTON_CLASS} h-9 min-w-0 gap-2 px-3 normal-case`}
+              className={`${ACTION_BUTTON_CLASS} h-9 min-w-36 gap-2 px-3 normal-case`}
               onClick={onBackToDashboard}
             >
               <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4">

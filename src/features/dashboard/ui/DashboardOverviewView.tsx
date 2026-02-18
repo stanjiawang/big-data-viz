@@ -225,21 +225,21 @@ export function DashboardOverviewView({
   return (
     <main
       id="app-main"
-      className="mx-auto grid w-full max-w-[1480px] gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+      className="mx-auto grid w-full max-w-[1520px] gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
     >
-      <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="grid gap-4 lg:grid-cols-12 lg:items-start">
-          <div className="lg:col-span-7">
+      <section className="space-y-4 rounded-3xl border border-slate-200/90 bg-white/90 p-6 shadow-[0_12px_30px_rgb(15_23_42/8%)] backdrop-blur-[1px]">
+        <div className="grid gap-4 xl:grid-cols-12 xl:items-start">
+          <div className="xl:col-span-7">
             <PageHeader title={t('dashboardTitle')} subtitle={t('dashboardSubtitle')} />
           </div>
-          <div className="flex flex-col gap-2 lg:col-span-5 lg:items-end">
-            <div className="flex w-full flex-wrap items-center justify-start gap-2 sm:justify-end lg:flex-nowrap lg:justify-end">
+          <div className="flex flex-col gap-2 xl:col-span-5 xl:items-end">
+            <div className="flex w-full flex-wrap items-center justify-start gap-2 sm:justify-end">
               <LanguageSwitcher />
               <ThemeToggle />
               {runtimeEnableAuth && isAuthenticated ? (
                 <button
                   type="button"
-                  className={`${ACTION_BUTTON_CLASS} w-full min-w-0 sm:w-auto sm:min-w-32`}
+                  className={`${ACTION_BUTTON_CLASS} w-full min-w-0 sm:w-auto sm:min-w-36`}
                   onClick={() => void onSignOut()}
                 >
                   {t('authSignOut')}
@@ -248,7 +248,7 @@ export function DashboardOverviewView({
             </div>
           </div>
         </div>
-        <div className="min-h-10 border-t border-slate-100 pt-3">
+        <div className="min-h-10 rounded-xl border border-slate-200/80 bg-slate-50/65 p-3">
           <DashboardHeaderBadges
             items={badgeItems}
             isLoading={isFetching}
@@ -332,7 +332,7 @@ export function DashboardOverviewView({
             role="dialog"
             aria-modal="true"
             aria-labelledby="filters-dialog-title"
-            className="relative z-10 w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl"
+            className="relative z-10 w-full max-w-lg rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-2xl backdrop-blur-sm"
           >
             <div className="flex items-center justify-between">
               <div>

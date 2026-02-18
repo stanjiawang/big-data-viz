@@ -86,7 +86,7 @@ export const DashboardDataSections = memo(function DashboardDataSections({
             return (
               <div
                 key={cardId}
-                className={`hidden lg:col-span-5 lg:block ${topCardReorder.overId === cardId && topCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
+                className={`hidden lg:col-span-4 lg:block ${topCardReorder.overId === cardId && topCardReorder.draggingId !== cardId ? 'rounded-2xl ring-2 ring-blue-200' : ''}`}
                 onDragOver={(event) => topCardReorder.onDragOver(event, cardId)}
                 onDrop={() => topCardReorder.onDrop(cardId)}
               >
@@ -123,7 +123,7 @@ export const DashboardDataSections = memo(function DashboardDataSections({
           return (
             <div
               key={cardId}
-              className={`lg:col-span-7 ${topCardReorder.overId === cardId && topCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
+              className={`lg:col-span-8 ${topCardReorder.overId === cardId && topCardReorder.draggingId !== cardId ? 'rounded-2xl ring-2 ring-blue-200' : ''}`}
               onDragOver={(event) => topCardReorder.onDragOver(event, cardId)}
               onDrop={() => topCardReorder.onDrop(cardId)}
             >

@@ -215,10 +215,10 @@ export function D3EmbeddingScatter({
 
   return (
     <div
-      className="relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white"
+      className="relative flex h-full flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-white/90"
       style={{ height }}
     >
-      <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-100 px-2 py-2">
+      <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-200/80 px-2 py-2">
         <span className={`${UI_LABEL_CLASS} mr-1`}>
           {t('d3ZoomLabel')}: {zoomLevel.toFixed(1)}x
         </span>
@@ -248,7 +248,7 @@ export function D3EmbeddingScatter({
         <div className="w-full sm:ml-auto sm:w-auto">
           <button
             type="button"
-            className={`${UI_CHIP_INTERACTIVE} w-full sm:w-auto`}
+            className={`${UI_CHIP_INTERACTIVE} w-full sm:min-w-36 sm:w-auto`}
             onClick={() => {
               setHiddenLabels(new Set());
               setPointScale(1);
@@ -285,7 +285,7 @@ export function D3EmbeddingScatter({
         ) : null}
       </div>
 
-      <div className="grid gap-2 border-t border-slate-100 px-2 py-2 text-xs uppercase tracking-wide text-slate-500 sm:grid-cols-2">
+      <div className="grid gap-2 border-t border-slate-200/80 px-2 py-2 text-xs uppercase tracking-wide text-slate-500 sm:grid-cols-2">
         <label className="space-y-1">
           <div className="flex items-center justify-between">
             <span className={UI_LABEL_CLASS}>{t('d3PointSize')}</span>
@@ -298,7 +298,7 @@ export function D3EmbeddingScatter({
             step={0.1}
             value={pointScale}
             onChange={(event) => setPointScale(Number(event.target.value))}
-            className="w-full"
+            className="w-full accent-blue-600"
           />
         </label>
         <label className="space-y-1">
@@ -313,7 +313,7 @@ export function D3EmbeddingScatter({
             step={0.05}
             value={pointOpacity}
             onChange={(event) => setPointOpacity(Number(event.target.value))}
-            className="w-full"
+            className="w-full accent-blue-600"
           />
         </label>
       </div>

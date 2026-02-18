@@ -275,7 +275,7 @@ export function RelationshipGraph({
   return (
     <div
       ref={containerRef}
-      className="relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white"
+      className="relative flex h-full flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-white/90"
       style={{ height }}
       data-testid="relationship-graph"
     >
@@ -329,7 +329,7 @@ export function RelationshipGraph({
           </div>
         </div>
 
-        <aside className="flex min-h-0 flex-col gap-4 rounded-lg bg-slate-50/70 p-3">
+        <aside className="flex min-h-0 flex-col gap-4 rounded-xl border border-slate-200/80 bg-slate-50/70 p-3">
           {clusters.length > 0 ? (
             <div className="shrink-0 space-y-2">
               <div className={UI_LABEL_CLASS}>Clusters</div>
@@ -369,7 +369,7 @@ export function RelationshipGraph({
             <div className="relative">
               <button
                 type="button"
-                className={`${UI_BUTTON_GHOST_SM} h-8 w-full px-3 text-xs`}
+                className={`${UI_BUTTON_GHOST_SM} h-8 w-full min-w-36 px-3 text-xs`}
                 onClick={() => setShowEdges((current) => !current)}
                 onMouseEnter={() => setShowHintTooltip(true)}
                 onMouseLeave={() => setShowHintTooltip(false)}
@@ -387,7 +387,7 @@ export function RelationshipGraph({
             {selectedClusters.size > 0 ? (
               <button
                 type="button"
-                className={`${UI_BUTTON_GHOST_SM} h-8 w-full px-2 text-xs`}
+                className={`${UI_BUTTON_GHOST_SM} h-8 w-full min-w-36 px-2 text-xs`}
                 onClick={() => {
                   setSelectedNode(null);
                   setHoveredNode(null);

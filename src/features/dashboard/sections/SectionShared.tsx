@@ -7,7 +7,11 @@ export function DetailButton({ onClick }: { onClick: () => void }) {
   const { t } = useI18n();
 
   return (
-    <button type="button" className={`${UI_BUTTON_GHOST_SM} w-full sm:w-36`} onClick={onClick}>
+    <button
+      type="button"
+      className={`${UI_BUTTON_GHOST_SM} w-full sm:w-auto sm:min-w-36`}
+      onClick={onClick}
+    >
       {t('detailOpen')}
     </button>
   );
@@ -52,7 +56,7 @@ function ExportImageButton({
   return (
     <button
       type="button"
-      className={`${UI_BUTTON_GHOST_SM} w-full sm:w-44`}
+      className={`${UI_BUTTON_GHOST_SM} w-full sm:w-auto sm:min-w-36`}
       disabled={isExporting}
       onClick={async () => {
         try {
@@ -92,7 +96,7 @@ export function SectionCardActions({
       {onAnnotate ? (
         <button
           type="button"
-          className={`${UI_BUTTON_GHOST_SM} w-full sm:w-32`}
+          className={`${UI_BUTTON_GHOST_SM} w-full sm:w-auto sm:min-w-36`}
           onClick={onAnnotate}
         >
           {t('annotationAdd')}

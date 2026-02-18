@@ -101,7 +101,7 @@ export function TableSection({
         {tableCardReorder.order.map((cardId) => (
           <div
             key={cardId}
-            className={`${tableCardReorder.overId === cardId && tableCardReorder.draggingId !== cardId ? 'rounded-xl ring-2 ring-blue-200' : ''}`}
+            className={`${tableCardReorder.overId === cardId && tableCardReorder.draggingId !== cardId ? 'rounded-2xl ring-2 ring-blue-200' : ''}`}
             onDragOver={(event) => tableCardReorder.onDragOver(event, cardId)}
             onDrop={() => tableCardReorder.onDrop(cardId)}
           >

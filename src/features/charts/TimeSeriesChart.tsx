@@ -61,25 +61,53 @@ export function TimeSeriesChart({
 
     return {
       animation: false,
+      textStyle: {
+        fontFamily: 'inherit',
+      },
       tooltip: {
         trigger: 'axis',
       },
       grid: {
         left: 16,
         right: 16,
-        top: 24,
-        bottom: 24,
+        top: 22,
+        bottom: 20,
         containLabel: true,
       },
       xAxis: {
         type: 'category',
         data: zoomedPoints.map((point) => point.timestamp.slice(0, 10)),
         boundaryGap: false,
+        axisLabel: {
+          color: '#64748b',
+          fontSize: 11,
+          margin: 10,
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#cbd5e1',
+          },
+        },
+        axisTick: {
+          show: false,
+        },
       },
       yAxis: {
         type: 'value',
         min: yMin,
         max: yMax,
+        axisLabel: {
+          color: '#64748b',
+          fontSize: 11,
+        },
+        axisLine: {
+          show: false,
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e2e8f0',
+          },
+        },
       },
       series: [
         {

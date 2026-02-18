@@ -131,7 +131,7 @@ export function EmbeddingCloud({
 
   return (
     <div
-      className="relative overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-b from-slate-50 to-white"
+      className="relative overflow-hidden rounded-xl border border-slate-200/90 bg-gradient-to-b from-slate-50 to-white"
       style={{ height }}
     >
       <div className="absolute left-2 top-2 z-10 rounded-md bg-white px-2 py-1 text-[10px] uppercase tracking-wide text-slate-500 shadow-sm">
@@ -139,7 +139,7 @@ export function EmbeddingCloud({
       </div>
       <button
         type="button"
-        className={`absolute left-2 top-9 z-10 ${UI_BUTTON_GHOST_SM} h-9 bg-white px-2 shadow-sm`}
+        className={`absolute left-2 top-9 z-10 ${UI_BUTTON_GHOST_SM} h-9 min-w-36 bg-white/95 px-3`}
         onClick={() =>
           setViewState({
             target: [0, 0, 0],

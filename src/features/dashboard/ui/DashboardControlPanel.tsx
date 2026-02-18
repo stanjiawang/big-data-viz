@@ -154,8 +154,8 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
   }, [compareDatasetSize, compareEnabled, datasetSize, filters]);
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs text-slate-500 shadow-sm">
-      <div className="flex min-h-10 flex-col gap-3 border-b border-slate-100 pb-3 sm:flex-row sm:flex-wrap sm:items-center lg:flex-nowrap">
+    <section className="rounded-2xl border border-slate-200/90 bg-white/90 px-5 py-4 text-xs text-slate-500 shadow-[0_8px_24px_rgb(15_23_42/7%)] backdrop-blur-[1px]">
+      <div className="flex min-h-10 flex-col gap-3 border-b border-slate-200/80 pb-3 md:flex-row md:flex-wrap md:items-center lg:flex-nowrap">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -174,7 +174,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
             {t('dashboardCompareRoleRequired')}
           </span>
         ) : null}
-        <span className="hidden h-4 w-px bg-slate-200 sm:inline" />
+        <span className="hidden h-4 w-px bg-slate-300/80 md:inline" />
         <div className="flex flex-wrap items-center gap-2">
           <span className={UI_LABEL_CLASS}>{t('dashboardCompareDataset')}</span>
           <span className="relative block w-28">
@@ -214,7 +214,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
             </svg>
           </span>
         </div>
-        <span className="hidden h-4 w-px bg-slate-200 sm:inline" />
+        <span className="hidden h-4 w-px bg-slate-300/80 md:inline" />
         <div className="flex flex-wrap items-center gap-2">
           <span className={UI_LABEL_CLASS}>{t('realtimeMode')}</span>
           <span
@@ -246,10 +246,10 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
             {realtimePaused ? t('realtimeResume') : t('realtimePause')}
           </button>
         </div>
-        <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto lg:flex-nowrap">
+        <div className="flex w-full flex-wrap items-center gap-2 md:ml-auto md:w-auto lg:flex-nowrap">
           <button
             type="button"
-            className={`${ACTION_BUTTON_CLASS} w-full min-w-0 sm:w-auto sm:min-w-32`}
+            className={`${ACTION_BUTTON_CLASS} w-full min-w-0 md:w-auto md:min-w-36`}
             onClick={onRefreshData}
           >
             {t('dashboardRefreshData')}
@@ -257,14 +257,14 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           <button
             type="button"
             onClick={onOpenFilters}
-            className={`${ACTION_BUTTON_CLASS} w-full min-w-0 sm:w-auto sm:min-w-32 lg:hidden`}
+            className={`${ACTION_BUTTON_CLASS} w-full min-w-0 md:w-auto md:min-w-36 lg:hidden`}
           >
             {t('dashboardFilters')}
           </button>
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2 border-b border-slate-100 pb-3">
+      <div className="mt-3 flex flex-wrap items-center gap-2 border-b border-slate-200/80 pb-3">
         <span className={UI_LABEL_CLASS}>{t('dashboardActiveFilters')}</span>
         {activeFilterChips.length > 0 ? (
           activeFilterChips.map((chip) => (
@@ -285,7 +285,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
         </button>
       </div>
 
-      <div className="mt-3 grid gap-2 xl:grid-cols-[minmax(220px,280px)_1fr_auto] xl:items-center">
+      <div className="mt-3 grid gap-3 xl:grid-cols-[minmax(240px,300px)_1fr_auto] xl:items-center">
         <label className="flex flex-col gap-1">
           <span className={UI_LABEL_CLASS}>{t('dashboardSavedViews')}</span>
           <span className="relative block">
@@ -321,7 +321,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           </span>
         </label>
 
-        <div className="grid gap-2 sm:grid-cols-[minmax(140px,200px)_repeat(4,minmax(0,1fr))] sm:items-end">
+        <div className="grid gap-2 md:grid-cols-[minmax(160px,220px)_repeat(4,minmax(0,1fr))] md:items-end">
           <label className="flex flex-col gap-1">
             <span className={UI_LABEL_CLASS}>{t('dashboardSavedViewName')}</span>
             <input
@@ -384,7 +384,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
         </div>
       </div>
 
-      <div className="mt-3 grid gap-2 border-t border-slate-100 pt-3 xl:grid-cols-[minmax(220px,280px)_1fr] xl:items-center">
+      <div className="mt-3 grid gap-3 border-t border-slate-200/80 pt-3 xl:grid-cols-[minmax(240px,300px)_1fr] xl:items-center">
         <label className="flex flex-col gap-1">
           <span className={UI_LABEL_CLASS}>{t('snapshotTimelineTitle')}</span>
           <span className="relative block">
@@ -420,7 +420,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           </span>
         </label>
 
-        <div className="grid gap-2 sm:grid-cols-4 sm:items-end">
+        <div className="grid gap-2 md:grid-cols-4 md:items-end">
           <button
             type="button"
             className={`${ACTION_BUTTON_CLASS} h-9 px-2`}
@@ -457,7 +457,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
         </div>
       </div>
 
-      <div className="mt-3 border-t border-slate-100 pt-3">
+      <div className="mt-3 border-t border-slate-200/80 pt-3">
         <AnnotationPanel
           annotations={annotations}
           activeContext={activeAnnotationContext}

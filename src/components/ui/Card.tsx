@@ -35,12 +35,18 @@ export function Card({
     <section
       ref={sectionRef}
       aria-labelledby={headingId}
-      className={`rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md ${className ?? ''}`}
+      className={`rounded-2xl border border-slate-200/90 bg-white/90 p-5 shadow-[0_6px_20px_rgb(15_23_42/6%)] backdrop-blur-[1px] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_26px_rgb(15_23_42/9%)] ${className ?? ''}`}
     >
       <div
         draggable={Boolean(dragHandle)}
         aria-label={dragHandle?.ariaLabel}
-        className={`min-h-24 rounded-lg border px-4 py-3 ${dragHandle?.isDragging ? 'cursor-grabbing border-blue-200 bg-blue-50/60' : dragHandle ? 'cursor-grab border-slate-100 bg-slate-50/85' : 'border-slate-100 bg-slate-50/75'}`}
+        className={`min-h-24 rounded-xl border px-4 py-3 ${
+          dragHandle?.isDragging
+            ? 'cursor-grabbing border-blue-300 bg-linear-to-r from-blue-50 to-cyan-50'
+            : dragHandle
+              ? 'cursor-grab border-slate-200/90 bg-linear-to-r from-slate-50 to-slate-100/80'
+              : 'border-slate-200/80 bg-linear-to-r from-slate-50 to-slate-100/75'
+        }`}
         onDragStart={(event) => {
           if (!dragHandle) return;
           const target = event.target as HTMLElement | null;
@@ -62,7 +68,7 @@ export function Card({
           <div className="min-w-0 space-y-1.5">
             <h3
               id={headingId}
-              className="text-sm font-semibold uppercase tracking-[0.08em] text-slate-600"
+              className="text-sm font-semibold uppercase tracking-[0.1em] text-slate-600"
             >
               {title}
             </h3>

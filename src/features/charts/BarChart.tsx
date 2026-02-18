@@ -54,11 +54,15 @@ export function BarChart({
 
     return {
       animation: false,
+      textStyle: {
+        fontFamily: 'inherit',
+      },
       title: {
         text: title,
         left: 'left',
+        top: 0,
         textStyle: {
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: 600,
           color: '#475569',
         },
@@ -70,17 +74,42 @@ export function BarChart({
         left: 12,
         right: 12,
         top: 32,
-        bottom: 16,
+        bottom: 20,
         containLabel: true,
       },
       xAxis: {
         type: 'category',
         data: zoomedCategories,
+        axisLabel: {
+          color: '#64748b',
+          fontSize: 11,
+          margin: 10,
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#cbd5e1',
+          },
+        },
+        axisTick: {
+          show: false,
+        },
       },
       yAxis: {
         type: 'value',
         min: yMin,
         max: yMax,
+        axisLabel: {
+          color: '#64748b',
+          fontSize: 11,
+        },
+        axisLine: {
+          show: false,
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#e2e8f0',
+          },
+        },
       },
       series: [
         {
