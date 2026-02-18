@@ -10,7 +10,8 @@ test('renders Chinese locale when lang query is set', async ({ page }) => {
 test('persists locale change from language switcher across reload', async ({ page }) => {
   await page.goto('/');
 
-  await page.getByLabel('Language').selectOption('zh-CN');
+  await page.getByLabel('Language').click();
+  await page.getByRole('option', { name: 'Chinese (Simplified)' }).click();
   await expect(page.getByRole('heading', { name: '大数据可视化实验室' })).toBeVisible();
 
   await page.reload();

@@ -7,7 +7,8 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react';
-import { UI_INPUT_MD, UI_LABEL_CLASS, UI_SELECT_MD } from '@/components/ui/styleTokens';
+import { UI_INPUT_MD, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
+import { ThemedSelect } from '@/components/ui/ThemedSelect';
 import { useI18n } from '@/i18n/useI18n';
 import type { MockFilters } from '@/lib/types';
 import {
@@ -30,7 +31,6 @@ export type FiltersPanelProps = {
 
 const LABEL_CLASS = `space-y-2 ${UI_LABEL_CLASS}`;
 const INPUT_CLASS = `${UI_INPUT_MD} h-10`;
-const SELECT_CLASS = `${UI_SELECT_MD} h-10`;
 
 export function FiltersPanel({
   datasetSize,
@@ -88,8 +88,8 @@ export function FiltersPanel({
   );
 
   const handleDatasetSizeChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      const nextSize = DATASET_SIZES.find((option) => option.value === Number(event.target.value));
+    (nextValue: string) => {
+      const nextSize = DATASET_SIZES.find((option) => option.value === Number(nextValue));
       if (nextSize) {
         setDatasetSize(nextSize);
       }
@@ -98,10 +98,10 @@ export function FiltersPanel({
   );
 
   const handleSourceChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
+    (nextValue: string) => {
       setFilters((current) => ({
         ...current,
-        source: event.target.value as MockFilters['source'],
+        source: nextValue as MockFilters['source'],
       }));
     },
     [setFilters],
@@ -165,64 +165,30 @@ export function FiltersPanel({
     <div className="grid gap-4 sm:grid-cols-2">
       <label className={LABEL_CLASS}>
         {t('filtersDatasetSize')}
-        <span className="relative block">
-          <select
-            className={SELECT_CLASS}
-            value={datasetSize.value}
-            onChange={handleDatasetSizeChange}
-          >
-            {DATASET_SIZES.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 20 20"
-            className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-          >
-            <path
-              d="M5.25 7.75 10 12.25l4.75-4.5"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.75"
-            />
-          </svg>
-        </span>
+        <ThemedSelect
+          ariaLabel={t('filtersDatasetSize')}
+          triggerClassName="h-10 text-sm"
+          value={String(datasetSize.value)}
+          onChange={handleDatasetSizeChange}
+          options={DATASET_SIZES.map((option) => ({
+            label: option.label,
+            value: String(option.value),
+          }))}
+        />
       </label>
 
       <label className={LABEL_CLASS}>
         {t('filtersSource')}
-        <span className="relative block">
-          <select
-            className={SELECT_CLASS}
-            value={filters.source ?? 'all'}
-            onChange={handleSourceChange}
-          >
-            {SOURCE_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 20 20"
-            className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-          >
-            <path
-              d="M5.25 7.75 10 12.25l4.75-4.5"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.75"
-            />
-          </svg>
-        </span>
+        <ThemedSelect
+          ariaLabel={t('filtersSource')}
+          triggerClassName="h-10 text-sm"
+          value={filters.source ?? 'all'}
+          onChange={handleSourceChange}
+          options={SOURCE_OPTIONS.map((option) => ({
+            label: option,
+            value: option,
+          }))}
+        />
       </label>
 
       <label className={LABEL_CLASS}>

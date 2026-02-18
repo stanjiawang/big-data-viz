@@ -7,10 +7,12 @@ test('dashboard interactive controls work across detail, table, and graph sectio
 
   await expect(page.getByRole('heading', { name: 'Big Data Viz Lab' })).toBeVisible();
 
-  await page.getByLabel('Dataset size').selectOption('50000000');
+  await page.getByLabel('Dataset size').click();
+  await page.getByRole('option', { name: '50M' }).click();
   await expect(page.getByText(/Dataset Size:\s*50M/i)).toBeVisible({ timeout: 15_000 });
 
-  await page.getByLabel('Source').selectOption('user');
+  await page.getByLabel('Source').click();
+  await page.getByRole('option', { name: 'user' }).click();
   await expect(page.getByText(/Source:\s*user/i).first()).toBeVisible({ timeout: 15_000 });
 
   const annotationPanel = page.locator('section', {
@@ -24,9 +26,11 @@ test('dashboard interactive controls work across detail, table, and graph sectio
 
   await page.getByRole('button', { name: 'Capture snapshot' }).click();
   const snapshotTimeline = page.getByLabel('Snapshot timeline');
-  await expect(snapshotTimeline).not.toHaveValue('');
+  await snapshotTimeline.click();
+  await expect(page.getByRole('option', { name: 'Snapshot 1' })).toBeVisible();
   await page.getByRole('button', { name: 'Clear all' }).click();
-  await snapshotTimeline.selectOption({ label: 'Snapshot 1' });
+  await snapshotTimeline.click();
+  await page.getByRole('option', { name: 'Snapshot 1' }).click();
   await page.getByRole('button', { name: 'Replay snapshot' }).click();
   await expect(page.getByText(/Source:\s*user/i).first()).toBeVisible({ timeout: 15_000 });
 

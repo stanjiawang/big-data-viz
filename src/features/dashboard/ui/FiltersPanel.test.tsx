@@ -36,9 +36,8 @@ function TestHarness() {
 describe('FiltersPanel', () => {
   it('updates dataset size', async () => {
     render(<TestHarness />);
-    const select = screen.getByLabelText(/Dataset size/i);
-
-    await userEvent.selectOptions(select, String(DATASET_SIZES[1].value));
+    await userEvent.click(screen.getByRole('combobox', { name: /Dataset size/i }));
+    await userEvent.click(screen.getByRole('option', { name: DATASET_SIZES[1].label }));
 
     expect(screen.getByTestId('dataset-size')).toHaveTextContent('1M');
   });
@@ -57,7 +56,8 @@ describe('FiltersPanel', () => {
   it('updates source and search', async () => {
     render(<TestHarness />);
 
-    await userEvent.selectOptions(screen.getByLabelText(/Source/i), 'user');
+    await userEvent.click(screen.getByRole('combobox', { name: /Source/i }));
+    await userEvent.click(screen.getByRole('option', { name: 'user' }));
     await userEvent.type(screen.getByLabelText(/Search ID prefix/i), 'batch-2025');
 
     expect(screen.getByTestId('source')).toHaveTextContent('user');

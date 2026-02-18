@@ -4,8 +4,8 @@ import {
   UI_CHIP_INTERACTIVE,
   UI_INPUT_MD,
   UI_LABEL_CLASS,
-  UI_SELECT_MD,
 } from '@/components/ui/styleTokens';
+import { ThemedSelect } from '@/components/ui/ThemedSelect';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import { AnnotationPanel } from '@/features/dashboard/ui/AnnotationPanel';
 import { buildDashboardSearchParams } from '@/features/dashboard/state/urlState';
@@ -177,42 +177,23 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
         <span className="hidden h-4 w-px bg-slate-300/80 md:inline" />
         <div className="flex flex-wrap items-center gap-2">
           <span className={UI_LABEL_CLASS}>{t('dashboardCompareDataset')}</span>
-          <span className="relative block w-28">
-            <select
-              aria-label={t('dashboardCompareDataset')}
-              className={`${UI_SELECT_MD} h-9 w-full px-2 pr-7 text-xs`}
-              value={compareDatasetSize.value}
-              onChange={(event) => {
-                const nextSize = DATASET_SIZES.find(
-                  (option) => option.value === Number(event.target.value),
-                );
-                if (nextSize) {
-                  setCompareDatasetSize(nextSize);
-                }
-              }}
-              disabled={!effectiveCompareEnabled}
-            >
-              {DATASET_SIZES.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 20 20"
-              className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-            >
-              <path
-                d="M5.25 7.75 10 12.25l4.75-4.5"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.75"
-              />
-            </svg>
-          </span>
+          <ThemedSelect
+            ariaLabel={t('dashboardCompareDataset')}
+            className="w-28"
+            triggerClassName="h-9 px-2 text-xs"
+            value={String(compareDatasetSize.value)}
+            onChange={(nextValue) => {
+              const nextSize = DATASET_SIZES.find((option) => option.value === Number(nextValue));
+              if (nextSize) {
+                setCompareDatasetSize(nextSize);
+              }
+            }}
+            options={DATASET_SIZES.map((option) => ({
+              label: option.label,
+              value: String(option.value),
+            }))}
+            disabled={!effectiveCompareEnabled}
+          />
         </div>
         <span className="hidden h-4 w-px bg-slate-300/80 md:inline" />
         <div className="flex flex-wrap items-center gap-2">
@@ -288,37 +269,15 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
       <div className="mt-3 grid gap-3 xl:grid-cols-[minmax(240px,300px)_1fr] xl:items-end">
         <label className="flex flex-col gap-1">
           <span className={UI_LABEL_CLASS}>{t('dashboardSavedViews')}</span>
-          <span className="relative block">
-            <select
-              aria-label={t('dashboardSavedViews')}
-              value={activeSavedViewId ?? ''}
-              className={`${UI_SELECT_MD} h-9 w-full px-2 pr-7 text-xs`}
-              onChange={(event) =>
-                setActiveSavedViewId(event.target.value ? event.target.value : null)
-              }
-            >
-              <option value="">{t('dashboardNoSavedView')}</option>
-              {savedViews.map((view) => (
-                <option key={view.id} value={view.id}>
-                  {view.name}
-                </option>
-              ))}
-            </select>
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 20 20"
-              className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-            >
-              <path
-                d="M5.25 7.75 10 12.25l4.75-4.5"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.75"
-              />
-            </svg>
-          </span>
+          <ThemedSelect
+            ariaLabel={t('dashboardSavedViews')}
+            value={activeSavedViewId ?? ''}
+            onChange={(nextValue) => setActiveSavedViewId(nextValue || null)}
+            options={[
+              { value: '', label: t('dashboardNoSavedView') },
+              ...savedViews.map((view) => ({ value: view.id, label: view.name })),
+            ]}
+          />
         </label>
 
         <div className="grid gap-2 md:grid-cols-[minmax(170px,220px)_repeat(5,minmax(0,1fr))] md:items-end">
@@ -386,37 +345,15 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
       <div className="mt-3 grid gap-2 border-t border-slate-200/80 pt-3 md:grid-cols-[minmax(240px,300px)_repeat(4,minmax(0,1fr))] md:items-end">
         <label className="flex flex-col gap-1">
           <span className={UI_LABEL_CLASS}>{t('snapshotTimelineTitle')}</span>
-          <span className="relative block">
-            <select
-              aria-label={t('snapshotTimelineTitle')}
-              value={activeSnapshotId ?? ''}
-              className={`${UI_SELECT_MD} h-9 w-full px-2 pr-7 text-xs`}
-              onChange={(event) =>
-                setActiveSnapshotId(event.target.value ? event.target.value : null)
-              }
-            >
-              <option value="">{t('snapshotNoItems')}</option>
-              {snapshots.map((snapshot) => (
-                <option key={snapshot.id} value={snapshot.id}>
-                  {snapshot.name}
-                </option>
-              ))}
-            </select>
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 20 20"
-              className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-            >
-              <path
-                d="M5.25 7.75 10 12.25l4.75-4.5"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.75"
-              />
-            </svg>
-          </span>
+          <ThemedSelect
+            ariaLabel={t('snapshotTimelineTitle')}
+            value={activeSnapshotId ?? ''}
+            onChange={(nextValue) => setActiveSnapshotId(nextValue || null)}
+            options={[
+              { value: '', label: t('snapshotNoItems') },
+              ...snapshots.map((snapshot) => ({ value: snapshot.id, label: snapshot.name })),
+            ]}
+          />
         </label>
 
         <button

@@ -3,9 +3,9 @@ import {
   UI_BUTTON_GHOST_SM,
   UI_INPUT_MD,
   UI_LABEL_CLASS,
-  UI_SELECT_MD,
   UI_TEXT_MUTED_SM,
 } from '@/components/ui/styleTokens';
+import { ThemedSelect } from '@/components/ui/ThemedSelect';
 import type { DashboardAnnotationContext } from '@/features/dashboard/sections/types';
 import type { DashboardAnnotation } from '@/features/dashboard/state/useDashboardState';
 import { useI18n } from '@/i18n/useI18n';
@@ -78,36 +78,15 @@ export function AnnotationPanel({
       <div className="grid gap-2 xl:grid-cols-[minmax(220px,280px)_1fr_auto] xl:items-end">
         <label className="flex flex-col gap-1">
           <span className={UI_LABEL_CLASS}>{t('annotationContext')}</span>
-          <span className="relative block">
-            <select
-              aria-label={t('annotationContext')}
-              value={activeContext}
-              className={`${UI_SELECT_MD} h-9 w-full px-2 pr-7 text-xs`}
-              onChange={(event) =>
-                onContextChange(event.target.value as DashboardAnnotationContext)
-              }
-            >
-              {ANNOTATION_CONTEXTS.map((context) => (
-                <option key={context} value={context}>
-                  {t(contextLabelKey(context))}
-                </option>
-              ))}
-            </select>
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 20 20"
-              className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-            >
-              <path
-                d="M5.25 7.75 10 12.25l4.75-4.5"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.75"
-              />
-            </svg>
-          </span>
+          <ThemedSelect
+            ariaLabel={t('annotationContext')}
+            value={activeContext}
+            onChange={(nextValue) => onContextChange(nextValue as DashboardAnnotationContext)}
+            options={ANNOTATION_CONTEXTS.map((context) => ({
+              value: context,
+              label: t(contextLabelKey(context)),
+            }))}
+          />
         </label>
 
         <label className="flex flex-col gap-1">
