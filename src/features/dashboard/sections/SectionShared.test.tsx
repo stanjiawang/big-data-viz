@@ -4,14 +4,14 @@ import {
   DetailButton,
   RangeSummary,
   SectionCardActions,
-} from '@/features/dashboard/sections/shared';
+} from '@/features/dashboard/sections/SectionShared';
 import { downloadElementAsImage } from '@/lib/exportImage';
 
 jest.mock('@/lib/exportImage', () => ({
   downloadElementAsImage: jest.fn(() => Promise.resolve()),
 }));
 
-describe('dashboard/sections/shared', () => {
+describe('dashboard/sections/SectionShared', () => {
   it('renders detail button and invokes callback', async () => {
     const onClick = jest.fn();
     render(<DetailButton onClick={onClick} />);

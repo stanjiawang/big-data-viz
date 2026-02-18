@@ -5,8 +5,8 @@ import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens'
 import { useI18n } from '@/i18n/useI18n';
 import { useMockDataSuspense } from '@/features/data/queries/useMockData';
 import { LABEL_OPTIONS, SOURCE_OPTIONS } from '@/features/dashboard/constants/filterOptions';
-import { LazyBarChart, LazyPieChart } from '@/features/dashboard/sections/lazyVisualizations';
-import { RangeSummary } from '@/features/dashboard/sections/shared';
+import { LazyBarChart, LazyPieChart } from '@/features/dashboard/sections/LazyVisualizations';
+import { RangeSummary } from '@/features/dashboard/sections/SectionShared';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
 
 type SummarySectionProps = DashboardSectionProps & {

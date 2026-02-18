@@ -10,11 +10,11 @@ jest.mock('@/components/ui/LanguageSwitcher', () => ({
   LanguageSwitcher: () => <div>LanguageSwitcherMock</div>,
 }));
 
-jest.mock('@/features/dashboard/FiltersPanel', () => ({
+jest.mock('@/features/dashboard/ui/FiltersPanel', () => ({
   FiltersPanel: () => <div>FiltersPanelMock</div>,
 }));
 
-jest.mock('@/features/dashboard/DashboardHeaderBadges', () => ({
+jest.mock('@/features/dashboard/ui/DashboardHeaderBadges', () => ({
   DashboardHeaderBadges: ({ items }: { items: string[] }) => (
     <div>{`Badges:${items.join('|')}`}</div>
   ),
@@ -24,13 +24,13 @@ jest.mock('@/features/dashboard/sections/KpiSection', () => ({
   KpiSection: () => <div>KpiSectionMock</div>,
 }));
 
-jest.mock('@/features/dashboard/ui/lazySections', () => ({
+jest.mock('@/features/dashboard/ui/LazySections', () => ({
   SummarySection: () => <div>SummarySectionMock</div>,
   ChartsSection: () => <div>ChartsSectionMock</div>,
   TableSection: () => <div>TableSectionMock</div>,
 }));
 
-jest.mock('@/features/dashboard/sections/shared', () => ({
+jest.mock('@/features/dashboard/sections/SectionShared', () => ({
   SectionCardActions: ({ onOpenDetail }: { onOpenDetail?: () => void }) => (
     <button type="button" onClick={onOpenDetail}>
       Open detail action

@@ -12,8 +12,8 @@ import {
   LazyEmbeddingCloud,
   LazyRelationshipGraph,
   LazyTimeSeriesChart,
-} from '@/features/dashboard/sections/lazyVisualizations';
-import { RangeSummary, SectionCardActions } from '@/features/dashboard/sections/shared';
+} from '@/features/dashboard/sections/LazyVisualizations';
+import { RangeSummary, SectionCardActions } from '@/features/dashboard/sections/SectionShared';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
 import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
 import {

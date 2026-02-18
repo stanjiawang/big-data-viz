@@ -1,22 +1,22 @@
 import { memo, type Dispatch, type RefObject, type SetStateAction } from 'react';
 import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
 import { Card } from '@/components/ui/Card';
-import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
+import { FiltersPanel } from '@/features/dashboard/ui/FiltersPanel';
 import {
   ChartsRowSkeleton,
   KpiSkeletonGrid,
   SummarySkeleton,
   TableSkeleton,
-} from '@/features/dashboard/SectionSkeletons';
+} from '@/features/dashboard/ui/SectionSkeletons';
 import { KpiSection } from '@/features/dashboard/sections/KpiSection';
-import { SectionCardActions } from '@/features/dashboard/sections/shared';
+import { SectionCardActions } from '@/features/dashboard/sections/SectionShared';
 import type {
   CrossFilterPatch,
   DashboardAnnotationContext,
   DetailView,
 } from '@/features/dashboard/sections/types';
 import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
-import { ChartsSection, SummarySection, TableSection } from '@/features/dashboard/ui/lazySections';
+import { ChartsSection, SummarySection, TableSection } from '@/features/dashboard/ui/LazySections';
 import { useI18n } from '@/i18n/useI18n';
 import type { MockFilters } from '@/lib/types';
 import type { DatasetSizeOption } from './types';

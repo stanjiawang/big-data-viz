@@ -41,6 +41,7 @@ All notable changes to this project are tracked in this file.
 - Added auth-enabled e2e regression for large-dataset bootstrap across overview and direct graph detail routes, matching render-perf sign-in readiness expectations.
 - ESLint now ignores generated Playwright/CI artifact directories (`test-results`, `playwright-report`, `coverage`, `artifacts`) to prevent lint/e2e race regressions.
 - Added e2e coverage for `Refresh data` behavior across realtime off/live/paused states, and tightened text locators in dashboard interaction tests to avoid strict-mode ambiguity.
+- Dashboard feature file layout was normalized for naming/structure consistency: shared dashboard UI files moved under `features/dashboard/ui`, generic section helpers renamed to explicit PascalCase modules (`SectionShared`, `LazySections`, `LazyVisualizations`), and imports/tests updated accordingly.
 
 ## Release Procedure
 

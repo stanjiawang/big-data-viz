@@ -10,7 +10,6 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
-import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
 import { invalidateDashboardQueries } from '@/features/dashboard/constants/queryInvalidation';
 import type {
   CrossFilterPatch,
@@ -23,7 +22,8 @@ import type {
   DashboardAnnotation,
   DashboardSnapshot,
 } from '@/features/dashboard/state/useDashboardState';
-import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadges';
+import { DashboardHeaderBadges } from '@/features/dashboard/ui/DashboardHeaderBadges';
+import { FiltersPanel } from '@/features/dashboard/ui/FiltersPanel';
 import { DashboardControlPanel } from '@/features/dashboard/ui/DashboardControlPanel';
 import { DashboardDataSections } from '@/features/dashboard/ui/DashboardDataSections';
 import type { DatasetSizeOption } from '@/features/dashboard/ui/types';

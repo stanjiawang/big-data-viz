@@ -110,7 +110,7 @@ jest.mock('@/features/charts/D3EmbeddingScatter', () => ({
   D3EmbeddingScatter: () => <div>D3EmbeddingScatter</div>,
 }));
 
-jest.mock('@/features/dashboard/ui/lazySections', () => ({
+jest.mock('@/features/dashboard/ui/LazySections', () => ({
   SummarySection: () => <div>SummarySection</div>,
   ChartsSection: () => <div>ChartsSection</div>,
   TableSection: () => <div>TableSection</div>,

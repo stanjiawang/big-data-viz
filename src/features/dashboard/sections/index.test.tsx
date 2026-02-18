@@ -12,7 +12,7 @@ import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import { clearChartDefinitionRegistry } from '@/features/visualizations/chartRegistry';
 import { registerGraphOverrideExtension } from '@/features/visualizations/chartExtensionExample';
 
-jest.mock('@/features/dashboard/sections/lazyVisualizations', () => ({
+jest.mock('@/features/dashboard/sections/LazyVisualizations', () => ({
   LazyBarChart: ({
     title,
     onItemClick,

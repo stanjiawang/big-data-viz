@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { DashboardHeaderBadges } from '@/features/dashboard/DashboardHeaderBadges';
+import { DashboardHeaderBadges } from '@/features/dashboard/ui/DashboardHeaderBadges';
 
 describe('DashboardHeaderBadges', () => {
   it('renders skeletons when loading', () => {

@@ -5,7 +5,7 @@ import {
   KpiSkeletonGrid,
   SummarySkeleton,
   TableSkeleton,
-} from '@/features/dashboard/SectionSkeletons';
+} from '@/features/dashboard/ui/SectionSkeletons';
 
 describe('SectionSkeletons', () => {
   it('renders KPI skeletons', () => {

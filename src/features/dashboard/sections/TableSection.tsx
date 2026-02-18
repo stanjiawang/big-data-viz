@@ -3,8 +3,8 @@ import { useRef } from 'react';
 import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
 import { Card } from '@/components/ui/Card';
 import { useI18n } from '@/i18n/useI18n';
-import { LazyLargeDataTable } from '@/features/dashboard/sections/lazyVisualizations';
-import { SectionCardActions } from '@/features/dashboard/sections/shared';
+import { LazyLargeDataTable } from '@/features/dashboard/sections/LazyVisualizations';
+import { SectionCardActions } from '@/features/dashboard/sections/SectionShared';
 import type { DashboardSectionProps } from '@/features/dashboard/sections/types';
 import { useDragReorder } from '@/features/dashboard/ui/useDragReorder';
 

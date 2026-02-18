@@ -4,7 +4,7 @@ import { DashboardDetailView } from '@/features/dashboard/ui/DashboardDetailView
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import type { MockFilters } from '@/lib/types';
 
-jest.mock('@/features/dashboard/ui/lazySections', () => ({
+jest.mock('@/features/dashboard/ui/LazySections', () => ({
   SummarySection: () => <div>SummarySectionMock</div>,
   ChartsSection: ({ focusView }: { focusView?: string }) => (
     <div>ChartsSectionMock:{focusView ?? 'none'}</div>
@@ -12,7 +12,7 @@ jest.mock('@/features/dashboard/ui/lazySections', () => ({
   TableSection: () => <div>TableSectionMock</div>,
 }));
 
-jest.mock('@/features/dashboard/sections/shared', () => ({
+jest.mock('@/features/dashboard/sections/SectionShared', () => ({
   SectionCardActions: () => <div>SectionCardActionsMock</div>,
 }));
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FiltersPanel } from '@/features/dashboard/FiltersPanel';
+import { FiltersPanel } from '@/features/dashboard/ui/FiltersPanel';
 import { DATASET_SIZES } from '@/features/dashboard/constants/filterOptions';
 import type { MockFilters } from '@/lib/types';
 
