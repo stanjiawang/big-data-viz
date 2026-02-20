@@ -27,6 +27,56 @@ function median(values: number[]) {
   return sorted[middle];
 }
 
+type TelemetryMetric = {
+  name: string;
+  value: number;
+  path?: string;
+  ts?: string;
+};
+
+function attachTelemetryLogger(page: import('@playwright/test').Page, sink: TelemetryMetric[]) {
+  page.on('console', async (message) => {
+    if (message.type() !== 'info') {
+      return;
+    }
+
+    const args = message.args();
+    if (args.length < 2) {
+      return;
+    }
+
+    const label = await args[0].jsonValue().catch(() => null);
+    if (label !== '[telemetry]') {
+      return;
+    }
+
+    const payload = (await args[1].jsonValue().catch(() => null)) as
+      | {
+          event?: string;
+          name?: string;
+          value?: number;
+          path?: string;
+          ts?: string;
+        }
+      | undefined
+      | null;
+
+    if (!payload || payload.event !== 'metric' || !payload.name) {
+      return;
+    }
+
+    const metric: TelemetryMetric = {
+      name: payload.name,
+      value: Number(payload.value ?? NaN),
+      path: typeof payload.path === 'string' ? payload.path : undefined,
+      ts: typeof payload.ts === 'string' ? payload.ts : undefined,
+    };
+
+    sink.push(metric);
+    console.log('Telemetry metric:', JSON.stringify(metric));
+  });
+}
+
 async function gotoDashboardAndWait(
   page: import('@playwright/test').Page,
   url: string,
@@ -83,11 +133,13 @@ async function collectSampleWithRetry(
   measure: (_page: import('@playwright/test').Page, _url: string) => Promise<number>,
   url: string,
   maxAttempts = SAMPLE_MAX_ATTEMPTS,
+  telemetrySink: TelemetryMetric[],
 ) {
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const samplePage = await context.newPage();
+    attachTelemetryLogger(samplePage, telemetrySink);
     try {
       const sample = await measure(samplePage, url);
       await samplePage.close();
@@ -108,6 +160,8 @@ async function collectSampleWithRetry(
 
 test('meets render budgets for large table and relationship graph', async ({ page }) => {
   test.setTimeout(90_000);
+  const telemetryMetrics: TelemetryMetric[] = [];
+  attachTelemetryLogger(page, telemetryMetrics);
   await gotoDashboardAndWait(page, '/');
 
   const tableSamples: number[] = [];
@@ -119,6 +173,8 @@ test('meets render budgets for large table and relationship graph', async ({ pag
         page.context(),
         measureTableRenderMs,
         `/?size=${TARGET_DATASET_SIZE}`,
+        SAMPLE_MAX_ATTEMPTS,
+        telemetryMetrics,
       ),
     );
 
@@ -127,12 +183,34 @@ test('meets render budgets for large table and relationship graph', async ({ pag
         page.context(),
         measureGraphRenderMs,
         `/?size=${TARGET_DATASET_SIZE}`,
+        SAMPLE_MAX_ATTEMPTS,
+        telemetryMetrics,
       ),
     );
   }
 
   const tableMedianMs = median(tableSamples);
   const graphMedianMs = median(graphSamples);
+
+  const telemetrySummary = Object.fromEntries(
+    Object.entries(
+      telemetryMetrics.reduce<Record<string, number[]>>((acc, metric) => {
+        if (!Number.isFinite(metric.value)) {
+          return acc;
+        }
+        acc[metric.name] ??= [];
+        acc[metric.name].push(metric.value);
+        return acc;
+      }, {}),
+    ).map(([name, values]) => [
+      name,
+      {
+        count: values.length,
+        median: median(values),
+        latest: values.at(-1),
+      },
+    ]),
+  );
 
   const report = {
     generatedAt: new Date().toISOString(),
@@ -147,6 +225,10 @@ test('meets render budgets for large table and relationship graph', async ({ pag
       graphSamples,
       tableMedianMs,
       graphMedianMs,
+      telemetry: {
+        samples: telemetryMetrics,
+        summary: telemetrySummary,
+      },
     },
   };
 
