@@ -1,5 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { MOCK_AUTH_ACCOUNTS } from '@/auth/authClient';
 import { useAuth } from '@/auth/useAuth';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -111,12 +111,6 @@ export function LoginPage() {
           <div className="flex flex-wrap items-center justify-end gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-2 shadow-sm">
             <LanguageSwitcher />
             <ThemeToggle />
-            <Link
-              to="/"
-              className={`${UI_BUTTON_GHOST_SM} w-full min-w-0 whitespace-nowrap text-[11px] sm:w-auto`}
-            >
-              {t('dashboardBackToDashboard')}
-            </Link>
           </div>
         </div>
 
