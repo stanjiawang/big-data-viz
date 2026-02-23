@@ -84,6 +84,11 @@ Mock sign-in account (when `VITE_AUTH_PROVIDER=mock`):
 - Email: `analyst@example.com`
 - Password: `DemoPass!123`
 
+When auth is enabled the app exposes a dedicated `/login` route with enterprise SSO shortcuts,
+mock credentials, forgot-password guidance, and language/theme controls.
+Unauthenticated visitors are redirected there automatically and sent back to their original
+destination after sign-in.
+
 ## Scripts
 
 ```bash

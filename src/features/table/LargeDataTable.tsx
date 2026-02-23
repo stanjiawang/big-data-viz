@@ -65,7 +65,7 @@ const TableRow = memo(function TableRow({
         <span className="truncate text-xs text-slate-600">{record?.source ?? '—'}</span>
         <span className="truncate text-xs text-slate-600">{record?.label ?? '—'}</span>
         <span
-          className="truncate font-mono text-[11px] tracking-[0.02em] text-slate-500/90"
+          className="truncate font-mono text-[11px] tracking-[0.02em] text-slate-600"
           title={featurePreview}
         >
           {featurePreview}

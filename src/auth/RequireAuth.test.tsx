@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { AUTH_SESSION_STORAGE_KEY, MOCK_AUTH_ACCOUNTS } from '@/auth/authClient';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { AUTH_SESSION_STORAGE_KEY } from '@/auth/authClient';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { RequireAuth } from '@/auth/RequireAuth';
 
@@ -28,68 +28,66 @@ describe('RequireAuth', () => {
 
   it('renders children when auth is disabled', () => {
     render(
-      <AuthProvider enabled={false}>
-        <RequireAuth enabled={false}>
-          <div>Protected Content</div>
-        </RequireAuth>
-      </AuthProvider>,
+      <MemoryRouter>
+        <AuthProvider enabled={false}>
+          <RequireAuth enabled={false}>
+            <div>Protected Content</div>
+          </RequireAuth>
+        </AuthProvider>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
   });
 
-  it('requires sign in when auth is enabled and no session exists', async () => {
-    render(
-      <AuthProvider enabled>
-        <RequireAuth enabled>
-          <div>Protected Content</div>
-        </RequireAuth>
-      </AuthProvider>,
+  function renderProtectedRoute(options?: {
+    requireTenant?: boolean;
+    requiredRoles?: string[];
+    authEnabled?: boolean;
+  }) {
+    const { requireTenant = false, requiredRoles = [], authEnabled = true } = options ?? {};
+    return render(
+      <MemoryRouter initialEntries={['/protected']}>
+        <AuthProvider enabled={authEnabled}>
+          <Routes>
+            <Route
+              path="/protected"
+              element={
+                <RequireAuth
+                  enabled={authEnabled}
+                  requireTenant={requireTenant}
+                  requiredRoles={requiredRoles}
+                >
+                  <div>Protected Content</div>
+                </RequireAuth>
+              }
+            />
+            <Route path="/login" element={<div>Login Route</div>} />
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>,
     );
+  }
 
-    expect(await screen.findByText('Sign in required')).toBeInTheDocument();
+  it('redirects to login route when auth is enabled and no session exists', async () => {
+    renderProtectedRoute();
+
+    expect(await screen.findByText('Login Route')).toBeInTheDocument();
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
   });
 
-  it('shows protected content after signing in', async () => {
-    render(
-      <AuthProvider enabled>
-        <RequireAuth enabled>
-          <div>Protected Content</div>
-        </RequireAuth>
-      </AuthProvider>,
-    );
+  it('shows protected content when a session exists', async () => {
+    setSession(['viewer'], 'tenant-1');
 
-    const signInButton = await screen.findByRole('button', { name: 'Sign in' });
-    await userEvent.click(signInButton);
+    renderProtectedRoute();
 
     expect(await screen.findByText('Protected Content')).toBeInTheDocument();
-  });
-
-  it('shows mock credentials helper on sign in page', async () => {
-    render(
-      <AuthProvider enabled>
-        <RequireAuth enabled>
-          <div>Protected Content</div>
-        </RequireAuth>
-      </AuthProvider>,
-    );
-
-    expect(await screen.findByText('Sign in required')).toBeInTheDocument();
-    expect(screen.getByText(MOCK_AUTH_ACCOUNTS[0].email)).toBeInTheDocument();
-    expect(screen.getByText(MOCK_AUTH_ACCOUNTS[0].password)).toBeInTheDocument();
   });
 
   it('blocks access when required role is missing', async () => {
     setSession(['viewer'], 'tenant-1');
 
-    render(
-      <AuthProvider enabled>
-        <RequireAuth enabled requiredRoles={['admin']}>
-          <div>Protected Content</div>
-        </RequireAuth>
-      </AuthProvider>,
-    );
+    renderProtectedRoute({ requiredRoles: ['admin'] });
 
     expect(await screen.findByText('Insufficient permissions')).toBeInTheDocument();
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
@@ -98,13 +96,7 @@ describe('RequireAuth', () => {
   it('blocks access when tenant is required but session has no tenant', async () => {
     setSession(['admin']);
 
-    render(
-      <AuthProvider enabled>
-        <RequireAuth enabled requireTenant>
-          <div>Protected Content</div>
-        </RequireAuth>
-      </AuthProvider>,
-    );
+    renderProtectedRoute({ requireTenant: true });
 
     expect(await screen.findByText('Tenant context required')).toBeInTheDocument();
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();

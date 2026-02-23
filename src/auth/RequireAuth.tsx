@@ -1,18 +1,10 @@
-import { useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/auth/useAuth';
-import { MOCK_AUTH_ACCOUNTS } from '@/auth/authClient';
 import {
   UI_BUTTON_GHOST_SM,
-  UI_BUTTON_PRIMARY_SM,
-  UI_INPUT_MD,
-  UI_LABEL_CLASS,
-  UI_TEXT_BODY_SM,
   UI_TEXT_SUBTITLE,
   UI_TEXT_TITLE_MD,
 } from '@/components/ui/styleTokens';
-import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { useI18n } from '@/i18n/useI18n';
 
 const PANEL_CLASS =
@@ -29,20 +21,9 @@ export function RequireAuth({
   requireTenant?: boolean;
   children: React.ReactNode;
 }) {
-  const {
-    isLoading,
-    isAuthenticated,
-    hasAnyRole,
-    hasTenantContext,
-    signIn,
-    signOut,
-    error,
-    session,
-  } = useAuth();
+  const { isLoading, isAuthenticated, hasAnyRole, hasTenantContext, signOut, session } = useAuth();
   const { t } = useI18n();
-  const [email, setEmail] = useState(MOCK_AUTH_ACCOUNTS[0]?.email ?? '');
-  const [password, setPassword] = useState(MOCK_AUTH_ACCOUNTS[0]?.password ?? '');
-  const authProvider = getRuntimeConfig().authProvider;
+  const location = useLocation();
 
   if (!enabled) {
     return <>{children}</>;
@@ -59,72 +40,7 @@ export function RequireAuth({
   }
 
   if (!isAuthenticated) {
-    return (
-      <main id="app-main" className={PANEL_CLASS}>
-        <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
-          <div className="bg-gradient-to-r from-slate-900 to-blue-900 px-6 py-5 text-white">
-            <div className="mb-3 flex flex-wrap justify-end gap-2">
-              <LanguageSwitcher />
-              <ThemeToggle />
-            </div>
-            <h1 className="text-lg font-semibold text-white">{t('authSignInRequired')}</h1>
-            <p className="mt-1 text-sm text-blue-100">{t('authSignInDescription')}</p>
-          </div>
-          <div className="space-y-4 p-6">
-            {authProvider === 'mock' ? (
-              <>
-                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
-                  {t('authMockAccount')}
-                  <span className="ml-2 font-semibold">{MOCK_AUTH_ACCOUNTS[0]?.email}</span>
-                  <span className="ml-2 font-semibold">{MOCK_AUTH_ACCOUNTS[0]?.password}</span>
-                </div>
-                <label className="block space-y-1 text-sm text-slate-700">
-                  <span className={UI_LABEL_CLASS}>{t('authEmail')}</span>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    className={UI_INPUT_MD}
-                    autoComplete="username"
-                  />
-                </label>
-                <label className="block space-y-1 text-sm text-slate-700">
-                  <span className={UI_LABEL_CLASS}>{t('authPassword')}</span>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    className={UI_INPUT_MD}
-                    autoComplete="current-password"
-                  />
-                </label>
-                <button
-                  type="button"
-                  className={`${UI_BUTTON_PRIMARY_SM} w-full`}
-                  onClick={() =>
-                    void signIn({
-                      email,
-                      password,
-                    })
-                  }
-                >
-                  {t('authSignIn')}
-                </button>
-              </>
-            ) : (
-              <button
-                type="button"
-                className={`${UI_BUTTON_PRIMARY_SM} w-full`}
-                onClick={() => void signIn()}
-              >
-                {t('authContinueSso')}
-              </button>
-            )}
-            {error ? <p className={`${UI_TEXT_BODY_SM} text-rose-600`}>{error}</p> : null}
-          </div>
-        </div>
-      </main>
-    );
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   if (requireTenant && !hasTenantContext()) {
