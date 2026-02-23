@@ -19,7 +19,7 @@ export function useDragReorder<T extends string>(ids: readonly T[], storageKey: 
       return fallback;
     }
 
-    let raw: string | null = null;
+    let raw: string | null;
     try {
       raw = window.localStorage.getItem(storageKey);
     } catch {

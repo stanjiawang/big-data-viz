@@ -544,7 +544,9 @@ function createOidcAuthClient(config: RuntimeConfig): AuthClient {
         reportError('auth.session.refresh_failed', error, {
           provider: 'oidc',
         });
-        throw new Error('Authentication session expired. Please sign in again.');
+        throw new Error('Authentication session expired. Please sign in again.', {
+          cause: error,
+        });
       }
     }
 
