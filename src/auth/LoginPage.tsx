@@ -121,20 +121,26 @@ export function LoginPage() {
             <p className={`${UI_TEXT_BODY_SM} mt-3 text-slate-600`}>
               {t('authProvidersDescription')}
             </p>
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 space-y-3">
               {FEDERATED_PROVIDERS.map((provider) => (
                 <button
                   key={provider.id}
                   type="button"
-                  className={`${UI_BUTTON_GHOST_SM} w-full justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 text-left text-slate-700 hover:border-blue-200`}
+                  className={`${UI_BUTTON_GHOST_SM} w-full items-center justify-between gap-6 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-left text-slate-700 hover:border-blue-200`}
                   onClick={() => void handleProviderClick(provider.id)}
                   disabled={isSubmitting}
                 >
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">{t(provider.labelKey)}</p>
-                    <p className="text-xs text-slate-500">{t(provider.descriptionKey)}</p>
+                  <div className="flex flex-1 flex-col gap-1">
+                    <p className="text-sm font-semibold tracking-wide text-slate-900">
+                      {t(provider.labelKey)}
+                    </p>
+                    <p className="text-[12px] uppercase tracking-[0.15em] text-slate-500">
+                      {t(provider.descriptionKey)}
+                    </p>
                   </div>
-                  <span className="text-xs font-semibold uppercase tracking-[0.1em] text-blue-600">
+                  <span
+                    className={`${UI_CHIP_INTERACTIVE} h-8 min-w-16 border-blue-200/80 px-4 text-[11px] tracking-[0.2em] text-blue-700`}
+                  >
                     {t('authProvidersBadge')}
                   </span>
                 </button>
