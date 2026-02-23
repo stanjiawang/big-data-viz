@@ -304,7 +304,7 @@ body {
   }
 
   [data-theme='dark'] .login-primary-btn {
-    background-image: linear-gradient(118deg, #141f38, #10172b);
+    background-image: linear-gradient(118deg, #141f38, #10172b) !important;
     border-color: rgb(46 64 103 / 70%);
     color: #e3ecff;
     box-shadow:
@@ -313,7 +313,7 @@ body {
   }
 
   [data-theme='dark'] .login-primary-btn:disabled {
-    background-image: linear-gradient(118deg, #0e1527, #0a1120);
+    background-image: linear-gradient(118deg, #0e1527, #0a1120) !important;
     color: rgb(126 141 170);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 3%);
     opacity: 0.95;
