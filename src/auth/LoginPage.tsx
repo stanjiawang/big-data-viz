@@ -189,7 +189,7 @@ export function LoginPage() {
                 >
                   <div className="flex flex-1 items-center gap-4">
                     <span
-                      className={`flex h-11 w-11 items-center justify-center overflow-hidden rounded-[18px] border border-white/60 bg-gradient-to-br ${provider.accentClass} p-1.5 text-slate-900/80 shadow-[inset_0_1px_4px_rgb(255_255_255/55%)]`}
+                      className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/70 bg-gradient-to-br ${provider.accentClass} p-1 text-slate-900/80 shadow-[inset_0_1px_4px_rgb(255_255_255/55%)]`}
                     >
                       {provider.icon}
                     </span>
