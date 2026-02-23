@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, type ReactNode, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { MOCK_AUTH_ACCOUNTS } from '@/auth/authClient';
 import { useAuth } from '@/auth/useAuth';
@@ -29,23 +29,80 @@ type FederatedProvider = {
   id: string;
   labelKey: MessageKey;
   descriptionKey: MessageKey;
+  accentClass: string;
+  icon: ReactNode;
 };
+
+const OktaGlyph = () => (
+  <svg viewBox="0 0 36 36" className="h-4 w-4" fill="none">
+    <circle cx="18" cy="18" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
+    <circle cx="18" cy="18" r="4" fill="currentColor" />
+  </svg>
+);
+
+const AzureGlyph = () => (
+  <svg viewBox="0 0 36 36" className="h-4 w-4" fill="currentColor">
+    <path d="M5 28h10l6-20h-9L5 28zm11 0h15l-9-11-6 11z" />
+  </svg>
+);
+
+const OneLoginGlyph = () => (
+  <svg viewBox="0 0 36 36" className="h-4 w-4" fill="none">
+    <circle cx="18" cy="18" r="12" stroke="currentColor" strokeWidth="3" />
+    <circle cx="18" cy="18" r="6" fill="currentColor" />
+  </svg>
+);
+
+const SsoShieldIcon = () => (
+  <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none">
+    <path
+      d="M10 2.5 4 4.5v4.7c0 3.6 2.6 6.9 6 7.8 3.4-.9 6-4.2 6-7.8V4.5L10 2.5Z"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7.5 10 9 11.5l3.5-3.5"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+const ArrowIcon = () => (
+  <svg aria-hidden="true" className="h-3.5 w-3.5 text-slate-400" viewBox="0 0 12 12" fill="none">
+    <path
+      d="M4 2.25 7.75 6 4 9.75"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 const FEDERATED_PROVIDERS: readonly FederatedProvider[] = [
   {
     id: 'okta',
     labelKey: 'authProviderOkta',
     descriptionKey: 'authProviderOktaDescription',
+    accentClass: 'from-sky-50 to-blue-100 text-sky-700',
+    icon: <OktaGlyph />,
   },
   {
     id: 'azure-ad',
     labelKey: 'authProviderAzureAd',
     descriptionKey: 'authProviderAzureAdDescription',
+    accentClass: 'from-indigo-50 to-indigo-100 text-indigo-700',
+    icon: <AzureGlyph />,
   },
   {
     id: 'onelogin',
     labelKey: 'authProviderOneLogin',
     descriptionKey: 'authProviderOneLoginDescription',
+    accentClass: 'from-violet-50 to-purple-100 text-violet-700',
+    icon: <OneLoginGlyph />,
   },
 ];
 
@@ -126,43 +183,33 @@ export function LoginPage() {
                 <button
                   key={provider.id}
                   type="button"
-                  className={`${UI_BUTTON_GHOST_SM} w-full items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-left text-slate-700 hover:-translate-y-0.5 hover:border-blue-200`}
+                  className={`${UI_BUTTON_GHOST_SM} group w-full items-center justify-between gap-5 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-left text-slate-700 hover:-translate-y-0.5 hover:border-blue-200`}
                   onClick={() => void handleProviderClick(provider.id)}
                   disabled={isSubmitting}
                 >
                   <div className="flex flex-1 items-center gap-4">
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700 shadow-inner shadow-blue-100">
-                      {t(provider.labelKey)[0] ?? ''}
+                    <span
+                      className={`flex h-11 w-11 items-center justify-center rounded-2xl border border-white/60 bg-gradient-to-br ${provider.accentClass} text-base font-semibold shadow-[inset_0_1px_4px_rgb(255_255_255/55%)]`}
+                    >
+                      {provider.icon}
                     </span>
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-semibold tracking-wide text-slate-900">
+                    <div className="flex flex-col gap-0.5">
+                      <p className="text-base font-semibold leading-tight tracking-tight text-slate-900">
                         {t(provider.labelKey)}
                       </p>
-                      <p className="text-[12px] uppercase tracking-[0.18em] text-slate-500">
+                      <p className="text-[11px] uppercase tracking-[0.3em] text-slate-500">
                         {t(provider.descriptionKey)}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <span
-                      className={`${UI_CHIP_INTERACTIVE} h-8 min-w-16 border-blue-200/80 px-4 text-[11px] tracking-[0.2em] text-blue-700`}
+                      className={`${UI_CHIP_INTERACTIVE} h-8 min-w-0 gap-1 border-blue-200/80 px-3 text-[10px] tracking-[0.3em] text-blue-700`}
                     >
+                      <SsoShieldIcon />
                       {t('authProvidersBadge')}
                     </span>
-                    <svg
-                      aria-hidden="true"
-                      className="h-3.5 w-3.5 text-slate-400"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                    >
-                      <path
-                        d="M4 2l4 4-4 4"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    <ArrowIcon />
                   </div>
                 </button>
               ))}
