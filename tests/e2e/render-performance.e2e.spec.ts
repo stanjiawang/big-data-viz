@@ -89,11 +89,18 @@ async function gotoDashboardAndWait(
       await page.goto(url, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle');
 
-      const signInHeading = page.getByRole('heading', { name: /sign in required|需要登录/i });
-      if (await signInHeading.isVisible().catch(() => false)) {
+      const loginEmailField = page.getByLabel(/email|邮箱/i);
+      const loginButton = page.getByRole('button', { name: /sign in|登录/i });
+      const loginHeading = page.getByRole('heading', { name: /sign in required|需要登录/i });
+
+      if (await loginEmailField.isVisible().catch(() => false)) {
+        await loginEmailField.fill(PERF_AUTH_EMAIL);
+        await page.getByLabel(/password|密码/i).fill(PERF_AUTH_PASSWORD);
+        await loginButton.click();
+      } else if (await loginHeading.isVisible().catch(() => false)) {
         await page.getByLabel(/email|邮箱/i).fill(PERF_AUTH_EMAIL);
         await page.getByLabel(/password|密码/i).fill(PERF_AUTH_PASSWORD);
-        await page.getByRole('button', { name: /sign in|登录/i }).click();
+        await loginButton.click();
       }
 
       await expect(page.locator('#app-main')).toBeVisible({
