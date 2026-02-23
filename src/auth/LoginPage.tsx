@@ -34,20 +34,20 @@ type FederatedProvider = {
 };
 
 const OktaGlyph = () => (
-  <svg viewBox="0 0 36 36" className="h-[18px] w-[18px]" fill="none">
+  <svg viewBox="0 0 36 36" className="h-4 w-4" fill="none">
     <circle cx="18" cy="18" r="10" stroke="currentColor" strokeWidth="3" />
     <circle cx="18" cy="18" r="4" fill="currentColor" />
   </svg>
 );
 
 const AzureGlyph = () => (
-  <svg viewBox="0 0 36 36" className="h-[18px] w-[18px]" fill="currentColor">
+  <svg viewBox="0 0 36 36" className="h-4 w-4" fill="currentColor">
     <path d="M5 28h10l6-20h-9L5 28zm11 0h15l-9-11-6 11z" />
   </svg>
 );
 
 const OneLoginGlyph = () => (
-  <svg viewBox="0 0 36 36" className="h-[18px] w-[18px]" fill="none">
+  <svg viewBox="0 0 36 36" className="h-4 w-4" fill="none">
     <circle cx="18" cy="18" r="12" stroke="currentColor" strokeWidth="3" />
     <circle cx="18" cy="18" r="6" fill="currentColor" />
   </svg>
@@ -183,13 +183,13 @@ export function LoginPage() {
                 <button
                   key={provider.id}
                   type="button"
-                  className={`${UI_BUTTON_GHOST_SM} group w-full items-center justify-between gap-5 rounded-2xl border border-slate-200 bg-white px-6 py-4 text-left text-slate-700 hover:-translate-y-0.5 hover:border-blue-200`}
+                  className={`${UI_BUTTON_GHOST_SM} group w-full items-center justify-between gap-5 rounded-2xl border border-slate-200 bg-white px-6 py-5 text-left text-slate-700 hover:-translate-y-0.5 hover:border-blue-200`}
                   onClick={() => void handleProviderClick(provider.id)}
                   disabled={isSubmitting}
                 >
                   <div className="flex flex-1 items-center gap-4">
                     <span
-                      className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/70 bg-gradient-to-br ${provider.accentClass} p-1 text-slate-900/80 shadow-[inset_0_1px_4px_rgb(255_255_255/55%)]`}
+                      className={`flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-white/70 bg-gradient-to-br ${provider.accentClass} p-1 text-slate-900/80 shadow-[inset_0_1px_4px_rgb(255_255_255/55%)]`}
                     >
                       {provider.icon}
                     </span>
