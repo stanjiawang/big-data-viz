@@ -21,6 +21,7 @@ const RENDER_BENCHMARK_ARTIFACT_PATH = path.resolve(
 );
 
 const primedPages = new WeakSet<Page>();
+const RENDER_PERF_LOG_PREFIX = '[render-perf]';
 
 function buildMockSession(): AuthSession {
   const fallbackAccount =
@@ -65,6 +66,41 @@ async function primeMockSession(page: Page) {
     },
     { storageKey: AUTH_SESSION_STORAGE_KEY, payload: JSON.stringify(sessionPayload) },
   );
+}
+
+async function waitForVisibility(locator: ReturnType<Page['locator']>, timeoutMs: number) {
+  try {
+    await locator.waitFor({ state: 'visible', timeout: timeoutMs });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function attemptCredentialLogin(page: Page) {
+  const loginEmailField = page.locator(
+    'input[type="email"], input[autocomplete="username"], input[name*="email" i]',
+  );
+  const loginPasswordField = page.locator(
+    'input[type="password"], input[autocomplete="current-password"], input[name*="password" i]',
+  );
+  const loginButton = page.getByRole('button', { name: /sign in|登录/i }).first();
+  const loginHeading = page.getByRole('heading', { name: /sign in required|需要登录/i }).first();
+
+  const loginDetected =
+    (await waitForVisibility(loginButton, 2_000)) ||
+    (await waitForVisibility(loginHeading, 2_000)) ||
+    (await waitForVisibility(loginEmailField, 2_000));
+
+  if (!loginDetected) {
+    return false;
+  }
+
+  console.log(`${RENDER_PERF_LOG_PREFIX} credential form detected; submitting mock account.`);
+  await loginEmailField.first().fill(PERF_AUTH_EMAIL, { timeout: 5_000 });
+  await loginPasswordField.first().fill(PERF_AUTH_PASSWORD, { timeout: 5_000 });
+  await loginButton.click({ timeout: 5_000 });
+  return true;
 }
 
 function median(values: number[]) {
@@ -141,28 +177,21 @@ async function gotoDashboardAndWait(
       await page.goto(url, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle');
 
-      const loginEmailField = page.getByLabel(/email|邮箱/i);
-      const loginButton = page.getByRole('button', { name: /sign in|登录/i });
-      const loginHeading = page.getByRole('heading', { name: /sign in required|需要登录/i });
-
-      if (await loginEmailField.isVisible().catch(() => false)) {
-        await loginEmailField.fill(PERF_AUTH_EMAIL);
-        await page.getByLabel(/password|密码/i).fill(PERF_AUTH_PASSWORD);
-        await loginButton.click();
-      } else if (await loginHeading.isVisible().catch(() => false)) {
-        await page.getByLabel(/email|邮箱/i).fill(PERF_AUTH_EMAIL);
-        await page.getByLabel(/password|密码/i).fill(PERF_AUTH_PASSWORD);
-        await loginButton.click();
+      const handledLogin = await attemptCredentialLogin(page);
+      if (handledLogin) {
+        await page.waitForLoadState('networkidle');
       }
-
       await expect(page.locator('#app-main')).toBeVisible({
         timeout: PAGE_READY_TIMEOUT_MS,
       });
       return;
     } catch (error) {
       lastError = error;
+      const currentUrl = page.url();
       console.warn(
-        `render-perf navigation attempt ${attempt} failed: ${error instanceof Error ? error.message : error}`,
+        `${RENDER_PERF_LOG_PREFIX} navigation attempt ${attempt} failed (${currentUrl}): ${
+          error instanceof Error ? error.message : error
+        }`,
       );
       if (attempt < maxAttempts) {
         await page.waitForTimeout(500);
