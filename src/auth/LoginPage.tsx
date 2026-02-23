@@ -107,8 +107,7 @@ const FEDERATED_PROVIDERS: readonly FederatedProvider[] = [
 ];
 
 const SUPPORT_EMAIL = 'support@example.com';
-const PANEL_CARD_CLASS =
-  'rounded-3xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-8 shadow-[0_20px_60px_rgb(15_23_42/6%)]';
+const PANEL_CARD_CLASS = 'login-card rounded-3xl border p-8';
 
 export function LoginPage() {
   const { t } = useI18n();
@@ -185,7 +184,7 @@ export function LoginPage() {
                 <button
                   key={provider.id}
                   type="button"
-                  className={`${UI_BUTTON_GHOST_SM} group w-full items-center justify-between gap-5 rounded-2xl border border-slate-200 bg-white px-6 py-5 text-left text-slate-700 hover:-translate-y-0.5 hover:border-blue-200`}
+                  className={`login-provider-item ${UI_BUTTON_GHOST_SM} group w-full items-center justify-between gap-5 rounded-2xl border px-6 py-5 text-left text-slate-700 hover:-translate-y-0.5`}
                   onClick={() => void handleProviderClick(provider.id)}
                   disabled={isSubmitting}
                 >
@@ -217,7 +216,7 @@ export function LoginPage() {
                 </button>
               ))}
             </div>
-            <div className="mt-6 rounded-2xl border border-slate-200 bg-white/60 p-4 text-sm text-slate-500">
+            <div className="login-help-card mt-6 rounded-2xl border p-4 text-sm text-slate-500">
               <p className="font-semibold text-slate-700">{t('authNeedHelp')}</p>
               <p className="mt-1">
                 {t('authContactSupport')}{' '}
@@ -231,12 +230,12 @@ export function LoginPage() {
             </div>
           </section>
 
-          <section className={`${PANEL_CARD_CLASS} shadow-[0_25px_80px_rgb(15_23_42/10%)]`}>
+          <section className={PANEL_CARD_CLASS}>
             <p className={UI_LABEL_CLASS}>{t('authCredentialsTitle')}</p>
             <h2 className={`${UI_TEXT_TITLE_MD} mt-3`}>{t('authCredentialsSubtitle')}</h2>
             <p className={`${UI_TEXT_BODY_SM} mt-2 text-slate-600`}>{t('authCredentialHelper')}</p>
             {runtimeConfig.authProvider === 'mock' ? (
-              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
+              <div className="login-alert-pill mt-4 rounded-2xl border px-4 py-3 text-xs">
                 {t('authMockAccount')}{' '}
                 <span className="font-semibold">{MOCK_AUTH_ACCOUNTS[0]?.email}</span>
                 <span className="ml-2 font-semibold">{MOCK_AUTH_ACCOUNTS[0]?.password}</span>
