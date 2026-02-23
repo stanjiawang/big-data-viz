@@ -34,20 +34,20 @@ type FederatedProvider = {
 };
 
 const OktaGlyph = () => (
-  <svg viewBox="0 0 36 36" className="h-5 w-5" fill="none">
+  <svg viewBox="0 0 36 36" className="h-[18px] w-[18px]" fill="none">
     <circle cx="18" cy="18" r="10" stroke="currentColor" strokeWidth="3" />
     <circle cx="18" cy="18" r="4" fill="currentColor" />
   </svg>
 );
 
 const AzureGlyph = () => (
-  <svg viewBox="0 0 36 36" className="h-5 w-5" fill="currentColor">
+  <svg viewBox="0 0 36 36" className="h-[18px] w-[18px]" fill="currentColor">
     <path d="M5 28h10l6-20h-9L5 28zm11 0h15l-9-11-6 11z" />
   </svg>
 );
 
 const OneLoginGlyph = () => (
-  <svg viewBox="0 0 36 36" className="h-5 w-5" fill="none">
+  <svg viewBox="0 0 36 36" className="h-[18px] w-[18px]" fill="none">
     <circle cx="18" cy="18" r="12" stroke="currentColor" strokeWidth="3" />
     <circle cx="18" cy="18" r="6" fill="currentColor" />
   </svg>
@@ -189,7 +189,7 @@ export function LoginPage() {
                 >
                   <div className="flex flex-1 items-center gap-4">
                     <span
-                      className={`flex h-11 w-11 items-center justify-center rounded-2xl border border-white/60 bg-gradient-to-br ${provider.accentClass} text-slate-900/80 shadow-[inset_0_1px_4px_rgb(255_255_255/55%)]`}
+                      className={`flex h-12 w-12 items-center justify-center rounded-[20px] border border-white/60 bg-gradient-to-br ${provider.accentClass} p-2 text-slate-900/80 shadow-[inset_0_1px_4px_rgb(255_255_255/55%)]`}
                     >
                       {provider.icon}
                     </span>
