@@ -206,7 +206,7 @@ export function LoginPage() {
                     <span
                       role="img"
                       aria-label={`${t(provider.labelKey)} ${t('authProvidersBadge')}`}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/70 bg-white/80 text-slate-500 transition group-hover:border-blue-200 group-hover:text-blue-600"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100/80 text-slate-500 transition group-hover:bg-blue-50 group-hover:text-blue-600"
                     >
                       <SsoShieldIcon />
                     </span>
