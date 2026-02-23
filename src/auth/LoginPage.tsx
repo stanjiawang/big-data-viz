@@ -183,7 +183,7 @@ export function LoginPage() {
                 <button
                   key={provider.id}
                   type="button"
-                  className={`${UI_BUTTON_GHOST_SM} group w-full items-center justify-between gap-5 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-left text-slate-700 hover:-translate-y-0.5 hover:border-blue-200`}
+                  className={`${UI_BUTTON_GHOST_SM} group w-full items-center justify-between gap-5 rounded-2xl border border-slate-200 bg-white px-6 py-4 text-left text-slate-700 hover:-translate-y-0.5 hover:border-blue-200`}
                   onClick={() => void handleProviderClick(provider.id)}
                   disabled={isSubmitting}
                 >
