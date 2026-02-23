@@ -275,7 +275,7 @@ export function LoginPage() {
               </div>
               <button
                 type="submit"
-                className={`${UI_BUTTON_PRIMARY_SM} w-full justify-center`}
+                className={`${UI_BUTTON_PRIMARY_SM} login-primary-btn w-full justify-center`}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? t('authSigningIn') : t('authSignIn')}
