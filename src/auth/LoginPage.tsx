@@ -108,7 +108,7 @@ export function LoginPage() {
               <li>- {t('authLoginBulletRbac')}</li>
             </ul>
           </div>
-          <div className="flex flex-wrap items-center justify-end gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-2 shadow-sm">
+          <div className="flex w-full flex-wrap items-center justify-end gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-2 shadow-sm lg:w-auto lg:self-start">
             <LanguageSwitcher />
             <ThemeToggle />
           </div>
