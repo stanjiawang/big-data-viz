@@ -126,23 +126,44 @@ export function LoginPage() {
                 <button
                   key={provider.id}
                   type="button"
-                  className={`${UI_BUTTON_GHOST_SM} w-full items-center justify-between gap-6 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-left text-slate-700 hover:border-blue-200`}
+                  className={`${UI_BUTTON_GHOST_SM} w-full items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-left text-slate-700 hover:-translate-y-0.5 hover:border-blue-200`}
                   onClick={() => void handleProviderClick(provider.id)}
                   disabled={isSubmitting}
                 >
-                  <div className="flex flex-1 flex-col gap-1">
-                    <p className="text-sm font-semibold tracking-wide text-slate-900">
-                      {t(provider.labelKey)}
-                    </p>
-                    <p className="text-[12px] uppercase tracking-[0.15em] text-slate-500">
-                      {t(provider.descriptionKey)}
-                    </p>
+                  <div className="flex flex-1 items-center gap-4">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700 shadow-inner shadow-blue-100">
+                      {t(provider.labelKey)[0] ?? ''}
+                    </span>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-semibold tracking-wide text-slate-900">
+                        {t(provider.labelKey)}
+                      </p>
+                      <p className="text-[12px] uppercase tracking-[0.18em] text-slate-500">
+                        {t(provider.descriptionKey)}
+                      </p>
+                    </div>
                   </div>
-                  <span
-                    className={`${UI_CHIP_INTERACTIVE} h-8 min-w-16 border-blue-200/80 px-4 text-[11px] tracking-[0.2em] text-blue-700`}
-                  >
-                    {t('authProvidersBadge')}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`${UI_CHIP_INTERACTIVE} h-8 min-w-16 border-blue-200/80 px-4 text-[11px] tracking-[0.2em] text-blue-700`}
+                    >
+                      {t('authProvidersBadge')}
+                    </span>
+                    <svg
+                      aria-hidden="true"
+                      className="h-3.5 w-3.5 text-slate-400"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                    >
+                      <path
+                        d="M4 2l4 4-4 4"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
                 </button>
               ))}
             </div>
