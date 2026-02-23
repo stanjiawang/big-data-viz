@@ -1,6 +1,9 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { AUTH_SESSION_STORAGE_KEY, MOCK_AUTH_ACCOUNTS } from '../../src/auth/authClient';
+import type { AuthSession } from '../../src/auth/types';
 
 const SAMPLE_COUNT = Number(process.env.PERF_RENDER_SAMPLES ?? 3);
 const TARGET_DATASET_SIZE = Number(process.env.PERF_RENDER_DATASET_SIZE ?? 50_000_000);
@@ -11,10 +14,58 @@ const GRAPH_READY_TIMEOUT_MS = Number(process.env.PERF_GRAPH_READY_TIMEOUT_MS ??
 const SAMPLE_MAX_ATTEMPTS = Number(process.env.PERF_SAMPLE_MAX_ATTEMPTS ?? 3);
 const PERF_AUTH_EMAIL = process.env.PERF_AUTH_EMAIL ?? 'analyst@example.com';
 const PERF_AUTH_PASSWORD = process.env.PERF_AUTH_PASSWORD ?? 'DemoPass!123';
+const PERF_SESSION_TTL_MS = Number(process.env.PERF_SESSION_TTL_MS ?? 8 * 60 * 60 * 1000);
 const RENDER_BENCHMARK_ARTIFACT_PATH = path.resolve(
   process.cwd(),
   'artifacts/render-benchmark.json',
 );
+
+const primedPages = new WeakSet<Page>();
+
+function buildMockSession(): AuthSession {
+  const fallbackAccount =
+    MOCK_AUTH_ACCOUNTS.find((account) => account.email === PERF_AUTH_EMAIL) ||
+    MOCK_AUTH_ACCOUNTS[0];
+
+  if (!fallbackAccount) {
+    throw new Error('No mock accounts available to seed the render performance session.');
+  }
+
+  return {
+    accessToken: 'render-perf-mock-token',
+    expiresAt: Date.now() + PERF_SESSION_TTL_MS,
+    user: {
+      id: `mock-${fallbackAccount.email}`,
+      name: fallbackAccount.name,
+      email: fallbackAccount.email,
+      roles: fallbackAccount.roles,
+      tenantId: fallbackAccount.tenantId,
+    },
+  };
+}
+
+async function primeMockSession(page: Page) {
+  if (primedPages.has(page)) {
+    return;
+  }
+  primedPages.add(page);
+  const sessionPayload = buildMockSession();
+  await page.addInitScript(
+    ({ storageKey, payload }) => {
+      try {
+        window.sessionStorage?.setItem(storageKey, payload);
+      } catch {
+        /* noop */
+      }
+      try {
+        window.localStorage?.setItem(storageKey, payload);
+      } catch {
+        /* noop */
+      }
+    },
+    { storageKey: AUTH_SESSION_STORAGE_KEY, payload: JSON.stringify(sessionPayload) },
+  );
+}
 
 function median(values: number[]) {
   const sorted = [...values].sort((left, right) => left - right);
@@ -86,6 +137,7 @@ async function gotoDashboardAndWait(
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
+      await primeMockSession(page);
       await page.goto(url, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle');
 
@@ -109,6 +161,9 @@ async function gotoDashboardAndWait(
       return;
     } catch (error) {
       lastError = error;
+      console.warn(
+        `render-perf navigation attempt ${attempt} failed: ${error instanceof Error ? error.message : error}`,
+      );
       if (attempt < maxAttempts) {
         await page.waitForTimeout(500);
       }
