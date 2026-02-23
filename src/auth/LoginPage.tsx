@@ -34,20 +34,20 @@ type FederatedProvider = {
 };
 
 const OktaGlyph = () => (
-  <svg viewBox="0 0 36 36" className="h-4 w-4" fill="none">
-    <circle cx="18" cy="18" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
+  <svg viewBox="0 0 36 36" className="h-5 w-5" fill="none">
+    <circle cx="18" cy="18" r="10" stroke="currentColor" strokeWidth="3" />
     <circle cx="18" cy="18" r="4" fill="currentColor" />
   </svg>
 );
 
 const AzureGlyph = () => (
-  <svg viewBox="0 0 36 36" className="h-4 w-4" fill="currentColor">
+  <svg viewBox="0 0 36 36" className="h-5 w-5" fill="currentColor">
     <path d="M5 28h10l6-20h-9L5 28zm11 0h15l-9-11-6 11z" />
   </svg>
 );
 
 const OneLoginGlyph = () => (
-  <svg viewBox="0 0 36 36" className="h-4 w-4" fill="none">
+  <svg viewBox="0 0 36 36" className="h-5 w-5" fill="none">
     <circle cx="18" cy="18" r="12" stroke="currentColor" strokeWidth="3" />
     <circle cx="18" cy="18" r="6" fill="currentColor" />
   </svg>
@@ -71,7 +71,7 @@ const SsoShieldIcon = () => (
 );
 
 const ArrowIcon = () => (
-  <svg aria-hidden="true" className="h-3.5 w-3.5 text-slate-400" viewBox="0 0 12 12" fill="none">
+  <svg aria-hidden="true" className="h-3 w-3 text-slate-400" viewBox="0 0 12 12" fill="none">
     <path
       d="M4 2.25 7.75 6 4 9.75"
       stroke="currentColor"
@@ -189,25 +189,26 @@ export function LoginPage() {
                 >
                   <div className="flex flex-1 items-center gap-4">
                     <span
-                      className={`flex h-11 w-11 items-center justify-center rounded-2xl border border-white/60 bg-gradient-to-br ${provider.accentClass} text-base font-semibold shadow-[inset_0_1px_4px_rgb(255_255_255/55%)]`}
+                      className={`flex h-11 w-11 items-center justify-center rounded-2xl border border-white/60 bg-gradient-to-br ${provider.accentClass} text-slate-900/80 shadow-[inset_0_1px_4px_rgb(255_255_255/55%)]`}
                     >
                       {provider.icon}
                     </span>
                     <div className="flex flex-col gap-0.5">
-                      <p className="text-base font-semibold leading-tight tracking-tight text-slate-900">
+                      <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-slate-900">
                         {t(provider.labelKey)}
                       </p>
-                      <p className="text-[11px] uppercase tracking-[0.3em] text-slate-500">
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500/80">
                         {t(provider.descriptionKey)}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <span
-                      className={`${UI_CHIP_INTERACTIVE} h-8 min-w-0 gap-1 border-blue-200/80 px-3 text-[10px] tracking-[0.3em] text-blue-700`}
+                      role="img"
+                      aria-label={`${t(provider.labelKey)} ${t('authProvidersBadge')}`}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/70 bg-white/80 text-slate-500 transition group-hover:border-blue-200 group-hover:text-blue-600"
                     >
                       <SsoShieldIcon />
-                      {t('authProvidersBadge')}
                     </span>
                     <ArrowIcon />
                   </div>
