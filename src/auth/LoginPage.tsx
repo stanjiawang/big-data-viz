@@ -107,6 +107,8 @@ const FEDERATED_PROVIDERS: readonly FederatedProvider[] = [
 ];
 
 const SUPPORT_EMAIL = 'support@example.com';
+const PANEL_CARD_CLASS =
+  'rounded-3xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-8 shadow-[0_20px_60px_rgb(15_23_42/6%)]';
 
 export function LoginPage() {
   const { t } = useI18n();
@@ -172,7 +174,7 @@ export function LoginPage() {
         </div>
 
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <section className="rounded-3xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-8 shadow-[0_20px_60px_rgb(15_23_42/6%)]">
+          <section className={PANEL_CARD_CLASS}>
             <p className={UI_LABEL_CLASS}>{t('authProvidersTitle')}</p>
             <h2 className={`${UI_TEXT_TITLE_MD} mt-3`}>{t('authProvidersSubtitle')}</h2>
             <p className={`${UI_TEXT_BODY_SM} mt-3 text-slate-600`}>
@@ -229,7 +231,7 @@ export function LoginPage() {
             </div>
           </section>
 
-          <section className="rounded-3xl border border-slate-200 bg-white/95 p-8 shadow-[0_25px_80px_rgb(15_23_42/10%)]">
+          <section className={`${PANEL_CARD_CLASS} shadow-[0_25px_80px_rgb(15_23_42/10%)]`}>
             <p className={UI_LABEL_CLASS}>{t('authCredentialsTitle')}</p>
             <h2 className={`${UI_TEXT_TITLE_MD} mt-3`}>{t('authCredentialsSubtitle')}</h2>
             <p className={`${UI_TEXT_BODY_SM} mt-2 text-slate-600`}>{t('authCredentialHelper')}</p>
