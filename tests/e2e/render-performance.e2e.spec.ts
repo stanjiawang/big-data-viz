@@ -78,16 +78,19 @@ async function waitForVisibility(locator: ReturnType<Page['locator']>, timeoutMs
 }
 
 async function attemptCredentialLogin(page: Page) {
-  const loginEmailField = page.locator(
-    'input[type="email"], input[autocomplete="username"], input[name*="email" i]',
-  );
-  const loginPasswordField = page.locator(
-    'input[type="password"], input[autocomplete="current-password"], input[name*="password" i]',
-  );
+  const loginEmailField = page
+    .locator('input[type="email"], input[autocomplete="username"], input[name*="email" i]')
+    .first();
+  const loginPasswordField = page
+    .locator(
+      'input[type="password"], input[autocomplete="current-password"], input[name*="password" i]',
+    )
+    .first();
   const loginButton = page.getByRole('button', { name: /sign in|登录/i }).first();
   const loginHeading = page.getByRole('heading', { name: /sign in required|需要登录/i }).first();
 
   const loginDetected =
+    page.url().includes('/login') ||
     (await waitForVisibility(loginButton, 2_000)) ||
     (await waitForVisibility(loginHeading, 2_000)) ||
     (await waitForVisibility(loginEmailField, 2_000));
@@ -96,10 +99,27 @@ async function attemptCredentialLogin(page: Page) {
     return false;
   }
 
-  console.log(`${RENDER_PERF_LOG_PREFIX} credential form detected; submitting mock account.`);
-  await loginEmailField.first().fill(PERF_AUTH_EMAIL, { timeout: 5_000 });
-  await loginPasswordField.first().fill(PERF_AUTH_PASSWORD, { timeout: 5_000 });
+  console.log(
+    `${RENDER_PERF_LOG_PREFIX} credential form detected at ${page.url()}; submitting mock account.`,
+  );
+  await loginEmailField.fill(PERF_AUTH_EMAIL, { timeout: 5_000 });
+  await loginPasswordField.fill(PERF_AUTH_PASSWORD, { timeout: 5_000 });
   await loginButton.click({ timeout: 5_000 });
+  await page
+    .waitForURL(
+      (attemptUrl) => {
+        try {
+          const next = new URL(attemptUrl);
+          return !next.pathname.startsWith('/login');
+        } catch {
+          return !attemptUrl.includes('/login');
+        }
+      },
+      { timeout: PAGE_READY_TIMEOUT_MS },
+    )
+    .catch(() => {
+      console.warn(`${RENDER_PERF_LOG_PREFIX} login redirect timeout; continuing anyway.`);
+    });
   return true;
 }
 
@@ -176,6 +196,12 @@ async function gotoDashboardAndWait(
       await primeMockSession(page);
       await page.goto(url, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle');
+      await page
+        .locator('#root')
+        .waitFor({ state: 'attached', timeout: PAGE_READY_TIMEOUT_MS })
+        .catch(() => {
+          console.warn(`${RENDER_PERF_LOG_PREFIX} #root not attached within timeout.`);
+        });
       const sessionStatus = await page
         .evaluate(
           (storageKey) => window.sessionStorage?.getItem(storageKey) ?? null,
