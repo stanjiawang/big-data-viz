@@ -127,6 +127,10 @@ pnpm run test:e2e:a11y
 `sbom:generate` writes CycloneDX SBOM output to `artifacts/sbom.cdx.json`.
 `quality:dashboard` writes consolidated CI quality artifacts under `artifacts/`.
 
+### Prototype routes
+
+- `/labs/glass`: gated behind the existing auth flow, renders an experimental Apple-style “liquid glass” look using our existing layout. Use it to evaluate styling direction without affecting the main dashboard.
+
 ## Deployment
 
 - Deploy guide (Vercel + Cloudflare Pages): `docs/deploy.md`

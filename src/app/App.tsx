@@ -5,6 +5,7 @@ import { LoginPage } from '@/auth/LoginPage';
 import { AppProviders } from '@/app/providers/AppProviders';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { DashboardPage } from '@/features/dashboard';
+import { GlassPrototypePage } from '@/features/labs/GlassPrototypePage';
 import { useI18n } from '@/i18n/useI18n';
 
 function AppContent() {
@@ -23,6 +24,18 @@ function AppContent() {
         <AuthProvider enabled={runtimeConfig.enableAuth}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/labs/glass"
+              element={
+                <RequireAuth
+                  enabled={runtimeConfig.enableAuth}
+                  requiredRoles={runtimeConfig.authRequiredRoles}
+                  requireTenant={runtimeConfig.authRequireTenant}
+                >
+                  <GlassPrototypePage />
+                </RequireAuth>
+              }
+            />
             <Route
               path="/*"
               element={
