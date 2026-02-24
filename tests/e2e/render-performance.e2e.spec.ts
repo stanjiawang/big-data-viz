@@ -176,6 +176,20 @@ async function gotoDashboardAndWait(
       await primeMockSession(page);
       await page.goto(url, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle');
+      const sessionStatus = await page
+        .evaluate(
+          (storageKey) => window.sessionStorage?.getItem(storageKey) ?? null,
+          AUTH_SESSION_STORAGE_KEY,
+        )
+        .catch(() => null);
+      const enableAuthFlag = await page
+        .evaluate(() => (globalThis as { __APP_ENABLE_AUTH__?: string }).__APP_ENABLE_AUTH__)
+        .catch(() => 'unknown');
+      console.log(
+        `${RENDER_PERF_LOG_PREFIX} auth flag=${enableAuthFlag} session=${
+          sessionStatus ? 'present' : 'missing'
+        }`,
+      );
 
       const handledLogin = await attemptCredentialLogin(page);
       if (handledLogin) {
@@ -188,11 +202,17 @@ async function gotoDashboardAndWait(
     } catch (error) {
       lastError = error;
       const currentUrl = page.url();
+      const domPreview =
+        (await page
+          .content()
+          .then((html) => html.replace(/\s+/g, ' ').trim())
+          .catch(() => '')) || 'unavailable';
       console.warn(
         `${RENDER_PERF_LOG_PREFIX} navigation attempt ${attempt} failed (${currentUrl}): ${
           error instanceof Error ? error.message : error
         }`,
       );
+      console.warn(`${RENDER_PERF_LOG_PREFIX} DOM preview: ${domPreview.slice(0, 600)}`);
       if (attempt < maxAttempts) {
         await page.waitForTimeout(500);
       }
