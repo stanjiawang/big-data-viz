@@ -21,6 +21,7 @@ const RENDER_BENCHMARK_ARTIFACT_PATH = path.resolve(
 );
 
 const primedPages = new WeakSet<Page>();
+const consoleAttachedPages = new WeakSet<Page>();
 const RENDER_PERF_LOG_PREFIX = '[render-perf]';
 
 function buildMockSession(): AuthSession {
@@ -66,6 +67,21 @@ async function primeMockSession(page: Page) {
     },
     { storageKey: AUTH_SESSION_STORAGE_KEY, payload: JSON.stringify(sessionPayload) },
   );
+}
+
+function attachPageDebuggers(page: Page) {
+  if (consoleAttachedPages.has(page)) {
+    return;
+  }
+  consoleAttachedPages.add(page);
+  page.on('console', (message) => {
+    console.log(
+      `${RENDER_PERF_LOG_PREFIX} console ${message.type()}: ${message.text().slice(0, 500)}`,
+    );
+  });
+  page.on('pageerror', (error) => {
+    console.log(`${RENDER_PERF_LOG_PREFIX} pageerror: ${error.message}`);
+  });
 }
 
 async function waitForVisibility(locator: ReturnType<Page['locator']>, timeoutMs: number) {
@@ -194,6 +210,7 @@ async function gotoDashboardAndWait(
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       await primeMockSession(page);
+      attachPageDebuggers(page);
       await page.goto(url, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle');
       await page
