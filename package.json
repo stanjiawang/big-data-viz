@@ -34,7 +34,7 @@
     "test:dependency-policy": "node scripts/check-dependency-policy.mjs",
     "sbom:generate": "node scripts/generate-sbom.mjs",
     "quality:dashboard": "node scripts/generate-quality-dashboard.mjs",
-    "test:render-perf": "playwright test tests/e2e/render-performance.e2e.spec.ts --workers=1",
+    "test:render-perf": "VITE_ENABLE_MSW=false playwright test tests/e2e/render-performance.e2e.spec.ts --workers=1",
     "test:e2e:a11y": "playwright test tests/e2e/a11y.e2e.spec.ts"
   },
   "devDependencies": {

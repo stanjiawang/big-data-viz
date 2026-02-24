@@ -24,7 +24,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
-      VITE_ENABLE_MSW: 'true',
+      VITE_ENABLE_MSW: process.env.VITE_ENABLE_MSW ?? 'true',
       VITE_ENABLE_AUTH: authSuite ? 'true' : 'false',
       VITE_AUTH_PROVIDER: 'mock',
       VITE_API_BASE_URL: '',
