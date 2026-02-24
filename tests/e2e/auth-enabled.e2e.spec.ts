@@ -1,9 +1,13 @@
 import { expect, test } from '@playwright/test';
 
 async function signInWithMockAccount(page: import('@playwright/test').Page) {
-  await expect(page.getByRole('heading', { name: /Sign in required|需要登录/ })).toBeVisible();
-  await expect(page.getByText('analyst@example.com')).toBeVisible();
+  await expect(page).toHaveURL(/\/login(?:$|\?)/);
+  await expect(page.locator('input[type="email"]')).toBeVisible();
+  await expect(page.locator('input[type="password"]')).toBeVisible();
+  await page.locator('input[type="email"]').fill('analyst@example.com');
+  await page.locator('input[type="password"]').fill('DemoPass!123');
   await page.getByRole('button', { name: /Sign in|登录/ }).click();
+  await expect(page).not.toHaveURL(/\/login(?:$|\?)/, { timeout: 15_000 });
   await expect(
     page.getByRole('heading', { name: /Big Data Viz Lab|大数据可视化实验室/ }),
   ).toBeVisible({ timeout: 15_000 });
@@ -22,7 +26,8 @@ test('returns to auth gate after sign out', async ({ page }) => {
 
   await page.getByRole('button', { name: /Sign out|登出/ }).click();
 
-  await expect(page.getByRole('heading', { name: /Sign in required|需要登录/ })).toBeVisible();
+  await expect(page).toHaveURL(/\/login(?:$|\?)/);
+  await expect(page.locator('input[type="email"]')).toBeVisible();
 });
 
 test('supports auth bootstrap for large dataset overview and graph detail routes', async ({
