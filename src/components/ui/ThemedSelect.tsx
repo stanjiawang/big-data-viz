@@ -142,7 +142,7 @@ export function ThemedSelect({
                 left: menuStyle.left,
                 width: menuStyle.width,
               }}
-              className={`z-[200] max-h-72 overflow-auto rounded-xl border border-slate-200 bg-white p-1 shadow-lg ${listClassName ?? ''}`}
+              className={`liquid-panel-subtle z-[200] max-h-72 overflow-auto rounded-xl border border-slate-200 bg-white p-1 shadow-lg ${listClassName ?? ''}`}
             >
               {options.map((option) => {
                 const isSelected = option.value === value;

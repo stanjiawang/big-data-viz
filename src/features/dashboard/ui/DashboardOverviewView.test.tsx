@@ -10,6 +10,10 @@ jest.mock('@/components/ui/LanguageSwitcher', () => ({
   LanguageSwitcher: () => <div>LanguageSwitcherMock</div>,
 }));
 
+jest.mock('@/components/ui/LiquidSkinToggle', () => ({
+  LiquidSkinToggle: () => <div>LiquidSkinToggleMock</div>,
+}));
+
 jest.mock('@/features/dashboard/ui/FiltersPanel', () => ({
   FiltersPanel: () => <div>FiltersPanelMock</div>,
 }));

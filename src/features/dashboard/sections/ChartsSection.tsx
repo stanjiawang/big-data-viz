@@ -140,7 +140,7 @@ export function ChartsSection({
                     max={Math.max(0, timeXEnd - 1)}
                     value={timeXStart}
                     onChange={(event) => setTimeXStart(Number(event.target.value))}
-                    className="w-full accent-blue-600"
+                    className="liquid-range w-full accent-blue-600"
                   />
                 </label>
                 <label className="space-y-1 text-xs text-slate-600">
@@ -151,7 +151,7 @@ export function ChartsSection({
                     max={100}
                     value={timeXEnd}
                     onChange={(event) => setTimeXEnd(Number(event.target.value))}
-                    className="w-full accent-blue-600"
+                    className="liquid-range w-full accent-blue-600"
                   />
                 </label>
                 <label className="space-y-1 text-xs text-slate-600">

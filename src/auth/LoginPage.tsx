@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MOCK_AUTH_ACCOUNTS } from '@/auth/authClient';
 import { useAuth } from '@/auth/useAuth';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { LiquidSkinToggle } from '@/components/ui/LiquidSkinToggle';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import {
   UI_BUTTON_GHOST_SM,
@@ -107,7 +108,7 @@ const FEDERATED_PROVIDERS: readonly FederatedProvider[] = [
 ];
 
 const SUPPORT_EMAIL = 'support@example.com';
-const PANEL_CARD_CLASS = 'login-card rounded-3xl border p-8';
+const PANEL_CARD_CLASS = 'liquid-panel login-card rounded-3xl border p-8';
 
 export function LoginPage() {
   const { t } = useI18n();
@@ -151,7 +152,7 @@ export function LoginPage() {
   )}`;
 
   return (
-    <main id="app-main" className="min-h-screen bg-slate-50">
+    <main id="app-main" className="login-shell min-h-screen bg-slate-50">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-12 sm:px-6 lg:px-10">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-4">
@@ -166,9 +167,10 @@ export function LoginPage() {
               <li>- {t('authLoginBulletRbac')}</li>
             </ul>
           </div>
-          <div className="flex w-full flex-wrap items-center justify-end gap-2 lg:w-auto lg:self-start">
+          <div className="login-toggle-bar flex w-full flex-wrap items-center justify-end gap-2 rounded-2xl border border-slate-200/70 bg-white/80 p-2 shadow-[0_8px_20px_rgb(15_23_42/5%)] backdrop-blur-sm lg:w-auto lg:self-start">
             <LanguageSwitcher />
-            <ThemeToggle />
+            <ThemeToggle className="sm:w-[11.5rem]" />
+            <LiquidSkinToggle className="sm:w-[11.5rem]" />
           </div>
         </div>
 
@@ -184,7 +186,7 @@ export function LoginPage() {
                 <button
                   key={provider.id}
                   type="button"
-                  className={`login-provider-item ${UI_BUTTON_GHOST_SM} group w-full items-center justify-between gap-5 rounded-2xl border px-6 py-5 text-left text-slate-700 hover:-translate-y-0.5`}
+                  className={`liquid-panel-subtle login-provider-item ${UI_BUTTON_GHOST_SM} group w-full items-center justify-between gap-5 rounded-2xl border px-6 py-5 text-left text-slate-700 hover:-translate-y-0.5`}
                   onClick={() => void handleProviderClick(provider.id)}
                   disabled={isSubmitting}
                 >
@@ -216,7 +218,7 @@ export function LoginPage() {
                 </button>
               ))}
             </div>
-            <div className="login-help-card mt-6 rounded-2xl border p-4 text-sm text-slate-500">
+            <div className="liquid-panel-subtle login-help-card mt-6 rounded-2xl border p-4 text-sm text-slate-500">
               <p className="font-semibold text-slate-700">{t('authNeedHelp')}</p>
               <p className="mt-1">
                 {t('authContactSupport')}{' '}
@@ -287,8 +289,12 @@ export function LoginPage() {
               </p>
             ) : null}
             <div className="mt-6 flex flex-wrap gap-3 text-xs text-slate-500">
-              <span className={UI_CHIP_INTERACTIVE}>{t('authProvidersBadge')}</span>
-              <span className={UI_CHIP_INTERACTIVE}>{t('authCredentialsBadge')}</span>
+              <span className={`${UI_CHIP_INTERACTIVE} liquid-chip-accent`}>
+                {t('authProvidersBadge')}
+              </span>
+              <span className={`${UI_CHIP_INTERACTIVE} liquid-chip-accent`}>
+                {t('authCredentialsBadge')}
+              </span>
             </div>
           </section>
         </div>

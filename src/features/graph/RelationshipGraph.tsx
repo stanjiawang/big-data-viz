@@ -402,7 +402,7 @@ export function RelationshipGraph({
           </div>
 
           {selectedNodeData ? (
-            <div className="shrink-0 rounded-lg bg-white px-3 py-2.5 text-xs text-slate-700">
+            <div className="liquid-panel-subtle shrink-0 rounded-lg border border-slate-200/80 bg-white/95 px-3 py-2.5 text-xs text-slate-700">
               <div className={UI_LABEL_CLASS}>Selected node</div>
               <div className="mt-1 font-semibold">{selectedNodeData.id}</div>
               <div className="mt-1">Cluster: {selectedNodeData.group}</div>
@@ -412,7 +412,7 @@ export function RelationshipGraph({
 
           {legendItems.length > 0 ? (
             <div
-              className="shrink-0 space-y-1.5 rounded-lg bg-white px-3 py-2.5 text-xs text-slate-600"
+              className="liquid-panel-subtle shrink-0 space-y-1.5 rounded-lg border border-slate-200/80 bg-white/95 px-3 py-2.5 text-xs text-slate-600"
               tabIndex={0}
               aria-label="Graph legend"
             >

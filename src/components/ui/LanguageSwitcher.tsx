@@ -1,11 +1,15 @@
 import { ThemedSelect } from '@/components/ui/ThemedSelect';
 import { useI18n } from '@/i18n/useI18n';
 
-export function LanguageSwitcher() {
+type LanguageSwitcherProps = {
+  className?: string;
+};
+
+export function LanguageSwitcher({ className }: LanguageSwitcherProps = {}) {
   const { locale, setLocale, t } = useI18n();
 
   return (
-    <div className="w-full sm:w-[12rem]">
+    <div className={`w-full sm:w-[12.5rem] ${className ?? ''}`}>
       <ThemedSelect
         ariaLabel={t('language')}
         value={locale}
@@ -14,7 +18,7 @@ export function LanguageSwitcher() {
           { value: 'zh-CN', label: t('languageChinese') },
         ]}
         className="w-full"
-        triggerClassName="h-10 text-xs font-semibold normal-case tracking-[0.08em]"
+        triggerClassName="flex h-10 items-center justify-between text-xs font-semibold uppercase tracking-[0.1em]"
         listClassName="max-w-[24rem]"
         onChange={(nextValue) => setLocale(nextValue as typeof locale)}
         leadingIcon={

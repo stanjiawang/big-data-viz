@@ -1,3 +1,4 @@
+import { type CSSProperties, useState } from 'react';
 import { UI_BUTTON_GHOST_SM } from '@/components/ui/styleTokens';
 
 const HERO_BADGES = [
@@ -27,11 +28,106 @@ const GLASS_SECTIONS = [
   },
 ];
 
+type Glow = {
+  x: number;
+  y: number;
+};
+
+type GlassStyle = CSSProperties & {
+  '--glass-sheen'?: number | string;
+  '--glass-blur'?: string;
+  '--glow-x'?: string;
+  '--glow-y'?: string;
+};
+
+type InteractiveCardProps = {
+  title: string;
+  description: string;
+  items: string[];
+  sheen: number;
+  blur: number;
+};
+
+function InteractiveCard({ title, description, items, sheen, blur }: InteractiveCardProps) {
+  const [glow, setGlow] = useState<Glow>({ x: 50, y: 30 });
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setGlow({
+      x: ((event.clientX - rect.left) / rect.width) * 100,
+      y: ((event.clientY - rect.top) / rect.height) * 100,
+    });
+  };
+
+  const cardStyle: GlassStyle = {
+    '--glass-sheen': sheen,
+    '--glass-blur': `${blur}px`,
+    '--glow-x': `${glow.x}%`,
+    '--glow-y': `${glow.y}%`,
+  };
+
+  return (
+    <article
+      className="glass-card rounded-[28px] border px-7 py-8 text-slate-900 dark:text-slate-100"
+      style={cardStyle}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={() => setGlow({ x: 50, y: 30 })}
+    >
+      <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
+      <ul className="mt-6 space-y-3 text-sm text-slate-600 dark:text-slate-200">
+        {items.map((item) => (
+          <li key={item} className="flex items-center gap-3">
+            <span className="h-1.5 w-12 rounded-full bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-300" />
+            {item}
+          </li>
+        ))}
+      </ul>
+      <div className="mt-8 flex flex-wrap gap-3">
+        <button
+          type="button"
+          className={`${UI_BUTTON_GHOST_SM} glass-pill border-none bg-transparent px-6 text-slate-700 dark:text-slate-200`}
+        >
+          Try CTA
+        </button>
+        <button
+          type="button"
+          className="glass-pill rounded-full px-6 py-2 text-sm font-semibold text-slate-800 shadow-[0_15px_30px_rgb(15_23_42/25%)] dark:text-slate-100"
+        >
+          Secondary action
+        </button>
+      </div>
+    </article>
+  );
+}
+
 export function GlassPrototypePage() {
+  const [heroGlow, setHeroGlow] = useState<Glow>({ x: 60, y: 20 });
+  const [sheenIntensity, setSheenIntensity] = useState(0.45);
+  const [blurAmount, setBlurAmount] = useState(22);
+
+  const heroStyle: GlassStyle = {
+    '--glass-sheen': sheenIntensity,
+    '--glass-blur': `${blurAmount}px`,
+    '--glow-x': `${heroGlow.x}%`,
+    '--glow-y': `${heroGlow.y}%`,
+  };
+
   return (
     <div className="glass-bg min-h-screen px-6 py-10 text-slate-50">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10">
-        <header className="glass-card rounded-[32px] border px-8 py-10 text-left text-slate-900 dark:text-slate-100">
+        <header
+          className="glass-card rounded-[32px] border px-8 py-10 text-left text-slate-900 dark:text-slate-100"
+          style={heroStyle}
+          onPointerMove={(event) => {
+            const rect = event.currentTarget.getBoundingClientRect();
+            setHeroGlow({
+              x: ((event.clientX - rect.left) / rect.width) * 100,
+              y: ((event.clientY - rect.top) / rect.height) * 100,
+            });
+          }}
+          onPointerLeave={() => setHeroGlow({ x: 60, y: 20 })}
+        >
           <p className="text-sm uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">
             Apple liquid glass prototype
           </p>
@@ -64,37 +160,14 @@ export function GlassPrototypePage() {
 
         <section className="grid gap-8 lg:grid-cols-2">
           {GLASS_SECTIONS.map((section) => (
-            <article
+            <InteractiveCard
               key={section.title}
-              className="glass-card rounded-[28px] border px-7 py-8 text-slate-900 dark:text-slate-100"
-            >
-              <h2 className="text-lg font-semibold tracking-tight">{section.title}</h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                {section.description}
-              </p>
-              <ul className="mt-6 space-y-3 text-sm text-slate-600 dark:text-slate-200">
-                {section.items.map((item) => (
-                  <li key={item} className="flex items-center gap-3">
-                    <span className="h-1.5 w-12 rounded-full bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-300" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  className={`${UI_BUTTON_GHOST_SM} glass-pill border-none bg-transparent px-6 text-slate-700 dark:text-slate-200`}
-                >
-                  Try CTA
-                </button>
-                <button
-                  type="button"
-                  className="glass-pill rounded-full px-6 py-2 text-sm font-semibold text-slate-800 shadow-[0_15px_30px_rgb(15_23_42/25%)] dark:text-slate-100"
-                >
-                  Secondary action
-                </button>
-              </div>
-            </article>
+              title={section.title}
+              description={section.description}
+              items={section.items}
+              sheen={sheenIntensity}
+              blur={blurAmount}
+            />
           ))}
         </section>
 
@@ -107,6 +180,38 @@ export function GlassPrototypePage() {
                 render budgets predictable. If we upstream the look, we can reuse these classes
                 inside our shared Card/Button primitives.
               </p>
+              <div className="mt-6 space-y-4 text-sm">
+                <label className="block">
+                  <div className="mb-1 flex items-center justify-between text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                    <span>Sheen intensity</span>
+                    <span>{sheenIntensity.toFixed(2)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0.15}
+                    max={0.7}
+                    step={0.05}
+                    value={sheenIntensity}
+                    className="glass-range"
+                    onChange={(event) => setSheenIntensity(Number(event.target.value))}
+                  />
+                </label>
+                <label className="block">
+                  <div className="mb-1 flex items-center justify-between text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">
+                    <span>Blur amount</span>
+                    <span>{blurAmount.toFixed(0)}px</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={14}
+                    max={32}
+                    step={1}
+                    value={blurAmount}
+                    className="glass-range"
+                    onChange={(event) => setBlurAmount(Number(event.target.value))}
+                  />
+                </label>
+              </div>
             </div>
             <div className="flex flex-col gap-2 text-right text-sm text-slate-500 dark:text-slate-300">
               <span>Design system impact: Medium</span>

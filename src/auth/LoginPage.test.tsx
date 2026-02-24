@@ -12,6 +12,9 @@ jest.mock('@/components/ui/LanguageSwitcher', () => ({
 jest.mock('@/components/ui/ThemeToggle', () => ({
   ThemeToggle: () => <div data-testid="theme-toggle" />,
 }));
+jest.mock('@/components/ui/LiquidSkinToggle', () => ({
+  LiquidSkinToggle: () => <div data-testid="liquid-toggle" />,
+}));
 
 describe('LoginPage', () => {
   const signInMock = jest.fn().mockResolvedValue(undefined);

@@ -300,7 +300,7 @@ export function D3EmbeddingScatter({
             step={0.1}
             value={pointScale}
             onChange={(event) => setPointScale(Number(event.target.value))}
-            className="w-full accent-blue-600"
+            className="liquid-range w-full accent-blue-600"
           />
         </label>
         <label className="space-y-1">
@@ -315,7 +315,7 @@ export function D3EmbeddingScatter({
             step={0.05}
             value={pointOpacity}
             onChange={(event) => setPointOpacity(Number(event.target.value))}
-            className="w-full accent-blue-600"
+            className="liquid-range w-full accent-blue-600"
           />
         </label>
       </div>

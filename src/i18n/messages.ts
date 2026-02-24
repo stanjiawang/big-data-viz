@@ -14,6 +14,10 @@ export const messages = {
     themeLight: 'Light',
     themeDark: 'Dark',
     themeSwitchAria: 'Switch color theme',
+    liquidSkin: 'Liquid skin',
+    liquidSkinOn: 'On',
+    liquidSkinOff: 'Off',
+    liquidSkinSwitchAria: 'Toggle liquid glass styling',
 
     authLoading: 'Loading authentication...',
     authSignInRequired: 'Sign in required',
@@ -238,6 +242,10 @@ export const messages = {
     themeLight: '浅色',
     themeDark: '深色',
     themeSwitchAria: '切换页面主题',
+    liquidSkin: '液态皮肤',
+    liquidSkinOn: '开启',
+    liquidSkinOff: '关闭',
+    liquidSkinSwitchAria: '切换液态玻璃样式',
 
     authLoading: '正在加载身份验证...',
     authSignInRequired: '需要登录',

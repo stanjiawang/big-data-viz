@@ -159,9 +159,9 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
   }, [compareDatasetSize, compareEnabled, datasetSize, filters]);
 
   return (
-    <section className="rounded-2xl border border-slate-200/90 bg-white/90 px-5 py-4 text-xs text-slate-500 shadow-[0_8px_24px_rgb(15_23_42/7%)] backdrop-blur-[1px]">
+    <section className="liquid-panel rounded-2xl border border-slate-200/90 bg-white/90 px-5 py-4 text-xs text-slate-500 shadow-[0_8px_24px_rgb(15_23_42/7%)] backdrop-blur-[1px]">
       <div className="space-y-3 border-b border-slate-200/80 pb-3">
-        <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-3">
+        <div className="liquid-panel-subtle rounded-xl border border-slate-200/80 bg-slate-50/60 p-3">
           <label className="flex items-center gap-2 text-sm text-slate-600">
             <input
               type="checkbox"
@@ -169,6 +169,7 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
               onChange={(event) => setCompareEnabled(event.target.checked)}
               disabled={!canUseCompareMode}
               aria-describedby={!canUseCompareMode ? 'compare-mode-note' : undefined}
+              className="liquid-checkbox h-4 w-4 rounded border-slate-300 accent-blue-600"
             />
             {t('dashboardCompareMode')}
           </label>
@@ -202,11 +203,11 @@ export const DashboardControlPanel = memo(function DashboardControlPanel({
           </label>
         </div>
 
-        <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-3">
+        <div className="liquid-panel-subtle rounded-xl border border-slate-200/80 bg-slate-50/60 p-3">
           <div className="flex items-center justify-between gap-2">
             <span className={UI_LABEL_CLASS}>{t('realtimeMode')}</span>
             <span
-              className={`inline-flex h-8 min-w-24 items-center justify-center rounded-full border px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${realtimeStatusClass}`}
+              className={`liquid-chip inline-flex h-8 min-w-24 items-center justify-center rounded-full border px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${realtimeStatusClass}`}
             >
               {realtimeStatusLabel}
             </span>

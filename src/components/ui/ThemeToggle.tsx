@@ -27,7 +27,11 @@ function applyTheme(theme: Theme) {
   document.documentElement.style.colorScheme = theme;
 }
 
-export function ThemeToggle() {
+type ThemeToggleProps = {
+  className?: string;
+};
+
+export function ThemeToggle({ className }: ThemeToggleProps = {}) {
   const { t } = useI18n();
   const [theme, setTheme] = useState<Theme>(() => resolveInitialTheme());
 
@@ -41,7 +45,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      className={`${UI_BUTTON_GHOST_SM} w-full min-w-0 sm:w-auto sm:min-w-36`}
+      className={`${UI_BUTTON_GHOST_SM} w-full min-w-0 sm:min-w-36 ${className ?? ''}`}
       aria-label={t('themeSwitchAria')}
       onClick={() => setTheme(nextTheme)}
     >

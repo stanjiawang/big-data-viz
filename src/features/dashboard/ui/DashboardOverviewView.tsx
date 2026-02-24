@@ -8,6 +8,7 @@ import {
 import { useIsFetching, useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { LiquidSkinToggle } from '@/components/ui/LiquidSkinToggle';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { UI_BUTTON_GHOST_SM, UI_LABEL_CLASS } from '@/components/ui/styleTokens';
 import { invalidateDashboardQueries } from '@/features/dashboard/constants/queryInvalidation';
@@ -221,28 +222,31 @@ export function DashboardOverviewView({
       id="app-main"
       className="mx-auto grid w-full max-w-[1520px] gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
     >
-      <section className="space-y-4 rounded-3xl border border-slate-200/90 bg-white/90 p-6 shadow-[0_12px_30px_rgb(15_23_42/8%)] backdrop-blur-[1px]">
+      <section className="liquid-panel space-y-4 rounded-3xl border border-slate-200/90 bg-white/90 p-6 shadow-[0_12px_30px_rgb(15_23_42/8%)] backdrop-blur-[1px]">
         <div className="grid gap-4 xl:grid-cols-12 xl:items-start">
           <div className="xl:col-span-7">
             <PageHeader title={t('dashboardTitle')} subtitle={t('dashboardSubtitle')} />
           </div>
           <div className="flex flex-col gap-2 xl:col-span-5 xl:items-end">
-            <div className="flex w-full flex-wrap items-center justify-start gap-2 sm:justify-end">
-              <LanguageSwitcher />
-              <ThemeToggle />
+            <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-[minmax(12rem,1fr)_minmax(9rem,auto)] sm:auto-rows-[minmax(0,1fr)]">
+              <LanguageSwitcher className="sm:w-full" />
               {runtimeEnableAuth && isAuthenticated ? (
                 <button
                   type="button"
-                  className={`${ACTION_BUTTON_CLASS} w-full min-w-0 sm:w-auto sm:min-w-36`}
+                  className={`${ACTION_BUTTON_CLASS} w-full min-w-0 sm:w-full`}
                   onClick={() => void onSignOut()}
                 >
                   {t('authSignOut')}
                 </button>
-              ) : null}
+              ) : (
+                <div className="hidden sm:block" aria-hidden="true" />
+              )}
+              <ThemeToggle className="sm:w-full sm:min-w-[12rem]" />
+              <LiquidSkinToggle className="sm:w-full sm:min-w-[12rem]" />
             </div>
           </div>
         </div>
-        <div className="min-h-10 rounded-xl border border-slate-200/80 bg-slate-50/65 p-3">
+        <div className="chip-tray flex flex-wrap items-center gap-2">
           <DashboardHeaderBadges items={badgeItems} isLoading={isFetching} />
         </div>
       </section>

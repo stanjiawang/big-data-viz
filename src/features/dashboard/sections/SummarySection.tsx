@@ -125,7 +125,7 @@ export function SummarySection({
                 max={Math.max(0, barXEnd - 1)}
                 value={barXStart}
                 onChange={(event) => setBarXStart(Number(event.target.value))}
-                className="w-full accent-blue-600"
+                className="liquid-range w-full accent-blue-600"
               />
             </label>
             <label className="space-y-1 text-xs text-slate-600">
@@ -136,7 +136,7 @@ export function SummarySection({
                 max={100}
                 value={barXEnd}
                 onChange={(event) => setBarXEnd(Number(event.target.value))}
-                className="w-full accent-blue-600"
+                className="liquid-range w-full accent-blue-600"
               />
             </label>
             <label className="space-y-1 text-xs text-slate-600">
