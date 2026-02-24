@@ -167,7 +167,7 @@ export function LoginPage() {
               <li>- {t('authLoginBulletRbac')}</li>
             </ul>
           </div>
-          <div className="login-toggle-bar flex w-full flex-wrap items-center justify-end gap-2 rounded-2xl border border-slate-200/70 bg-white/80 p-2 shadow-[0_8px_20px_rgb(15_23_42/5%)] backdrop-blur-sm lg:w-auto lg:self-start">
+          <div className="flex w-full flex-wrap items-center justify-end gap-2 lg:w-auto lg:self-start">
             <LanguageSwitcher />
             <ThemeToggle className="sm:w-[11.5rem]" />
             <LiquidSkinToggle className="sm:w-[11.5rem]" />
