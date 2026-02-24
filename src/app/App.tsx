@@ -1,6 +1,7 @@
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { RequireAuth } from '@/auth/RequireAuth';
+import { LoginPage } from '@/auth/LoginPage';
 import { AppProviders } from '@/app/providers/AppProviders';
 import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { DashboardPage } from '@/features/dashboard';
@@ -18,17 +19,25 @@ function AppContent() {
       >
         {t('appSkipToMain')}
       </a>
-      <AuthProvider enabled={runtimeConfig.enableAuth}>
-        <RequireAuth
-          enabled={runtimeConfig.enableAuth}
-          requiredRoles={runtimeConfig.authRequiredRoles}
-          requireTenant={runtimeConfig.authRequireTenant}
-        >
-          <BrowserRouter>
-            <DashboardPage />
-          </BrowserRouter>
-        </RequireAuth>
-      </AuthProvider>
+      <BrowserRouter>
+        <AuthProvider enabled={runtimeConfig.enableAuth}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/*"
+              element={
+                <RequireAuth
+                  enabled={runtimeConfig.enableAuth}
+                  requiredRoles={runtimeConfig.authRequiredRoles}
+                  requireTenant={runtimeConfig.authRequireTenant}
+                >
+                  <DashboardPage />
+                </RequireAuth>
+              }
+            />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
     </>
   );
 }
