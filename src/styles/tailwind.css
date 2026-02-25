@@ -461,6 +461,13 @@ html[data-liquid='on'][data-theme='dark'] body {
       linear-gradient(180deg, #f1f5fb, #f8fbff);
   }
 
+  html[data-theme='dark'] .login-shell {
+    background:
+      radial-gradient(circle at 10% 4%, rgb(37 99 235 / 26%), transparent 34%),
+      radial-gradient(circle at 88% 6%, rgb(14 165 233 / 18%), transparent 36%),
+      linear-gradient(180deg, #050a18, #0a1326 70%, #060d1b);
+  }
+
   html[data-liquid='on'] .login-shell {
     background:
       radial-gradient(circle at 10% 6%, rgb(59 130 246 / 35%), transparent 35%),
@@ -565,12 +572,12 @@ html[data-liquid='on'][data-theme='dark'] body {
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
-    padding: 0 !important;
+    padding: 0.35rem 0.5rem !important;
   }
 
   html[data-liquid='on'] .chip-tray {
     border-radius: 999px;
-    padding: 0.4rem 0.6rem;
+    padding: 0.4rem 0.6rem !important;
     border: 1px solid rgb(255 255 255 / 25%) !important;
     background: linear-gradient(120deg, rgb(255 255 255 / 40%), rgb(255 255 255 / 12%)) !important;
     box-shadow:
@@ -784,10 +791,33 @@ html[data-liquid='on'][data-theme='dark'] body {
   }
 
   .liquid-checkbox {
+    appearance: none;
+    appearance: none;
+    display: inline-grid;
+    place-content: center;
+    margin: 0;
+    border: 1px solid rgb(148 163 184 / 70%);
+    border-radius: 0.25rem;
+    background-color: rgb(255 255 255 / 92%);
+    background-clip: padding-box;
     transition:
       box-shadow 150ms ease,
       border-color 150ms ease,
       background 150ms ease;
+  }
+
+  .liquid-checkbox::after {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 0.125rem;
+    transform: scale(0);
+    transition: transform 120ms ease;
+    background: rgb(37 99 235);
+  }
+
+  .liquid-checkbox:checked::after {
+    transform: scale(1);
   }
 
   html[data-liquid='on'] .liquid-checkbox {
@@ -803,6 +833,10 @@ html[data-liquid='on'][data-theme='dark'] body {
     border-color: rgb(147 197 253 / 90%);
   }
 
+  html[data-liquid='on'] .liquid-checkbox:checked::after {
+    background: rgb(29 78 216);
+  }
+
   html[data-liquid='on'][data-theme='dark'] .liquid-checkbox {
     background: rgb(15 23 42 / 70%);
     border-color: rgb(148 163 184 / 55%) !important;
@@ -814,5 +848,9 @@ html[data-liquid='on'][data-theme='dark'] body {
   html[data-liquid='on'][data-theme='dark'] .liquid-checkbox:checked {
     background: linear-gradient(140deg, rgb(37 99 235 / 70%), rgb(14 165 233 / 55%));
     border-color: rgb(96 165 250 / 75%);
+  }
+
+  html[data-liquid='on'][data-theme='dark'] .liquid-checkbox:checked::after {
+    background: rgb(224 242 254);
   }
 }

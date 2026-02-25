@@ -246,7 +246,7 @@ export function DashboardOverviewView({
             </div>
           </div>
         </div>
-        <div className="chip-tray flex flex-wrap items-center gap-2">
+        <div className="chip-tray mt-1 px-1.5 py-1 sm:px-2 sm:py-1.5">
           <DashboardHeaderBadges items={badgeItems} isLoading={isFetching} />
         </div>
       </section>
