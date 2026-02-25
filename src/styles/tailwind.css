@@ -792,7 +792,6 @@ html[data-liquid='on'][data-theme='dark'] body {
 
   .liquid-checkbox {
     appearance: none;
-    appearance: none;
     display: inline-grid;
     place-content: center;
     margin: 0;
