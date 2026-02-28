@@ -20,7 +20,7 @@ function AppContent() {
       >
         {t('appSkipToMain')}
       </a>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <AuthProvider enabled={runtimeConfig.enableAuth}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
