@@ -7,24 +7,25 @@ import { getRuntimeConfig } from '@/config/runtimeConfig';
 import { initPerformanceTelemetry } from '@/lib/performanceTelemetry';
 import { initGlobalErrorTracking } from '@/lib/telemetry';
 
+function getAppBaseUrl() {
+  return typeof __APP_BASE_URL__ !== 'undefined' && __APP_BASE_URL__ ? __APP_BASE_URL__ : '/';
+}
+
 export async function enableMocking(enabled: boolean) {
   if (enabled) {
     const { worker } = await import('@/mocks/browser');
     return worker.start({
       onUnhandledRequest: 'bypass',
+      serviceWorker: {
+        url: `${getAppBaseUrl()}mockServiceWorker.js`,
+      },
     });
   }
 
   return Promise.resolve();
 }
 
-export async function bootstrap({
-  rootId = 'root',
-  isDev = getRuntimeConfig().mode === 'development',
-}: {
-  rootId?: string;
-  isDev?: boolean;
-} = {}) {
+export async function bootstrap({ rootId = 'root' }: { rootId?: string } = {}) {
   const container = document.getElementById(rootId);
 
   if (!container) {
@@ -32,7 +33,7 @@ export async function bootstrap({
   }
 
   const config = getRuntimeConfig();
-  await enableMocking(isDev && config.enableMocking);
+  await enableMocking(config.enableMocking);
 
   createRoot(container).render(
     <StrictMode>

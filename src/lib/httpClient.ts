@@ -28,6 +28,19 @@ function buildUrl(path: string, baseUrl: string) {
   }
 
   if (!baseUrl) {
+    const appBasePath =
+      typeof __APP_BASE_URL__ !== 'undefined' && __APP_BASE_URL__ ? __APP_BASE_URL__ : '/';
+    const normalizedAppBasePath =
+      appBasePath && appBasePath !== '/' && path.startsWith('/')
+        ? appBasePath.endsWith('/')
+          ? appBasePath.slice(0, -1)
+          : appBasePath
+        : '';
+
+    if (normalizedAppBasePath) {
+      return `${normalizedAppBasePath}${path}`;
+    }
+
     return path;
   }
 

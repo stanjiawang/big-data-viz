@@ -38,6 +38,8 @@ jobs:
       - name: Build static site
         env:
           VITE_BASE_PATH: /big-data-viz/
+          VITE_API_BASE_URL: /big-data-viz
+          VITE_ENABLE_MSW: true
         run: pnpm run build
 
       - name: Add SPA fallback

@@ -11,6 +11,8 @@ import { useI18n } from '@/i18n/useI18n';
 function AppContent() {
   const runtimeConfig = getRuntimeConfig();
   const { t } = useI18n();
+  const basename =
+    typeof __APP_BASE_URL__ !== 'undefined' && __APP_BASE_URL__ ? __APP_BASE_URL__ : '/';
 
   return (
     <>
@@ -20,7 +22,7 @@ function AppContent() {
       >
         {t('appSkipToMain')}
       </a>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <BrowserRouter basename={basename}>
         <AuthProvider enabled={runtimeConfig.enableAuth}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />

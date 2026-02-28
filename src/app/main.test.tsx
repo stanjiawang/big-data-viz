@@ -24,14 +24,12 @@ describe('bootstrap', () => {
   it('renders the app when root exists', async () => {
     document.body.innerHTML = '<div id="root"></div>';
 
-    await bootstrap({ isDev: false });
+    await bootstrap();
 
     expect(renderMock).toHaveBeenCalled();
   });
 
   it('throws when root container is missing', async () => {
-    await expect(bootstrap({ isDev: false })).rejects.toThrow(
-      'Root container is missing in index.html',
-    );
+    await expect(bootstrap()).rejects.toThrow('Root container is missing in index.html');
   });
 });
