@@ -49,6 +49,9 @@ describe('msw handlers', () => {
     expect(handlers).toHaveLength(3);
     expect(http.get).toHaveBeenCalledTimes(3);
     expect(handlers.map((handler) => handler.info.method)).toEqual(['GET', 'GET', 'GET']);
+    handlers.forEach((handler) => {
+      expect(handler.info.path).toBeInstanceOf(RegExp);
+    });
   });
 
   it('parses numbers with fallback', () => {

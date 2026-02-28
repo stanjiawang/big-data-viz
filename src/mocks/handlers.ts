@@ -20,6 +20,11 @@ const ALLOWED_SOURCES = new Set<TrainingRecord['source'] | 'all'>([
   'synthetic',
 ]);
 const MAX_SEARCH_LENGTH = 64;
+const API_ROUTE_PATTERNS = {
+  mockData: /\/(?:big-data-viz\/)?api\/mock-data$/,
+  timeseries: /\/(?:big-data-viz\/)?api\/timeseries$/,
+  graph: /\/(?:big-data-viz\/)?api\/graph$/,
+} as const;
 
 function parseBoolean(value: string | null, fallback = false) {
   if (value === null || value === '') {
@@ -139,7 +144,7 @@ export function parseFilters(searchParams: URLSearchParams): MockFilters {
 }
 
 export const handlers = [
-  http.get('/api/mock-data', async ({ request }) => {
+  http.get(API_ROUTE_PATTERNS.mockData, async ({ request }) => {
     const { searchParams } = new URL(request.url);
     const controls = parseMockControls(searchParams);
     const authHeader = request.headers.get('authorization');
@@ -205,7 +210,7 @@ export const handlers = [
       },
     });
   }),
-  http.get('/api/timeseries', async ({ request }) => {
+  http.get(API_ROUTE_PATTERNS.timeseries, async ({ request }) => {
     const { searchParams } = new URL(request.url);
     const controls = parseMockControls(searchParams);
 
@@ -247,7 +252,7 @@ export const handlers = [
       },
     });
   }),
-  http.get('/api/graph', async ({ request }) => {
+  http.get(API_ROUTE_PATTERNS.graph, async ({ request }) => {
     const { searchParams } = new URL(request.url);
     const controls = parseMockControls(searchParams);
 
